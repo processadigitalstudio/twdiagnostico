@@ -1,0 +1,3402 @@
+[
+ {
+  "id": "UoL-A1-G01",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "My name is Valentina. I study at a university in the city and I love my programme.",
+  "stem": "I _____ eighteen years old and I live with my family in an apartment near the campus.",
+  "options": [
+   "am",
+   "is",
+   "are",
+   "be"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G02",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Daniel is studying in his first year at university. He works very hard and attends every class.",
+  "stem": "His favourite professor _____ very patient and always explains difficult concepts with clear examples.",
+  "options": [
+   "am",
+   "is",
+   "are",
+   "be"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G03",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "María and I met during the first week of the academic year and we became very good friends.",
+  "stem": "We _____ classmates in the same programme and we sit together in every lecture.",
+  "options": [
+   "am",
+   "is",
+   "are",
+   "be"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G04",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "A new student arrives at the faculty building. She looks lost and is searching for her classroom.",
+  "stem": "\\\"_____ you in the first-year group? I think our classroom is on the second floor,\\\" she asks.",
+  "options": [
+   "Am",
+   "Is",
+   "Are",
+   "Be"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G05",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Carlos has a brother called Andrés who lives and works in another city.",
+  "stem": "Andrés _____ a student anymore. He already graduated several years ago and now has a full-time job.",
+  "options": [
+   "isn't",
+   "aren't",
+   "am not",
+   "not is"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G06",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "It is the beginning of a new semester and Sofia has been shopping for all her university materials.",
+  "stem": "I _____ a new laptop, three notebooks, and all the textbooks I need for this term\\'s courses.",
+  "options": [
+   "has got",
+   "have got",
+   "am got",
+   "got"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G07",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The librarian is helping a new student register for the borrowing service at the front desk.",
+  "stem": "\\\"_____ she got a valid student card with her name and photo on it?\\\" the librarian asks.",
+  "options": [
+   "Have",
+   "Do",
+   "Has",
+   "Is"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G08",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Laura is applying for a customer service position at an international company in the city centre.",
+  "stem": "She _____ speak English and French fluently, which makes her an excellent candidate for the role.",
+  "options": [
+   "cans",
+   "is can",
+   "can",
+   "have can"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G09",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The university cafeteria is the most popular place for students to eat between their morning classes.",
+  "stem": "It _____ hot meals, sandwiches, fresh fruit, and drinks at prices that students can easily afford.",
+  "options": [
+   "serve",
+   "serving",
+   "served",
+   "serves"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G10",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Pedro follows a strict vegetarian diet for personal health and ethical reasons.",
+  "stem": "He _____ meat, fish, or poultry of any kind. He only eats vegetables, rice, beans, and eggs.",
+  "options": [
+   "don't eat",
+   "doesn't eats",
+   "doesn't eat",
+   "isn't eat"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G11",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Luisa is looking for a comfortable place to study that is close to where she lives.",
+  "stem": "Luckily, _____ a quiet café on the corner of her street that has free Wi-Fi and excellent coffee.",
+  "options": [
+   "There are",
+   "There is",
+   "It is",
+   "They are"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G12",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The new faculty building opened last year and students are very pleased with the modern facilities.",
+  "stem": "_____ three computer labs, a large reading room, and a rooftop terrace where students can relax.",
+  "options": [
+   "There is",
+   "It are",
+   "There are",
+   "They is"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G13",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Natalia received some very exciting news this morning that could change her career completely.",
+  "stem": "She has been offered _____ internship at a technology company that is based in the capital city.",
+  "options": [
+   "a",
+   "an",
+   "the",
+   "---"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G14",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The English professor is well-known across the faculty for her innovative and engaging approach.",
+  "stem": "_____ uses videos, games, and real conversations to help students develop their speaking skills.",
+  "options": [
+   "He",
+   "It",
+   "She",
+   "They"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-G15",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "There is an important sign at the entrance of the university examination hall.",
+  "stem": "The sign clearly states: \\\"_____ electronic devices of any kind during the examination period.\\\"",
+  "options": [
+   "Not use",
+   "Don't use",
+   "No using",
+   "Using not"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-V01",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Catalina has a very strong and loving relationship with all the members of her extended family.",
+  "stem": "Her mother\\'s mother is her _____. She is a wonderful woman of seventy-eight who is still very active.",
+  "options": [
+   "aunt",
+   "cousin",
+   "grandmother",
+   "sister"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-V02",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Simón has always dreamed of helping sick people and saving lives in his community.",
+  "stem": "After many years of university study, he became a _____ and now works in the emergency department.",
+  "options": [
+   "lawyer",
+   "doctor",
+   "teacher",
+   "engineer"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-V03",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "David needs to find several academic books and articles for an important assignment.",
+  "stem": "He goes to the university _____ every afternoon after class to search for the sources he needs.",
+  "options": [
+   "canteen",
+   "gym",
+   "office",
+   "library"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-V04",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The reading room has strict rules to help everyone concentrate and work effectively.",
+  "stem": "It is always very _____ inside. Students are not allowed to speak, eat, or use their phones there.",
+  "options": [
+   "busy",
+   "noisy",
+   "big",
+   "quiet"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-V05",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The climate in this city changes dramatically between the summer and winter months.",
+  "stem": "In December and January, the weather becomes very _____. Students need warm coats and scarves.",
+  "options": [
+   "hot",
+   "warm",
+   "cool",
+   "cold"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-V06",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The main lecture hall is used for the biggest classes and all official university events.",
+  "stem": "It is an extremely _____ room. More than three hundred students can sit there comfortably.",
+  "options": [
+   "tiny",
+   "narrow",
+   "large",
+   "low"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-V07",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Ana has a very organised daily schedule during the academic semester.",
+  "stem": "She has all her classes in the _____, so she can use the afternoons for studying and revision.",
+  "options": [
+   "evening",
+   "afternoon",
+   "night",
+   "morning"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-V08",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "After the accident on the sports field, the injured student needed urgent medical attention.",
+  "stem": "An ambulance was called and took him to the nearest _____, where doctors treated him immediately.",
+  "options": [
+   "school",
+   "office",
+   "hotel",
+   "hospital"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-V09",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The week of final examinations is by far the most demanding period of the academic year.",
+  "stem": "By Thursday evening, most students feel completely _____. They have been studying since early morning.",
+  "options": [
+   "energetic",
+   "happy",
+   "bored",
+   "tired"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-V10",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The academic year at the university is divided into two separate study periods.",
+  "stem": "The _____ semester runs from January to June, and the second semester runs from August to December.",
+  "options": [
+   "one",
+   "once",
+   "firstly",
+   "first"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-V11",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The university offers many additional services to help students during their studies.",
+  "stem": "English conversation sessions are completely _____ for all enrolled students every Tuesday evening.",
+  "options": [
+   "cheap",
+   "expensive",
+   "paid",
+   "free"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-V12",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Students need to know where their lessons take place before the semester begins.",
+  "stem": "The professor explained that all practical sessions would be held in a different _____ from the lectures.",
+  "options": [
+   "office",
+   "laboratory",
+   "classroom",
+   "canteen"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-V13",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The first year of university is a significant change from secondary school for most students.",
+  "stem": "Many first-year students find the transition _____ because they have to manage their time independently.",
+  "options": [
+   "easy",
+   "simple",
+   "exciting",
+   "difficult"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-C01",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The university timetable includes a 90-minute break in the middle of every teaching day.",
+  "stem": "Students usually _____ lunch together in the dining area before returning to their afternoon sessions.",
+  "options": [
+   "take",
+   "make",
+   "have",
+   "do"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-C02",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The last lecture of the day finishes at five o\\'clock in the afternoon.",
+  "stem": "After their final class, most students _____ home to eat dinner with their families and rest.",
+  "options": [
+   "make",
+   "do",
+   "go",
+   "take"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-C03",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The university sports facilities are available to all students every afternoon and at weekends.",
+  "stem": "Many students _____ a sport there after classes as a way to relax and stay healthy.",
+  "options": [
+   "make",
+   "do",
+   "go",
+   "play"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-C04",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The student health centre encourages all students to maintain an active and balanced lifestyle.",
+  "stem": "The doctor recommends that students _____ at least thirty minutes of physical exercise every day.",
+  "options": [
+   "make",
+   "take",
+   "have",
+   "do"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-C05",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "After a long and tiring week of exams, students need some time to relax and switch off.",
+  "stem": "Many students _____ a film at the cinema or at home on Friday evenings to celebrate the weekend.",
+  "options": [
+   "see",
+   "look",
+   "watch",
+   "view"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-C06",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The student realised she had left her textbook at home on an important day.",
+  "stem": "She decided to _____ a message to her classmate to ask if she could share her copy during the lesson.",
+  "options": [
+   "write",
+   "give",
+   "send",
+   "post"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-C07",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "It was the first day of term and many new students were trying to find their classrooms.",
+  "stem": "Several students _____ their way in the large building because the maps were not very clear.",
+  "options": [
+   "missed",
+   "got",
+   "lost",
+   "found"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-C08",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The university is located several kilometres from the city centre where many students live.",
+  "stem": "Every morning, Juliana _____ an early bus at 6:45 so she can arrive at campus before eight o\\'clock.",
+  "options": [
+   "takes",
+   "gets",
+   "catches",
+   "rides"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-C09",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "Meeting new people can feel uncomfortable at first, especially in an unfamiliar environment.",
+  "stem": "During orientation week, Diego found it easy to _____ a conversation with other students his age.",
+  "options": [
+   "begin",
+   "open",
+   "start",
+   "create"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-C10",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "University students need to balance their studies with other important areas of their lives.",
+  "stem": "Most students _____ time with their friends and families at the weekends to rest and recharge.",
+  "options": [
+   "use",
+   "pass",
+   "waste",
+   "spend"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-C11",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "Students who travel by public transport need to bring their study materials with them every day.",
+  "stem": "Most students _____ a backpack to university with their books, laptop, and water bottle inside.",
+  "options": [
+   "hold",
+   "take",
+   "carry",
+   "bring"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-C12",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The professor encouraged all students to participate actively during lectures.",
+  "stem": "\\\"Don\\'t be shy,\\\" she said. \\\"Feel free to _____ a question at any point if something is unclear.\\\"",
+  "options": [
+   "make",
+   "say",
+   "do",
+   "ask"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-P01",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The first lesson of each day begins very early. Punctuality is essential for all students.",
+  "stem": "All morning classes start _____ eight o\\'clock. The professor locks the door five minutes later.",
+  "options": [
+   "in",
+   "on",
+   "at",
+   "by"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-P02",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The faculty organises extra study sessions throughout the week to help students prepare for exams.",
+  "stem": "The voluntary English conversation group meets _____ Wednesdays at six in the evening.",
+  "options": [
+   "in",
+   "on",
+   "at",
+   "by"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-P03",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The university calendar divides the year into two distinct teaching periods separated by holidays.",
+  "stem": "The second semester begins _____ August and continues until December when the final exams take place.",
+  "options": [
+   "on",
+   "at",
+   "in",
+   "by"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-P04",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The professor announced where the practical session would take place for the following week.",
+  "stem": "\\\"Our next class will be _____ the computer laboratory on the ground floor,\\\" she explained clearly.",
+  "options": [
+   "on",
+   "at",
+   "in",
+   "by"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-P05",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "A student cannot find an important document that he needs for his afternoon appointment.",
+  "stem": "\\\"Your student card is _____ the desk, next to your laptop,\\\" his flatmate tells him helpfully.",
+  "options": [
+   "in",
+   "on",
+   "at",
+   "by"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-P06",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The university has recently opened a modern new health and wellness centre for all students.",
+  "stem": "The new centre is located _____ the sports hall, so students can use both facilities conveniently.",
+  "options": [
+   "in front of",
+   "behind",
+   "next to",
+   "between"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-P07",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The graduation ceremony takes place outdoors in the university gardens every December.",
+  "stem": "The graduating students stand _____ the main entrance for the traditional group photograph.",
+  "options": [
+   "next to",
+   "behind",
+   "between",
+   "in front of"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-P08",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The student break room is a small space where staff and students can relax during the day.",
+  "stem": "It is located _____ the main library and the administrative offices on the ground floor.",
+  "options": [
+   "in front of",
+   "next to",
+   "behind",
+   "between"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-P09",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "During the examination period, students choose different environments that suit their study style.",
+  "stem": "Valentina always prefers to study _____ home because she finds the library too cold and noisy.",
+  "options": [
+   "in",
+   "on",
+   "at",
+   "by"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A1-P10",
+  "skill": "UoL",
+  "level": "A1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The student could not see the information on the board because someone tall was sitting near her.",
+  "stem": "A student who was very tall was sitting right _____ her, completely blocking her view of the screen.",
+  "options": [
+   "in front of",
+   "next to",
+   "between",
+   "behind"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G01",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Last semester was an extremely demanding period for all the students in the programme.",
+  "stem": "Sofia _____ the library every single evening for three weeks to prepare for her final examinations.",
+  "options": [
+   "visit",
+   "visits",
+   "was visiting",
+   "visited"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G02",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The annual field trip to a nearby industrial facility was a highlight of the academic calendar.",
+  "stem": "The journey _____ approximately two hours by coach because of heavy traffic on the main road.",
+  "options": [
+   "takes",
+   "take",
+   "was taking",
+   "took"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G03",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Andrea needed to purchase several items before starting her laboratory course this term.",
+  "stem": "She _____ a scientific calculator, safety goggles, and a protective coat from the campus shop.",
+  "options": [
+   "buyed",
+   "buy",
+   "bought",
+   "buys"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G04",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The group of students had been looking forward to the excursion for several weeks.",
+  "stem": "Unfortunately, they _____ because the coach broke down before it even reached the university gate.",
+  "options": [
+   "didn't went",
+   "didn't go",
+   "don't went",
+   "wasn't go"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G05",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "A student receives an urgent phone call from her flatmate while she is at the library.",
+  "stem": "\\\"I can\\'t talk right now. I _____ an important email to the professor about the assignment deadline.\\\"",
+  "options": [
+   "write",
+   "wrote",
+   "am writing",
+   "is writing"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G06",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "After finishing her degree, Valentina has very clear and specific plans for her professional future.",
+  "stem": "She _____ apply for a postgraduate scholarship in another country as soon as she receives her results.",
+  "options": [
+   "goes to",
+   "is going to",
+   "will going",
+   "go to"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G07",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The professor is delivering a lecture about how technology is shaping the future of many professions.",
+  "stem": "\\\"Artificial intelligence _____ completely transform how we approach problem-solving in the next decade.\\\"",
+  "options": [
+   "is going",
+   "goes to",
+   "would",
+   "will"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G08",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The recently renovated campus library has much better resources than the previous building.",
+  "stem": "It is _____ than the old one and gives students access to thousands of digital journals and databases.",
+  "options": [
+   "more modern",
+   "moderner",
+   "most modern",
+   "more modernly"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G09",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The university has received several national awards for academic excellence over recent years.",
+  "stem": "Last year, independent reviewers officially ranked it as _____ institution in the region for technical education.",
+  "options": [
+   "the most good",
+   "the better",
+   "the best",
+   "the goodest"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G10",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The first-year students were finding the academic writing requirements very challenging.",
+  "stem": "The professor decided to create additional support materials to help _____ improve their written skills.",
+  "options": [
+   "they",
+   "their",
+   "them",
+   "theirs"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G11",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Marcela is widely regarded as one of the most punctual and dedicated students in the programme.",
+  "stem": "She _____ arrives late to any class. In fact, she is almost always the first person to sit down.",
+  "options": [
+   "always",
+   "usually",
+   "never",
+   "sometimes"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G12",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Students who participate in clinical placements must adhere to a strict professional code of conduct.",
+  "stem": "They _____ wear their full uniform at all times and maintain extremely high standards of personal hygiene.",
+  "options": [
+   "should",
+   "can",
+   "have to",
+   "must to"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G13",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The annual graduation ceremony was a deeply moving and memorable event for all those who attended.",
+  "stem": "All the families in the audience _____ incredibly proud and emotional when their children received their certificates.",
+  "options": [
+   "is",
+   "are",
+   "were",
+   "was"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G14",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "A classmate is feeling overwhelmed by the amount of work she has before the submission deadline.",
+  "stem": "\\\"Don\\'t stress about it,\\\" says Diego. \\\"I _____ help you with the research section this evening after class.\\\"",
+  "options": [
+   "am going to",
+   "would",
+   "will",
+   "going to"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-G15",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Dark clouds are rapidly filling the sky above the sports field where students are training.",
+  "stem": "\\\"Look at those clouds --- it _____ pour with rain very soon. We should move everything inside immediately.\\\"",
+  "options": [
+   "will",
+   "is going to",
+   "going to",
+   "would"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-V01",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Camila had been waiting anxiously for weeks to hear back from the national scholarship committee.",
+  "stem": "She was absolutely _____ when she finally read that she had been selected for the full award.",
+  "options": [
+   "boring",
+   "bored",
+   "exciting",
+   "excited"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-V02",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Andrés has been saving money for several months to buy the equipment he needs for his studies.",
+  "stem": "Unfortunately, the laptop model he wants is far too _____ for his current budget.",
+  "options": [
+   "cheap",
+   "affordable",
+   "free",
+   "expensive"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-V03",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "After six consecutive hours of studying at the library, Ricardo was beginning to feel very unwell.",
+  "stem": "He had a terrible _____ that was getting worse. His head was pounding and he could not focus.",
+  "options": [
+   "fever",
+   "cold",
+   "headache",
+   "cough"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-V04",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The academic conference included presentations from researchers across many different disciplines.",
+  "stem": "The final speaker was extremely _____. Half of the audience had stopped listening within ten minutes.",
+  "options": [
+   "bore",
+   "bored",
+   "boringly",
+   "boring"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-V05",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The career fair gave students direct access to professionals working in their field of study.",
+  "stem": "Most students said it was extremely _____ and that they came away with practical advice and contacts.",
+  "options": [
+   "useless",
+   "boring",
+   "useful",
+   "pointless"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-V06",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Sofia has always maintained a warm and friendly relationship with the people who live near her.",
+  "stem": "Her _____ is a kind elderly woman who sometimes brings food when Sofia is busy with exams.",
+  "options": [
+   "colleague",
+   "classmate",
+   "neighbour",
+   "flatmate"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-V07",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The new student accommodation was specifically designed with student wellbeing in mind.",
+  "stem": "The rooms are spacious and very _____. Each one has a bed, a desk, a wardrobe, and a private bathroom.",
+  "options": [
+   "tiny",
+   "uncomfortable",
+   "comfortable",
+   "cold"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-V08",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Before choosing a university programme, it is essential to research all available options carefully.",
+  "stem": "The admissions office provides all the _____ students need about courses, fees, and entry requirements.",
+  "options": [
+   "inform",
+   "informing",
+   "informative",
+   "information"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-V09",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The student union organises events throughout the year to bring the university community together.",
+  "stem": "The annual end-of-year celebration is by far the most _____ event on campus. Hundreds attend every year.",
+  "options": [
+   "boring",
+   "quiet",
+   "unpopular",
+   "popular"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-V10",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The professor handed back the corrected essays and reviewed the most common errors with the group.",
+  "stem": "She pointed out that the most frequent _____ was using incorrect verb tenses in academic writing.",
+  "options": [
+   "problem",
+   "mistake",
+   "difficulty",
+   "fault"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-V11",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The university recently invested a significant amount of money in upgrading its facilities.",
+  "stem": "The new engineering laboratories are equipped with _____ technology that reflects current industry standards.",
+  "options": [
+   "old",
+   "ancient",
+   "outdated",
+   "modern"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-V12",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Students in the first year receive a timetable at the beginning of each semester.",
+  "stem": "It is important to follow your _____ carefully so that you do not miss any important sessions or deadlines.",
+  "options": [
+   "plan",
+   "agenda",
+   "programme",
+   "schedule"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-V13",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The coastal city where the university is located attracts thousands of visitors every year.",
+  "stem": "The historic centre is absolutely _____. Its colonial architecture and colourful buildings are world-famous.",
+  "options": [
+   "beauty",
+   "beautifully",
+   "beautify",
+   "beautiful"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-C01",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The professor reminded students about the strict regulations for academic work at the end of class.",
+  "stem": "\\\"You must _____ your assignments through the online portal before midnight on the due date,\\\" she said.",
+  "options": [
+   "deliver",
+   "hand",
+   "submit",
+   "upload"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-C02",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "Students must demonstrate a minimum level of English before being permitted to advance to the next year.",
+  "stem": "Those who _____ the language assessment can enrol immediately in the advanced communication module.",
+  "options": [
+   "do",
+   "win",
+   "pass",
+   "finish"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-C03",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The professor operates a strict attendance policy across all her courses this academic year.",
+  "stem": "Students who _____ more than three sessions without a valid justification will lose the right to sit the exam.",
+  "options": [
+   "lose",
+   "skip",
+   "miss",
+   "absent"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-C04",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The outdoor event that the student association had planned had to be cancelled unexpectedly.",
+  "stem": "There was _____ rain all morning and the entire outdoor area was completely flooded by midday.",
+  "options": [
+   "strong",
+   "big",
+   "heavy",
+   "hard"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-C05",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The communications module requires students to demonstrate their ability to speak formally in English.",
+  "stem": "Each student must _____ a ten-minute individual presentation on a topic relevant to their future career.",
+  "options": [
+   "do",
+   "give",
+   "deliver",
+   "make"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-C06",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "Many students work part-time jobs in the evenings and at weekends to support their studies.",
+  "stem": "Tomás works at a local restaurant every Friday and Saturday to _____ money for his rent and living expenses.",
+  "options": [
+   "keep",
+   "hold",
+   "earn",
+   "save"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-C07",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "University life involves many costs that students need to manage carefully on a tight budget.",
+  "stem": "Most students _____ a significant amount of money on textbooks and stationery at the start of each term.",
+  "options": [
+   "use",
+   "waste",
+   "invest",
+   "spend"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-C08",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The faculty holds an annual competition to celebrate innovation and creativity among students.",
+  "stem": "The engineering team was delighted to _____ first prize for their project on renewable energy solutions.",
+  "options": [
+   "get",
+   "earn",
+   "gain",
+   "win"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-C09",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "Extracurricular activities are an excellent way to develop skills and meet new people at university.",
+  "stem": "Many students _____ a sports club, debate society, or volunteer group during their first semester.",
+  "options": [
+   "enter",
+   "sign up",
+   "join",
+   "register"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-C10",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The examination regulations are explained clearly to all students at the start of every academic year.",
+  "stem": "Any student who _____ a rule during an official assessment faces serious academic consequences.",
+  "options": [
+   "disobeys",
+   "ignores",
+   "breaks",
+   "bends"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-C11",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The professor told students about a famous professional who had overcome many obstacles.",
+  "stem": "He explained that she had worked extremely hard to _____ the top of her profession over thirty years.",
+  "options": [
+   "arrive at",
+   "get to",
+   "reach",
+   "climb to"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-C12",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The university runs a range of free workshops designed to support students throughout their studies.",
+  "stem": "Students are strongly encouraged to attend these sessions to _____ their academic and professional skills.",
+  "options": [
+   "develop",
+   "improve",
+   "grow",
+   "build"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-P01",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "Elena has demonstrated a remarkable natural talent for numbers and quantitative reasoning from a young age.",
+  "stem": "She is extremely good _____ mathematics and often helps her classmates understand difficult problems.",
+  "options": [
+   "in",
+   "on",
+   "at",
+   "for"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-P02",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "Before choosing a degree programme, Miguel spent months exploring different professional possibilities.",
+  "stem": "He had always been deeply interested _____ technology and how it could be used to solve real problems.",
+  "options": [
+   "about",
+   "for",
+   "on",
+   "in"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-P03",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "Public speaking consistently ranks as one of the most common fears among university students worldwide.",
+  "stem": "Many students admitted that they were genuinely afraid _____ presenting their work to a large audience.",
+  "options": [
+   "from",
+   "about",
+   "of",
+   "for"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-P04",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The student had studied at two different institutions before deciding to transfer to her current university.",
+  "stem": "She said the approach to teaching here was very different _____ anything she had experienced before.",
+  "options": [
+   "to",
+   "than",
+   "from",
+   "with"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-P05",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The student union conducted a survey to find out what activities students most wanted to get involved in.",
+  "stem": "The majority of first-year respondents said they were very keen _____ joining social and cultural groups.",
+  "options": [
+   "about",
+   "for",
+   "on",
+   "in"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-P06",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The graduation ceremony was a highly emotional occasion for the families of all the new graduates.",
+  "stem": "Every parent in the audience said they felt enormously proud _____ their child\\'s incredible achievement.",
+  "options": [
+   "about",
+   "for",
+   "of",
+   "with"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-P07",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The examination results have been taking much longer than expected to appear on the online portal.",
+  "stem": "Several students are extremely worried _____ their performance. They refresh the page every few minutes.",
+  "options": [
+   "of",
+   "for",
+   "with",
+   "about"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-P08",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The student spent an hour comparing two different course structures before making her final decision.",
+  "stem": "She concluded that the content of both programmes was very similar _____ each other in terms of topics covered.",
+  "options": [
+   "as",
+   "like",
+   "from",
+   "to"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-P09",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "Not all students feel equally confident or competent in every subject they encounter at university.",
+  "stem": "Rodrigo freely admits that he is quite bad _____ writing formal essays in English, but he is improving.",
+  "options": [
+   "in",
+   "on",
+   "at",
+   "for"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-A2-P10",
+  "skill": "UoL",
+  "level": "A2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The student had spent two weeks working on an essay only to discover the submission system had crashed.",
+  "stem": "She was understandably very angry _____ losing all her work and having to start again from scratch.",
+  "options": [
+   "of",
+   "with",
+   "at",
+   "about"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G01",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The professor is one of the most respected and experienced members of the teaching staff.",
+  "stem": "She has been teaching Environmental Engineering _____ the programme was first established over fifteen years ago.",
+  "options": [
+   "for",
+   "during",
+   "since",
+   "ago"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G02",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The research group has been working intensively on their environmental project for the past eight weeks.",
+  "stem": "They have _____ completed the fieldwork phase, but they have not yet begun writing the final analysis.",
+  "options": [
+   "still",
+   "yet",
+   "ever",
+   "already"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G03",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Technology has completely transformed the way that students study and access information.",
+  "stem": "Before smartphones became widespread, students _____ spend hours in the library searching through physical books.",
+  "options": [
+   "was used to",
+   "use to",
+   "would used to",
+   "used to"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G04",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The head of the faculty explained the serious academic consequences of persistent absenteeism.",
+  "stem": "\\\"If students miss more than twenty percent of scheduled classes, they _____ the right to sit the final exam.\\\"",
+  "options": [
+   "would lose",
+   "lose",
+   "will lose",
+   "are losing"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G05",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "During a career guidance workshop, the counsellor asked students to think about their professional goals.",
+  "stem": "\\\"If you _____ any career in the world without any financial concerns, what would you choose and why?\\\"",
+  "options": [
+   "can choose",
+   "could choose",
+   "will choose",
+   "chose"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G06",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The research team is currently reviewing the preliminary data collected from their field study.",
+  "stem": "The early results are promising, but the team _____ need to gather more samples before drawing any conclusions.",
+  "options": [
+   "will",
+   "can",
+   "must",
+   "might"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G07",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The institution is celebrating the achievements of its most distinguished graduates at a formal ceremony.",
+  "stem": "The keynote speaker, _____ graduated top of her class over a decade ago, is now a leading professional.",
+  "options": [
+   "which",
+   "whose",
+   "that",
+   "who"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G08",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The engineering students were in the middle of a critical laboratory experiment that afternoon.",
+  "stem": "They _____ their measurements carefully when the fire alarm suddenly sounded and they had to evacuate.",
+  "options": [
+   "recorded",
+   "had recorded",
+   "were recording",
+   "record"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G09",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Law students in the faculty have access to a rich variety of extracurricular activities throughout the year.",
+  "stem": "Most of them greatly enjoy _____ in the debate club because it develops their argumentation and speaking skills.",
+  "options": [
+   "participate",
+   "to participate",
+   "participated",
+   "participating"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G10",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The institution has earned a strong and well-deserved national reputation for technical education.",
+  "stem": "It _____ as one of the leading universities in the country for science and engineering programmes.",
+  "options": [
+   "considers",
+   "is considering",
+   "is considered",
+   "considered"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G11",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "After the lecture on climate change, students were discussing the key points that had been raised.",
+  "stem": "The professor said that global temperatures _____ at a rate that scientists had never observed before.",
+  "options": [
+   "are rising",
+   "rise",
+   "were rising",
+   "have risen"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G12",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The university received a substantial government grant to develop its research infrastructure.",
+  "stem": "_____, the administration confirmed that the funding would not be shared equally across all departments.",
+  "options": [
+   "Therefore",
+   "Although",
+   "However",
+   "Because"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G13",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The interdisciplinary research team has shown tremendous dedication throughout the entire academic year.",
+  "stem": "They _____ on this project continuously for over six months and are now ready to present their findings.",
+  "options": [
+   "worked",
+   "have been working",
+   "are working",
+   "had worked"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G14",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The competitive scholarship programme has very high entry requirements that not all students can meet.",
+  "stem": "Unfortunately, the applicant\\'s language level was _____ low to qualify. She needs further development first.",
+  "options": [
+   "very",
+   "so",
+   "too",
+   "much"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-G15",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "A student has been preparing intensively for the regional public speaking competition for weeks.",
+  "stem": "Her tutor told her that she was now confident _____ to compete and that she had an excellent chance of winning.",
+  "options": [
+   "too",
+   "very",
+   "so",
+   "enough"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-V01",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "After finishing her degree, Camila applied for several positions in different companies.",
+  "stem": "She finally found a great job _____ at a company she had always wanted to work for.",
+  "options": [
+   "opportunity",
+   "opportune",
+   "opportunistic",
+   "opportunely"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-V02",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "A public health researcher is studying the relationship between lifestyle habits and academic performance.",
+  "stem": "She found that chronic stress had a deeply _____ impact on students\\' ability to retain information.",
+  "options": [
+   "effective",
+   "affective",
+   "affecting",
+   "negative"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-V03",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Working as a student representative in the faculty council is a demanding and serious role.",
+  "stem": "It comes with significant _____ because the representative must voice the concerns of hundreds of students.",
+  "options": [
+   "responsible",
+   "responsibly",
+   "respond",
+   "responsibility"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-V04",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The career fair this year featured talks and exhibits from professionals across many different sectors.",
+  "stem": "Students said the presentations were extremely _____. They gained clear insights into career paths and salaries.",
+  "options": [
+   "information",
+   "informing",
+   "informative",
+   "informed"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-V05",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The student union has been campaigning for improved working conditions for students on campus.",
+  "stem": "They are calling on the administration to _____ the hourly rate paid to all student assistants significantly.",
+  "options": [
+   "rise",
+   "arose",
+   "risen",
+   "raise"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-V06",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "A major national transport disruption made it impossible to hold the scheduled academic events.",
+  "stem": "The regional student conference was _____ until the following month, when transport links were restored.",
+  "options": [
+   "cancelled",
+   "moved",
+   "postponed",
+   "delayed"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-V07",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The engineering team worked for two years on a project that attracted national media attention.",
+  "stem": "Winning the national innovation prize was their greatest academic _____ to date.",
+  "options": [
+   "success",
+   "result",
+   "achievement",
+   "performance"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-V08",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The community health outreach programme has been running for five years.",
+  "stem": "The project has been extremely _____ in improving health literacy in underserved communities.",
+  "options": [
+   "success",
+   "succeed",
+   "successfully",
+   "successful"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-V09",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Diego needs to choose a time for his weekly meeting with his academic advisor.",
+  "stem": "He prefers Tuesday afternoons because it is the most _____ time for his schedule.",
+  "options": [
+   "convenient",
+   "impossible",
+   "expensive",
+   "difficult"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-V10",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The law student was preparing her argument for the moot court competition.",
+  "stem": "A lawyer\\'s argument is only as strong as the quality of the _____ used to support each claim.",
+  "options": [
+   "proof",
+   "clue",
+   "evidence",
+   "data"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-V11",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The engineering team was tasked with redesigning the production process to reduce costs.",
+  "stem": "Their new method was far more _____ than the previous one, consuming significantly less energy.",
+  "options": [
+   "economic",
+   "economics",
+   "economically",
+   "economical"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-V12",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Ana is choosing a new laptop for her university work and wants one that will not break down often.",
+  "stem": "She decided to buy a well-known brand because it has a reputation for being _____ .",
+  "options": [
+   "reliable",
+   "expensive",
+   "heavy",
+   "old"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-V13",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Pedro has been practicing English every day for the past six months.",
+  "stem": "His teacher noticed a big _____ in his speaking skills during the last few weeks.",
+  "options": [
+   "improvement",
+   "improve",
+   "improving",
+   "improved"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-C01",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The graduating class selected one student to represent all of them at the formal ceremony.",
+  "stem": "She was nervous but managed to _____ a confident and moving speech in front of over four hundred people.",
+  "options": [
+   "give",
+   "say",
+   "deliver",
+   "make"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-C02",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "Sofia wants to work in international business after she graduates from university.",
+  "stem": "She took a summer internship abroad in order to _____ experience in a global company.",
+  "options": [
+   "gain",
+   "do",
+   "make",
+   "take"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-C03",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The internship coordinator emphasised the importance of gaining practical experience before graduating.",
+  "stem": "Working in a professional environment allows students to _____ skills that cannot be taught in a classroom.",
+  "options": [
+   "improve",
+   "grow",
+   "acquire",
+   "develop"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-C04",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The student representative attended the faculty board meeting to speak on behalf of her fellow students.",
+  "stem": "She _____ several serious concerns about the quality of the feedback students were receiving on assessments.",
+  "options": [
+   "lifted",
+   "mentioned",
+   "raised",
+   "brought"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-C05",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The new restaurant downtown has become extremely popular in just a few months.",
+  "stem": "Because of its sudden popularity, the owners now _____ a problem: they don't have enough tables for all their customers.",
+  "options": [
+   "face",
+   "do",
+   "make",
+   "catch"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-C06",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The transition from secondary school to higher education presents students with many new difficulties.",
+  "stem": "Students who develop strong organisational habits are much better equipped to _____ the challenges of university life.",
+  "options": [
+   "face",
+   "solve",
+   "overcome",
+   "avoid"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-C07",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The student had set herself very specific targets at the start of each academic year.",
+  "stem": "By the end of her degree, she had _____ every single goal she had written in her personal development plan.",
+  "options": [
+   "reached",
+   "won",
+   "achieved",
+   "completed"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-C08",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "Camila is working on an important project that must be finished by Friday.",
+  "stem": "She has been working extra hours every day this week to make sure she can _____ the deadline.",
+  "options": [
+   "meet",
+   "do",
+   "make",
+   "catch"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-C09",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "During the team meeting, everyone was asked to give their thoughts about the new proposal.",
+  "stem": "Even the quietest member of the team decided to _____ her opinion about the new plan.",
+  "options": [
+   "share",
+   "tell",
+   "say",
+   "speak"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-C10",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The department takes academic integrity very seriously and expects all students to behave responsibly.",
+  "stem": "Faculty members work hard to _____ high standards in both teaching and assessment throughout the year.",
+  "options": [
+   "keep",
+   "hold",
+   "maintain",
+   "ensure"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-C11",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "Reading widely outside the core curriculum is strongly encouraged by all the teaching staff.",
+  "stem": "Students who _____ their knowledge beyond the textbook tend to perform better in assessments.",
+  "options": [
+   "grow",
+   "widen",
+   "expand",
+   "increase"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-C12",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "Many students choose their degree based on the professional path they hope to follow after graduation.",
+  "stem": "She decided to _____ a career in public health after completing her internship at a regional clinic.",
+  "options": [
+   "follow",
+   "chase",
+   "seek",
+   "pursue"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-P01",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The newly appointed head of the research centre has extensive experience in academic leadership.",
+  "stem": "She is directly responsible _____ managing a team of thirty researchers and overseeing six ongoing projects.",
+  "options": [
+   "about",
+   "of",
+   "with",
+   "for"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-P02",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The outcome of the collaborative project remains uncertain at this intermediate stage.",
+  "stem": "Whether the team achieves its targets will largely depend _____ the quality and reliability of the collected data.",
+  "options": [
+   "about",
+   "in",
+   "on",
+   "from"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-P03",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The university introduced a revised attendance policy at the beginning of the current academic year.",
+  "stem": "The regulations state that excessive absences without valid justification will result _____ automatic course failure.",
+  "options": [
+   "on",
+   "from",
+   "to",
+   "in"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-P04",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The student had attempted the professional language certification twice before without passing.",
+  "stem": "After months of intensive preparation, she finally succeeded _____ passing with a distinction-level score.",
+  "options": [
+   "at",
+   "on",
+   "in",
+   "for"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-P05",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "University life involves managing multiple deadlines, social pressures, and financial concerns simultaneously.",
+  "stem": "Students who build strong support networks find it much easier to cope _____ the demands of academic life.",
+  "options": [
+   "about",
+   "in",
+   "on",
+   "with"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-P06",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The student had missed an important meeting with her supervisor without giving any prior warning.",
+  "stem": "She sent a formal email to apologise _____ her absence and requested a new appointment as soon as possible.",
+  "options": [
+   "about",
+   "of",
+   "for",
+   "with"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-P07",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The final weeks of the semester are the most critical period for all students\\' academic performance.",
+  "stem": "The professor advised the class to concentrate _____ revision and to minimise unnecessary distractions.",
+  "options": [
+   "in",
+   "at",
+   "about",
+   "on"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-P08",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The international exchange programme is one of the most competitive opportunities available to students.",
+  "stem": "Students who _____ in the scheme consistently report that it is a transformative personal and professional experience.",
+  "options": [
+   "attend",
+   "join",
+   "take part",
+   "participate"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-P09",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The lecturer presented two contrasting theories about urban planning during the seminar.",
+  "stem": "Most students said they agreed _____ the second approach because it prioritised community wellbeing over profit.",
+  "options": [
+   "to",
+   "on",
+   "with",
+   "about"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B1-P10",
+  "skill": "UoL",
+  "level": "B1",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The student representative gathered feedback from peers to present at the monthly faculty meeting.",
+  "stem": "Many students were complaining _____ the lack of available study spaces during the examination period.",
+  "options": [
+   "of",
+   "for",
+   "at",
+   "about"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G01",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "A technology company failed to secure a major government contract despite months of preparation.",
+  "stem": "If the development team _____ the prototype more thoroughly, they would almost certainly have won the bid.",
+  "options": [
+   "tested",
+   "had tested",
+   "would test",
+   "has tested"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G02",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "A talented engineer turned down a prestigious international opportunity during her final year of study.",
+  "stem": "If she _____ that position, she would be working at a leading global firm with excellent career prospects right now.",
+  "options": [
+   "took",
+   "takes",
+   "had taken",
+   "would take"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G03",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The researcher is deeply frustrated by the restrictions placed on funding for independent scientific projects.",
+  "stem": "She wishes the government _____ considerably more resources to basic research and innovation programmes.",
+  "options": [
+   "allocates",
+   "allocated",
+   "will allocate",
+   "has allocated"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G04",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The graduate is reflecting honestly on some of the decisions he made during his time at university.",
+  "stem": "He wishes he _____ more time building professional relationships while he still had access to industry events.",
+  "options": [
+   "spent",
+   "spends",
+   "had spent",
+   "would spend"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G05",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The findings of the two-year collaborative study on water quality have attracted considerable attention.",
+  "stem": "The results _____ in several of the country\\'s most respected peer-reviewed scientific journals this year.",
+  "options": [
+   "has published",
+   "have been published",
+   "published",
+   "is publishing"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G06",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The institution enforces strict and non-negotiable regulations on the submission of academic work.",
+  "stem": "All dissertations _____ through a certified plagiarism detection system before they can receive approval.",
+  "options": [
+   "must pass",
+   "must be passed",
+   "should pass",
+   "ought pass"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G07",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The regional innovation award was presented at a formal ceremony attended by industry leaders.",
+  "stem": "By the time the panel announced the winner, the young engineers _____ on their project for nearly three years.",
+  "options": [
+   "have been",
+   "has been",
+   "had been",
+   "would have been"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G08",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The university completed several campus improvements last year. Students have noticed the difference in many buildings.",
+  "stem": "The main library, _____ was renovated last year, now has a much larger study area and better lighting.",
+  "options": [
+   "that",
+   "which",
+   "who",
+   "whom"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G09",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "Marco struggled with his first year at university. He eventually adapted well to his studies.",
+  "stem": "_____ several difficulties at the beginning, Marco managed to pass all his first-year courses with good grades.",
+  "options": [
+   "Despite having",
+   "Although had",
+   "Despite of having",
+   "In spite having"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G10",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The research consortium is experiencing significant delays due to complications with the data collection phase.",
+  "stem": "They have reluctantly decided to put the final conference presentation _____ by four weeks to resolve the issues.",
+  "options": [
+   "up",
+   "out",
+   "off",
+   "through"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G11",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The student submitted an outstanding dissertation that left every member of the evaluation panel impressed.",
+  "stem": "She _____ an enormous amount of time and effort preparing the literature review. The quality is exceptional.",
+  "options": [
+   "must spend",
+   "must have spent",
+   "should have spent",
+   "might have spent"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G12",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The report submitted to the board of directors contains numerous factual errors and serious inconsistencies.",
+  "stem": "The author _____ it carefully before sending it. The mistakes are far too basic to have been overlooked.",
+  "options": [
+   "can't have proofread",
+   "mustn't have proofread",
+   "couldn't proofread",
+   "shouldn't have proofread"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G13",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The organisation is undergoing a comprehensive digital overhaul in preparation for a major inspection.",
+  "stem": "The director has _____ all internal reporting systems completely redesigned and automated over the past month.",
+  "options": [
+   "had",
+   "got",
+   "been having",
+   "made"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G14",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "During a routine check, the manager wanted to know whether a report had already been submitted.",
+  "stem": "The manager asked the new employee _____ she had finished the report yet.",
+  "options": [
+   "if",
+   "that",
+   "did she",
+   "does she"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-G15",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Gramatica",
+  "type": "Estructural",
+  "context": "The doctoral candidate is making excellent progress and is expected to complete her work on schedule.",
+  "stem": "By this time next year, she _____ all the required fieldwork and submitted the final version of her dissertation.",
+  "options": [
+   "will complete",
+   "will have completed",
+   "is completing",
+   "would complete"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-V01",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "A team of researchers studied customer satisfaction before and after a company introduced a new training program for its staff.",
+  "stem": "The final report showed a _____ improvement in customer satisfaction scores after the program began.",
+  "options": [
+   "substantial",
+   "minor",
+   "occasional",
+   "unclear"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-V02",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "A running coach is reviewing the performance records of two athletes preparing for a competition.",
+  "stem": "One athlete's times vary a lot from week to week, but the other has remained remarkably _____ throughout the season.",
+  "options": [
+   "consistent",
+   "comprehensive",
+   "occasional",
+   "reluctant"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-V03",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The review committee examined the programme from multiple perspectives before reaching their conclusions.",
+  "stem": "The _____ concern was whether graduates were being adequately prepared for the real demands of the workforce.",
+  "options": [
+   "principled",
+   "principally",
+   "principle",
+   "principal"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-V04",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The research ethics committee spent three months carefully reviewing the controversial proposal.",
+  "stem": "After extensive deliberation, they formally _____ it, citing insufficient evidence of methodological soundness.",
+  "options": [
+   "turned down",
+   "said no to",
+   "rejected",
+   "didn't accept"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-V05",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The trade agreement signed between the two countries ended decades of economic tension.",
+  "stem": "Commentators across the political spectrum described it as a _____ moment for the entire region.",
+  "options": [
+   "historical",
+   "history",
+   "historian",
+   "historic"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-V06",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The longitudinal study followed five hundred graduates across the first decade of their careers.",
+  "stem": "It revealed a _____ correlation between early mentorship experience and long-term professional achievement.",
+  "options": [
+   "notable",
+   "big",
+   "significant",
+   "large"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-V07",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "Some academics argue that overreliance on technology may weaken students\\' independent thinking.",
+  "stem": "They suggest that excessive use of automated tools could _____ students\\' capacity for critical analysis.",
+  "options": [
+   "damage",
+   "reduce",
+   "undermine",
+   "break"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-V08",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "A company wants to introduce a new software system, but several long-time employees still prefer the old one.",
+  "stem": "Many of the older staff members seem _____ to adopt the new system, even after several training sessions.",
+  "options": [
+   "reluctant",
+   "eager",
+   "qualified",
+   "responsible"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-V09",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "During the storm season, certain coastal towns experience much more damage than others.",
+  "stem": "Communities built close to the shoreline are particularly _____ to flooding during severe storms.",
+  "options": [
+   "vulnerable",
+   "responsible",
+   "reluctant",
+   "confident"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-V10",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "City officials met to discuss the growing problem of traffic congestion in the downtown area.",
+  "stem": "The council proposed several new policies to _____ the issue before it affects the local economy further.",
+  "options": [
+   "tackle",
+   "ignore",
+   "celebrate",
+   "delay"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-V11",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The research paper drew on contributions from scholars working across three different disciplines.",
+  "stem": "In their conclusion, the authors formally _____ the work of all previous researchers whose findings had shaped theirs.",
+  "options": [
+   "admitted",
+   "recognised",
+   "acknowledged",
+   "accepted"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-V12",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "The quality assurance department is responsible for maintaining the institution\\'s academic standards.",
+  "stem": "Its core function is to _____ that all degree programmes fully comply with national accreditation criteria.",
+  "options": [
+   "assure",
+   "insure",
+   "ensure",
+   "guarantee"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-V13",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Vocabulario",
+  "type": "Léxico en contexto",
+  "context": "There is growing pressure on organisations to be more open about how they make important decisions.",
+  "stem": "Stakeholders are demanding that the decision-making process be fully _____ and accessible to the public.",
+  "options": [
+   "honest",
+   "open",
+   "transparent",
+   "clear"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-C01",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "A group of university students organized a campaign about the importance of recycling on campus.",
+  "stem": "Their goal was to _____ awareness among students about reducing plastic waste.",
+  "options": [
+   "raise",
+   "do",
+   "make",
+   "take"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-C02",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The research team has invested years of effort into developing an innovative energy storage system.",
+  "stem": "Their persistence has finally begun to _____ results. The prototype is performing beyond expectations.",
+  "options": [
+   "produce",
+   "give",
+   "yield",
+   "show"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-C03",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "After years of consistent research, a young scientist finally published a study that attracted attention from experts around the world.",
+  "stem": "Her work helped her _____ recognition within the international scientific community.",
+  "options": [
+   "gain",
+   "do",
+   "make",
+   "take"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-C04",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The vocational training initiative was created to address a serious and well-documented skills shortage.",
+  "stem": "Its primary aim is to _____ the gap between what universities teach and the competencies employers actually need.",
+  "options": [
+   "fill",
+   "close",
+   "bridge",
+   "narrow"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-C05",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The committee spent several hours discussing different options for the new company policy.",
+  "stem": "After a long debate, the members were finally able to _____ a consensus on how to proceed.",
+  "options": [
+   "reach",
+   "do",
+   "make",
+   "take"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-C06",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The university senate convened an emergency meeting to discuss a growing problem among the student body.",
+  "stem": "The rector emphasised the importance of _____ the issue proactively rather than waiting for it to escalate.",
+  "options": [
+   "deal with",
+   "resolve",
+   "address",
+   "handle"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-C07",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The new sports science department began working with student athletes to improve their competitive results.",
+  "stem": "The training programme was specifically designed to _____ performance during high-pressure competitions.",
+  "options": [
+   "improve",
+   "raise",
+   "boost",
+   "increase"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-C08",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The company's new advertising campaign used bright colors and an unusual slogan.",
+  "stem": "The unusual approach managed to _____ attention from a much younger audience than expected.",
+  "options": [
+   "attract",
+   "do",
+   "make",
+   "take"
+  ],
+  "correct": 0,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-C09",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The laboratory had been operating with outdated equipment for several years due to budget constraints.",
+  "stem": "The team finally _____ funding from a private foundation to purchase the technology they urgently needed.",
+  "options": [
+   "obtained",
+   "won",
+   "secured",
+   "received"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-C10",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "The interdisciplinary module was designed to expose students to perspectives from different fields.",
+  "stem": "The aim was to _____ students\\' understanding of complex social problems that no single discipline can explain.",
+  "options": [
+   "improve",
+   "grow",
+   "deepen",
+   "enhance"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-C11",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "Employers look for candidates who show genuine dedication to their professional development.",
+  "stem": "Students can _____ their commitment to a field by volunteering, publishing, or presenting at conferences.",
+  "options": [
+   "show",
+   "prove",
+   "demonstrate",
+   "express"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-C12",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Colocaciones",
+  "type": "Combinación léxica",
+  "context": "Regulators have given the industry a five-year timeline to eliminate the use of harmful substances.",
+  "stem": "The new legislation requires all manufacturers to _____ the use of certain chemicals by the end of the decade.",
+  "options": [
+   "end",
+   "remove",
+   "phase out",
+   "eliminate"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-P01",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "A controversy emerged after the publication of the annual financial audit of the institution.",
+  "stem": "Several senior administrators were formally accused _____ misallocating public research funds over multiple years.",
+  "options": [
+   "for",
+   "with",
+   "about",
+   "of"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-P02",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The research supervisor has exceptionally high standards for all academic work produced in her department.",
+  "stem": "She insists _____ rigorous referencing practices and will not approve any submission that fails to meet them.",
+  "options": [
+   "in",
+   "about",
+   "for",
+   "on"
+  ],
+  "correct": 3,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-P03",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The new postgraduate programme was designed in close collaboration with leading industry partners.",
+  "stem": "It _____ four advanced taught modules, a methodology seminar, and an independent research dissertation.",
+  "options": [
+   "is consisted of",
+   "consists of",
+   "consists in",
+   "consist from"
+  ],
+  "correct": 1,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-P04",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "Several international companies have expressed strong interest in the university\\'s applied research capabilities.",
+  "stem": "The firms are eager to _____ in joint ventures that could lead to commercially viable technological applications.",
+  "options": [
+   "put",
+   "spend",
+   "invest",
+   "place"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-P05",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The student volunteering scheme has had a measurable positive impact on several local communities.",
+  "stem": "Each participant _____ to building stronger, more meaningful relationships between the university and the city.",
+  "options": [
+   "adds",
+   "gives",
+   "contributes",
+   "provides"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-P06",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "Institutions that receive government funding must adhere strictly to a range of regulatory requirements.",
+  "stem": "Any organisation that fails to _____ with national accreditation standards faces the risk of losing its licence.",
+  "options": [
+   "follow",
+   "obey",
+   "comply",
+   "agree"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-P07",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The faculty senate debated the proposed changes to the examination format at considerable length.",
+  "stem": "Several senior professors strongly _____ to the reforms, arguing they would disadvantage less privileged students.",
+  "options": [
+   "disagreed",
+   "complained",
+   "objected",
+   "protested"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-P08",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The research team published their first findings and received very positive feedback from the academic community.",
+  "stem": "They plan to _____ on this success by expanding the scope of their study in the following year.",
+  "options": [
+   "rely",
+   "improve",
+   "build",
+   "draw"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-P09",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The quality assurance team was given a six-month mandate to evaluate all academic programmes.",
+  "stem": "They _____ out a thorough review of assessment practices, student outcomes, and faculty development activities.",
+  "options": [
+   "did",
+   "conducted",
+   "carried",
+   "performed"
+  ],
+  "correct": 2,
+  "audio_id": null
+ },
+ {
+  "id": "UoL-B2-P10",
+  "skill": "UoL",
+  "level": "B2",
+  "category": "Preposiciones",
+  "type": "Prepositional",
+  "context": "The consultant was asked to advise the organisation on developing a new strategic plan.",
+  "stem": "She _____ on over twenty years of experience working in the sector to formulate her key recommendations.",
+  "options": [
+   "relied",
+   "used",
+   "drew",
+   "built"
+  ],
+  "correct": 2,
+  "audio_id": null
+ }
+]
