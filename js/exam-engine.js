@@ -1,6 +1,6 @@
 import { db } from "./firebase-config.js";
 import {
-  doc, getDoc, setDoc, updateDoc, collection, serverTimestamp
+  doc, getDoc, setDoc, updateDoc, arrayUnion, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import {
   N_PER_SKILL, LEVEL_DISTRIBUTION, LEVELS_ORDER, WEIGHTS,
@@ -26,21 +26,17 @@ function simpleHash(str) {
   return Math.abs(h);
 }
 
-// 4 patrones de rotación para no sesgar siempre el mismo nivel con el "extra"
-function getLevelDistributionFor(accessCode) {
+function getLevelDistributionFor(username) {
   const patterns = [
     { A1: 5, A2: 5, B1: 4, B2: 4 },
     { A2: 5, B1: 5, A1: 4, B2: 4 },
     { B1: 5, B2: 5, A1: 4, A2: 4 },
     { B2: 5, A1: 5, A2: 4, B1: 4 }
   ];
-  const idx = simpleHash(accessCode) % patterns.length;
+  const idx = simpleHash(username) % patterns.length;
   return patterns[idx];
 }
 
-// Selección estratificada: dentro de cada nivel, reparte lo más parejo
-// posible entre las categorías presentes (round-robin), para que Moodle-like
-// aleatoriedad no favorezca siempre la misma subcategoría.
 function pickForLevel(bankLevelItems, count) {
   const byCategory = {};
   for (const it of bankLevelItems) {
@@ -56,7 +52,6 @@ function pickForLevel(bankLevelItems, count) {
     const pool = byCategory[cat];
     if (pool.length > 0) picked.push(pool.pop());
     ci++;
-    // salvaguarda: si ya no hay items en ninguna categoría, corta el loop
     if (cats.every(c => byCategory[c].length === 0) && picked.length < count) break;
   }
   return picked;
@@ -77,8 +72,8 @@ export async function loadAllBanks() {
 }
 
 // ---------- construir la sesión de examen ----------
-export function buildExamItems(banks, accessCode) {
-  const distribution = getLevelDistributionFor(accessCode);
+export function buildExamItems(banks, username) {
+  const distribution = getLevelDistributionFor(username);
   const skills = ["UoL", "Reading", "Listening"];
   const finalItems = [];
 
@@ -92,8 +87,6 @@ export function buildExamItems(banks, accessCode) {
     }
   }
 
-  // Se agrupan por destreza (UoL → Reading → Listening) pero el orden
-  // interno de cada bloque se mezcla, para que no siempre A1 salga primero.
   const bySkill = { UoL: [], Reading: [], Listening: [] };
   for (const it of finalItems) bySkill[it.skill].push(it);
   const ordered = [
@@ -104,40 +97,45 @@ export function buildExamItems(banks, accessCode) {
   return ordered;
 }
 
-// ---------- validar código de acceso ----------
-export async function validateAccessCode(code) {
-  const ref = doc(db, "access_codes", code.trim().toUpperCase());
+// ---------- validar usuario / contraseña ----------
+export async function validateLogin(username, password) {
+  const uname = username.trim();
+  const ref = doc(db, "access_codes", uname);
   const snap = await getDoc(ref);
   if (!snap.exists()) {
-    return { ok: false, reason: "Código no encontrado. Revisa mayúsculas/minúsculas." };
+    return { ok: false, reason: "Usuario no encontrado. Revisa mayúsculas/minúsculas." };
   }
   const data = snap.data();
-  if (data.usedAt && data.status === "completed") {
-    return { ok: false, reason: "Este código ya completó el examen." };
+  if (data.password !== password.trim()) {
+    return { ok: false, reason: "Contraseña incorrecta." };
+  }
+  if (data.status === "completed") {
+    return { ok: false, reason: "Este usuario ya completó el examen." };
   }
   return { ok: true, name: data.name || "" };
 }
 
 // ---------- crear sesión ----------
-export async function createSession(accessCode, name, items) {
-  const sessionId = `${accessCode}_${Date.now()}`;
+export async function createSession(username, name, items) {
+  const sessionId = `${username}_${Date.now()}`;
   const ref = doc(db, "sessions", sessionId);
   await setDoc(ref, {
-    accessCode,
+    username,
     name,
     itemIds: items.map(i => i.id),
     startedAt: serverTimestamp(),
     status: "in_progress",
-    durationMin: EXAM_DURATION_MIN
+    durationMin: EXAM_DURATION_MIN,
+    suspiciousEvents: []
   });
-  await updateDoc(doc(db, "access_codes", accessCode), {
+  await updateDoc(doc(db, "access_codes", username), {
     status: "in_progress",
     usedAt: serverTimestamp()
   });
   return sessionId;
 }
 
-// ---------- guardar una respuesta (incremental, resiliente a cierres de pestaña) ----------
+// ---------- guardar una respuesta ----------
 export async function recordAnswer(sessionId, item, selectedIndex, timeMs) {
   const correct = selectedIndex === item.correct;
   const ref = doc(db, "sessions", sessionId);
@@ -152,6 +150,22 @@ export async function recordAnswer(sessionId, item, selectedIndex, timeMs) {
     }
   });
   return correct;
+}
+
+// ---------- registrar evento sospechoso (cambio de pestaña, traduccion, copiar/pegar, print screen) ----------
+export async function logSuspiciousEvent(sessionId, type, meta = {}) {
+  try {
+    const ref = doc(db, "sessions", sessionId);
+    await updateDoc(ref, {
+      suspiciousEvents: arrayUnion({
+        type,
+        meta,
+        atClientMs: Date.now()
+      })
+    });
+  } catch (e) {
+    console.warn("No se pudo registrar evento sospechoso:", e);
+  }
 }
 
 // ---------- calcular resultado final ----------
@@ -191,4 +205,15 @@ export async function finishSession(sessionId, results) {
     level: results.level,
     alerts: results.alerts
   });
+}
+
+// ---------- generar contraseña aleatoria (para el panel de administración) ----------
+export function generateRandomPassword(length = 8) {
+  // se excluyen caracteres ambiguos: 0/O, 1/l/I
+  const chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  let pass = "";
+  for (let i = 0; i < length; i++) {
+    pass += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return pass;
 }

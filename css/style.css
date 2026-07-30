@@ -348,6 +348,90 @@ table.admin-table th {
   color: var(--ink-soft);
 }
 
+/* ---------- Aviso de integridad academica ---------- */
+.integrity-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(22,48,43,0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+.integrity-card {
+  background: var(--bg-panel);
+  border-radius: var(--radius);
+  padding: 36px;
+  max-width: 560px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.integrity-card h2 { margin-bottom: 14px; }
+.integrity-card ul { padding-left: 20px; margin: 14px 0; }
+.integrity-card li { margin-bottom: 8px; font-size: 14.5px; color: var(--ink-soft); }
+.integrity-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 20px 0;
+  padding: 14px;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+.integrity-check input { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--teal-dark); }
+.integrity-check label { margin: 0; font-size: 14px; font-weight: 500; color: var(--ink); cursor: pointer; }
+
+/* ---------- Blur al salir de la pestaña ---------- */
+.focus-blur-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  backdrop-filter: blur(18px);
+  background: rgba(22,48,43,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-align: center;
+  padding: 24px;
+}
+.focus-blur-overlay.hidden { display: none; }
+.focus-blur-overlay .msg { font-family: "Newsreader", serif; font-size: 22px; max-width: 420px; }
+
+body.exam-locked .exam-body { filter: blur(14px); pointer-events: none; user-select: none; }
+
+/* Bloquea seleccion de texto en toda la pantalla de examen */
+.exam-shell { user-select: none; -webkit-user-select: none; }
+.exam-shell input, .exam-shell button { user-select: auto; }
+
+/* ---------- Panel de accesos (admin) ---------- */
+textarea.access-input {
+  width: 100%;
+  min-height: 140px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13.5px;
+  background: var(--bg);
+  color: var(--ink);
+  resize: vertical;
+}
+.badge-event {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-family: "IBM Plex Mono", monospace;
+  background: var(--gold-soft);
+  color: var(--gold);
+  border: 1px solid rgba(184,145,43,0.35);
+  margin: 0 3px 3px 0;
+}
+.badge-event.high { background: #F6DEE0; color: var(--bad); border-color: rgba(178,58,72,0.35); }
+
 @media (max-width: 640px) {
   .card { padding: 26px; }
   .result-grid { grid-template-columns: 1fr; }

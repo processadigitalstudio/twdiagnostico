@@ -8,6 +8,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "REEMPLAZA_CON_TU_API_KEY",
@@ -21,7 +22,8 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+export const auth = getAuth(app);
 
-// Contraseña simple para entrar al dashboard de resultados (solo tú la usas).
-// Cámbiala por algo tuyo antes de publicar el repo.
-export const ADMIN_PASSWORD = "cambia-esta-clave";
+// La protección del dashboard ahora usa Firebase Authentication real
+// (correo + contraseña tuya), no una clave fija en el código.
+// Crea tu usuario en: Firebase Console → Authentication → Users → Add user

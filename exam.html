@@ -1,14 +1,40 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en" translate="no">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate">
 <title>Examen en curso — Tweetalig</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+<!-- Aviso de integridad academica -->
+<div class="integrity-overlay" id="integrityOverlay">
+  <div class="integrity-card">
+    <div class="eyebrow">Antes de empezar</div>
+    <h2>Compromiso de integridad</h2>
+    <p class="muted">Este piloto ayuda a calibrar el examen real que van a presentar miles de estudiantes. Para que los datos sean útiles, es esencial que respondas por tu cuenta.</p>
+    <ul>
+      <li>No uses traductores, diccionarios externos, ni asistentes de IA durante el examen.</li>
+      <li>No copies, fotografíes, ni compartas las preguntas.</li>
+      <li>Responde solo, sin ayuda de otra persona.</li>
+      <li>El sistema registra cambios de pestaña y otras señales durante el examen — esto se revisa junto con tu resultado.</li>
+    </ul>
+    <div class="integrity-check">
+      <input type="checkbox" id="integrityCheck">
+      <label for="integrityCheck">Entiendo y acepto presentar el examen por mi cuenta, sin ayuda externa.</label>
+    </div>
+    <button class="btn-primary" id="integrityBtn" disabled>Comenzar examen</button>
+  </div>
+</div>
+
+<!-- Overlay que aparece si cambia de pestaña/ventana -->
+<div class="focus-blur-overlay hidden" id="focusBlurOverlay">
+  <div class="msg">⏸ El examen se pausó porque saliste de esta pestaña.<br><br>Vuelve aquí para continuar. Esto queda registrado.</div>
+</div>
 
 <div class="exam-shell">
   <div class="segments" id="segments"></div>
@@ -35,52 +61,119 @@
 </div>
 
 <script type="module">
-import { loadAllBanks, buildExamItems, createSession, recordAnswer, computeResults, finishSession } from "./js/exam-engine.js";
+import { loadAllBanks, buildExamItems, createSession, recordAnswer, computeResults, finishSession, logSuspiciousEvent } from "./js/exam-engine.js";
 import { EXAM_DURATION_MIN } from "./js/exam-config.js";
 
-const accessCode = sessionStorage.getItem("accessCode");
+const username = sessionStorage.getItem("username");
 const participantName = sessionStorage.getItem("participantName") || "";
-if (!accessCode) window.location.href = "index.html";
+if (!username) window.location.href = "index.html";
 
-const STORAGE_KEY = `examState_${accessCode}`;
+const STORAGE_KEY = `examState_${username}`;
 
 let state = null;
 const saved = sessionStorage.getItem(STORAGE_KEY);
-if (saved) {
-  state = JSON.parse(saved);
-} 
+if (saved) state = JSON.parse(saved);
 
 function persist() {
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+// ============================================================
+// AVISO DE INTEGRIDAD
+// ============================================================
+const integrityOverlay = document.getElementById("integrityOverlay");
+const integrityCheck = document.getElementById("integrityCheck");
+const integrityBtn = document.getElementById("integrityBtn");
+
+integrityCheck.addEventListener("change", () => {
+  integrityBtn.disabled = !integrityCheck.checked;
+});
+
+integrityBtn.addEventListener("click", () => {
+  integrityOverlay.style.display = "none";
+  init();
+});
+
+// ============================================================
+// MEDIDAS ANTI-COPIA / DETECCION (no bloquean capturas de pantalla,
+// eso no es posible desde una pagina web — ver README)
+// ============================================================
+let sessionIdRef = null; // se llena cuando exista la sesion
+
+function tryLog(type, meta) {
+  if (sessionIdRef) logSuspiciousEvent(sessionIdRef, type, meta);
+}
+
+document.addEventListener("copy", (e) => { e.preventDefault(); tryLog("copy_attempt"); });
+document.addEventListener("cut", (e) => { e.preventDefault(); tryLog("cut_attempt"); });
+document.addEventListener("paste", (e) => { e.preventDefault(); tryLog("paste_attempt"); });
+document.addEventListener("contextmenu", (e) => { e.preventDefault(); tryLog("right_click"); });
+
+document.addEventListener("keydown", (e) => {
+  const k = e.key.toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && ["c", "v", "x"].includes(k)) {
+    e.preventDefault();
+    tryLog("keyboard_copy_paste", { key: k });
+  }
+  if (e.key === "PrintScreen") {
+    tryLog("print_screen_key");
+  }
+});
+
+// Deteccion de cambio de pestaña / minimizar
+const focusBlurOverlay = document.getElementById("focusBlurOverlay");
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    focusBlurOverlay.classList.remove("hidden");
+    document.body.classList.add("exam-locked");
+    tryLog("tab_hidden");
+  } else {
+    focusBlurOverlay.classList.add("hidden");
+    document.body.classList.remove("exam-locked");
+  }
+});
+window.addEventListener("blur", () => {
+  focusBlurOverlay.classList.remove("hidden");
+  document.body.classList.add("exam-locked");
+});
+window.addEventListener("focus", () => {
+  if (!document.hidden) {
+    focusBlurOverlay.classList.add("hidden");
+    document.body.classList.remove("exam-locked");
+  }
+});
+
+// Deteccion de traductor de navegador (Chrome agrega una clase al <html>
+// cuando el usuario activa "Traducir esta pagina")
+const htmlObserver = new MutationObserver(() => {
+  const cls = document.documentElement.className || "";
+  if (cls.includes("translated")) {
+    tryLog("browser_translate_detected", { htmlClass: cls });
+  }
+});
+htmlObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+// ============================================================
+// MOTOR DEL EXAMEN
+// ============================================================
 async function init() {
   if (!state) {
     const banks = await loadAllBanks();
-    const items = buildExamItems(banks, accessCode);
-    const sessionId = await createSession(accessCode, participantName, items);
+    const items = buildExamItems(banks, username);
+    const sessionId = await createSession(username, participantName, items);
     state = {
       sessionId,
       items,
       currentIndex: 0,
-      responses: {},         // itemId -> {selected, timeMs}
+      responses: {},
       startTimeMs: Date.now()
     };
     persist();
   }
+  sessionIdRef = state.sessionId;
   renderSegments();
   renderQuestion();
   startTimer();
-}
-
-function skillBlockRanges() {
-  // determina en qué rango de índices cae cada destreza, para la barra segmentada
-  const ranges = { UoL: [null, null], Reading: [null, null], Listening: [null, null] };
-  state.items.forEach((it, idx) => {
-    if (ranges[it.skill][0] === null) ranges[it.skill][0] = idx;
-    ranges[it.skill][1] = idx;
-  });
-  return ranges;
 }
 
 function renderSegments() {
@@ -110,6 +203,7 @@ function renderQuestion() {
     wrap.className = "audio-box";
     const audioEl = document.createElement("audio");
     audioEl.controls = true;
+    audioEl.controlsList = "nodownload noplaybackrate";
     audioEl.src = `audio/${item.audio_id}.mp3`;
     audioEl.onerror = () => {
       wrap.innerHTML = `<span class="audio-pending">🎧 Audio "${item.audio_id}" pendiente de cargar — avísale a Rox.</span>`;
@@ -142,7 +236,6 @@ function renderQuestion() {
     optionsList.appendChild(label);
   });
 
-  document.getElementById("backBtn").disabled = state.currentIndex === 0;
   document.getElementById("backBtn").style.visibility = state.currentIndex === 0 ? "hidden" : "visible";
   document.getElementById("nextBtn").textContent =
     state.currentIndex === state.items.length - 1 ? "Finalizar examen" : "Siguiente →";
@@ -162,9 +255,8 @@ function selectOption(index) {
 async function goNext() {
   const item = state.items[state.currentIndex];
   const r = state.responses[item.id];
-  if (r) {
-    recordAnswer(state.sessionId, item, r.selected, r.timeMs).catch(console.error);
-  }
+  if (r) recordAnswer(state.sessionId, item, r.selected, r.timeMs).catch(console.error);
+
   if (state.currentIndex === state.items.length - 1) {
     await submitExam();
     return;
@@ -191,7 +283,6 @@ async function submitExam() {
   window.location.href = "results.html";
 }
 
-// ---------- timer ----------
 function startTimer() {
   const timerEl = document.getElementById("timer");
   function tick() {
@@ -214,7 +305,11 @@ function startTimer() {
 document.getElementById("nextBtn").addEventListener("click", goNext);
 document.getElementById("backBtn").addEventListener("click", goBack);
 
-init();
+// Si ya habia una sesion guardada (recarga de pagina), saltar el aviso
+if (state) {
+  integrityOverlay.style.display = "none";
+  init();
+}
 </script>
 
 </body>
