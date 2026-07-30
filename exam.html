@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen en curso — Tweetalig</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="exam-shell">
+  <div class="segments" id="segments"></div>
+  <div class="topbar">
+    <div class="brand">Tweetalig · Piloto de ubicación</div>
+    <div class="timer mono" id="timer">60:00</div>
+  </div>
+
+  <div class="exam-body">
+    <div class="skill-tag" id="skillTag">—</div>
+    <div class="item-counter mono" id="itemCounter">Pregunta 1 de 54</div>
+
+    <div id="contextBox"></div>
+    <div id="audioBox"></div>
+
+    <div class="stem" id="stemText"></div>
+    <div class="options" id="optionsList"></div>
+
+    <div class="nav-row">
+      <button class="btn-secondary" id="backBtn">← Anterior</button>
+      <button class="btn-primary" id="nextBtn" style="margin-top:0; width:auto;">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { loadAllBanks, buildExamItems, createSession, recordAnswer, computeResults, finishSession } from "./js/exam-engine.js";
+import { EXAM_DURATION_MIN } from "./js/exam-config.js";
+
+const accessCode = sessionStorage.getItem("accessCode");
+const participantName = sessionStorage.getItem("participantName") || "";
+if (!accessCode) window.location.href = "index.html";
+
+const STORAGE_KEY = `examState_${accessCode}`;
+
+let state = null;
+const saved = sessionStorage.getItem(STORAGE_KEY);
+if (saved) {
+  state = JSON.parse(saved);
+} 
+
+function persist() {
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+async function init() {
+  if (!state) {
+    const banks = await loadAllBanks();
+    const items = buildExamItems(banks, accessCode);
+    const sessionId = await createSession(accessCode, participantName, items);
+    state = {
+      sessionId,
+      items,
+      currentIndex: 0,
+      responses: {},         // itemId -> {selected, timeMs}
+      startTimeMs: Date.now()
+    };
+    persist();
+  }
+  renderSegments();
+  renderQuestion();
+  startTimer();
+}
+
+function skillBlockRanges() {
+  // determina en qué rango de índices cae cada destreza, para la barra segmentada
+  const ranges = { UoL: [null, null], Reading: [null, null], Listening: [null, null] };
+  state.items.forEach((it, idx) => {
+    if (ranges[it.skill][0] === null) ranges[it.skill][0] = idx;
+    ranges[it.skill][1] = idx;
+  });
+  return ranges;
+}
+
+function renderSegments() {
+  const container = document.getElementById("segments");
+  container.innerHTML = "";
+  state.items.forEach((it, idx) => {
+    const seg = document.createElement("div");
+    seg.className = "seg";
+    if (idx < state.currentIndex) seg.classList.add("done");
+    if (idx === state.currentIndex) seg.classList.add("active");
+    container.appendChild(seg);
+  });
+}
+
+function renderQuestion() {
+  const item = state.items[state.currentIndex];
+  document.getElementById("skillTag").textContent = `${item.skill} · Nivel ${item.level} · ${item.category}`;
+  document.getElementById("itemCounter").textContent = `Pregunta ${state.currentIndex + 1} de ${state.items.length}`;
+
+  const contextBox = document.getElementById("contextBox");
+  const audioBox = document.getElementById("audioBox");
+  contextBox.innerHTML = "";
+  audioBox.innerHTML = "";
+
+  if (item.skill === "Listening") {
+    const wrap = document.createElement("div");
+    wrap.className = "audio-box";
+    const audioEl = document.createElement("audio");
+    audioEl.controls = true;
+    audioEl.src = `audio/${item.audio_id}.mp3`;
+    audioEl.onerror = () => {
+      wrap.innerHTML = `<span class="audio-pending">🎧 Audio "${item.audio_id}" pendiente de cargar — avísale a Rox.</span>`;
+    };
+    wrap.appendChild(audioEl);
+    audioBox.appendChild(wrap);
+  } else if (item.context) {
+    const box = document.createElement("div");
+    box.className = "context-box";
+    box.textContent = item.context;
+    contextBox.appendChild(box);
+  }
+
+  document.getElementById("stemText").textContent = item.stem;
+
+  const optionsList = document.getElementById("optionsList");
+  optionsList.innerHTML = "";
+  const letters = ["a", "b", "c", "d"];
+  const savedResponse = state.responses[item.id];
+
+  item.options.forEach((opt, i) => {
+    const label = document.createElement("label");
+    label.className = "option" + (savedResponse && savedResponse.selected === i ? " selected" : "");
+    label.innerHTML = `
+      <input type="radio" name="opt" value="${i}" ${savedResponse && savedResponse.selected === i ? "checked" : ""}>
+      <span class="letter">${letters[i]})</span>
+      <span class="opt-text">${opt}</span>
+    `;
+    label.addEventListener("click", () => selectOption(i));
+    optionsList.appendChild(label);
+  });
+
+  document.getElementById("backBtn").disabled = state.currentIndex === 0;
+  document.getElementById("backBtn").style.visibility = state.currentIndex === 0 ? "hidden" : "visible";
+  document.getElementById("nextBtn").textContent =
+    state.currentIndex === state.items.length - 1 ? "Finalizar examen" : "Siguiente →";
+
+  state.questionShownAt = Date.now();
+  renderSegments();
+}
+
+function selectOption(index) {
+  document.querySelectorAll(".option").forEach((el, i) => el.classList.toggle("selected", i === index));
+  const item = state.items[state.currentIndex];
+  const timeMs = Date.now() - (state.questionShownAt || Date.now());
+  state.responses[item.id] = { selected: index, timeMs };
+  persist();
+}
+
+async function goNext() {
+  const item = state.items[state.currentIndex];
+  const r = state.responses[item.id];
+  if (r) {
+    recordAnswer(state.sessionId, item, r.selected, r.timeMs).catch(console.error);
+  }
+  if (state.currentIndex === state.items.length - 1) {
+    await submitExam();
+    return;
+  }
+  state.currentIndex += 1;
+  persist();
+  renderQuestion();
+}
+
+function goBack() {
+  if (state.currentIndex === 0) return;
+  state.currentIndex -= 1;
+  persist();
+  renderQuestion();
+}
+
+async function submitExam() {
+  document.getElementById("nextBtn").disabled = true;
+  document.getElementById("nextBtn").textContent = "Calculando...";
+  const results = computeResults(state.items, state.responses);
+  await finishSession(state.sessionId, results);
+  sessionStorage.setItem("lastResults", JSON.stringify(results));
+  sessionStorage.removeItem(STORAGE_KEY);
+  window.location.href = "results.html";
+}
+
+// ---------- timer ----------
+function startTimer() {
+  const timerEl = document.getElementById("timer");
+  function tick() {
+    const elapsedMs = Date.now() - state.startTimeMs;
+    const totalMs = EXAM_DURATION_MIN * 60 * 1000;
+    const remainingMs = Math.max(0, totalMs - elapsedMs);
+    const min = Math.floor(remainingMs / 60000);
+    const sec = Math.floor((remainingMs % 60000) / 1000);
+    timerEl.textContent = `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+    timerEl.classList.toggle("low", remainingMs < 5 * 60 * 1000);
+    if (remainingMs <= 0) {
+      clearInterval(interval);
+      submitExam();
+    }
+  }
+  tick();
+  const interval = setInterval(tick, 1000);
+}
+
+document.getElementById("nextBtn").addEventListener("click", goNext);
+document.getElementById("backBtn").addEventListener("click", goBack);
+
+init();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Piloto — Tweetalig</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px 20px; }
+  .stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin: 20px 0; }
+  .stat-pill { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; }
+  .stat-pill .n { font-family: "IBM Plex Mono", monospace; font-size: 22px; font-weight: 700; color: var(--teal-dark); }
+  .stat-pill .l { font-size: 12px; color: var(--ink-soft); }
+  .flag-bad { color: var(--bad); font-weight: 700; }
+  .flag-ok { color: var(--good); }
+  .tabs { display: flex; gap: 8px; margin: 24px 0 8px 0; }
+  .tab { padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; border: 1px solid var(--line); background: var(--bg-panel); }
+  .tab.active { background: var(--teal-dark); color: #fff; border-color: var(--teal-dark); }
+  .section { display: none; }
+  .section.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="page-center" id="loginGate">
+  <div class="card">
+    <div class="eyebrow">Solo administración</div>
+    <h1>Dashboard del piloto</h1>
+    <label for="pw">Contraseña</label>
+    <input type="password" id="pw" autocomplete="off">
+    <div class="error-msg" id="pwError"></div>
+    <button class="btn-primary" id="pwBtn">Entrar</button>
+  </div>
+</div>
+
+<div class="wrap" id="dashboard" style="display:none;">
+  <div class="eyebrow">Tweetalig · Piloto</div>
+  <h1>Resultados del piloto</h1>
+
+  <div class="stat-row" id="summaryRow"></div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="sessions">Sesiones</div>
+    <div class="tab" data-tab="items">Análisis por ítem</div>
+  </div>
+
+  <div class="section active" id="sessionsSection">
+    <button class="btn-secondary" id="exportCsvBtn">⬇ Exportar respuestas (CSV, para Python/Excel)</button>
+    <table class="admin-table">
+      <thead><tr><th>Nombre</th><th>Código</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Alertas</th></tr></thead>
+      <tbody id="sessionsBody"></tbody>
+    </table>
+  </div>
+
+  <div class="section" id="itemsSection">
+    <p class="muted">p = % que respondió bien · disc = discriminación punto-biserial (correlación ítem vs. nota final). Se resaltan ítems con p&gt;0.90, p&lt;0.20, o discriminación &lt; 0.10 — candidatos a revisar antes de la sesión Bookmark.</p>
+    <table class="admin-table">
+      <thead><tr><th>ID</th><th>Destreza</th><th>Nivel</th><th>Categoría</th><th>n</th><th>p</th><th>disc.</th><th>Estado</th></tr></thead>
+      <tbody id="itemsBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script type="module">
+import { db, ADMIN_PASSWORD } from "./js/firebase-config.js";
+import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+document.getElementById("pwBtn").addEventListener("click", async () => {
+  const val = document.getElementById("pw").value;
+  if (val !== ADMIN_PASSWORD) {
+    document.getElementById("pwError").textContent = "Contraseña incorrecta.";
+    return;
+  }
+  document.getElementById("loginGate").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+  await loadDashboard();
+});
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById(tab.dataset.tab + "Section").classList.add("active");
+  });
+});
+
+let allSessions = [];
+
+async function loadDashboard() {
+  const q = query(collection(db, "sessions"), where("status", "==", "completed"));
+  const snap = await getDocs(q);
+  allSessions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  renderSummary();
+  renderSessionsTable();
+  renderItemAnalysis();
+}
+
+function renderSummary() {
+  const n = allSessions.length;
+  const avg = n > 0 ? (allSessions.reduce((s, x) => s + (x.finalScore || 0), 0) / n).toFixed(1) : "—";
+  const row = document.getElementById("summaryRow");
+  row.innerHTML = `
+    <div class="stat-pill"><div class="n mono">${n}</div><div class="l">Sesiones completadas</div></div>
+    <div class="stat-pill"><div class="n mono">${avg}%</div><div class="l">Nota final promedio</div></div>
+  `;
+}
+
+function renderSessionsTable() {
+  const tbody = document.getElementById("sessionsBody");
+  tbody.innerHTML = "";
+  for (const s of allSessions) {
+    const tr = document.createElement("tr");
+    const pct = s.pct || {};
+    tr.innerHTML = `
+      <td>${s.name || "—"}</td>
+      <td class="mono">${s.accessCode}</td>
+      <td>${pct.UoL ?? "—"}%</td>
+      <td>${pct.Reading ?? "—"}%</td>
+      <td>${pct.Listening ?? "—"}%</td>
+      <td><strong>${s.finalScore ?? "—"}%</strong></td>
+      <td>${s.level ?? "—"}</td>
+      <td>${(s.alerts || []).join(", ") || "—"}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function renderItemAnalysis() {
+  // agrega respuestas por item a través de todas las sesiones
+  const itemData = {}; // itemId -> { skill, level, category, results: [{correct, finalScore}] }
+
+  for (const s of allSessions) {
+    const responses = s.responses || {};
+    const finalScore = s.finalScore ?? 0;
+    for (const [itemId, r] of Object.entries(responses)) {
+      if (!itemData[itemId]) {
+        itemData[itemId] = { skill: r.skill, level: r.level, category: r.category, results: [] };
+      }
+      itemData[itemId].results.push({ correct: r.correct ? 1 : 0, finalScore });
+    }
+  }
+
+  // desviación estándar de las notas finales (para el punto-biserial)
+  const allFinalScores = allSessions.map(s => s.finalScore ?? 0);
+  const mean = allFinalScores.reduce((a, b) => a + b, 0) / (allFinalScores.length || 1);
+  const variance = allFinalScores.reduce((a, b) => a + (b - mean) ** 2, 0) / (allFinalScores.length || 1);
+  const sd = Math.sqrt(variance);
+
+  const rows = [];
+  for (const [itemId, data] of Object.entries(itemData)) {
+    const n = data.results.length;
+    const correctCount = data.results.filter(r => r.correct === 1).length;
+    const p = n > 0 ? correctCount / n : 0;
+
+    const correctScores = data.results.filter(r => r.correct === 1).map(r => r.finalScore);
+    const wrongScores = data.results.filter(r => r.correct === 0).map(r => r.finalScore);
+    const m1 = correctScores.length ? correctScores.reduce((a, b) => a + b, 0) / correctScores.length : 0;
+    const m0 = wrongScores.length ? wrongScores.reduce((a, b) => a + b, 0) / wrongScores.length : 0;
+    const q = 1 - p;
+    const disc = (sd > 0 && correctScores.length > 0 && wrongScores.length > 0)
+      ? ((m1 - m0) / sd) * Math.sqrt(p * q)
+      : null;
+
+    let status = "OK";
+    let flagClass = "flag-ok";
+    if (p > 0.9 || p < 0.2 || (disc !== null && disc < 0.1)) {
+      status = "Revisar";
+      flagClass = "flag-bad";
+    }
+
+    rows.push({ itemId, ...data, n, p, disc, status, flagClass });
+  }
+
+  rows.sort((a, b) => a.itemId.localeCompare(b.itemId));
+
+  const tbody = document.getElementById("itemsBody");
+  tbody.innerHTML = "";
+  for (const r of rows) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="mono">${r.itemId}</td>
+      <td>${r.skill}</td>
+      <td>${r.level}</td>
+      <td>${r.category}</td>
+      <td>${r.n}</td>
+      <td>${(r.p * 100).toFixed(0)}%</td>
+      <td>${r.disc !== null ? r.disc.toFixed(2) : "—"}</td>
+      <td class="${r.flagClass}">${r.status}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  window._itemRows = rows; // para el export CSV
+}
+
+document.getElementById("exportCsvBtn").addEventListener("click", () => {
+  const lines = ["session_id,access_code,name,item_id,skill,level,category,selected,correct,time_ms,final_score,level_assigned"];
+  for (const s of allSessions) {
+    const responses = s.responses || {};
+    for (const [itemId, r] of Object.entries(responses)) {
+      lines.push([
+        s.id, s.accessCode, (s.name || "").replace(/,/g, " "), itemId, r.skill, r.level, r.category,
+        r.selected, r.correct ? 1 : 0, r.timeMs ?? "", s.finalScore ?? "", s.level ?? ""
+      ].join(","));
+    }
+  }
+  const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `piloto_respuestas_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+});
+</script>
+
+</body>
+</html>

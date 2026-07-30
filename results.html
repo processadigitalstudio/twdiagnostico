@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resultado — Tweetalig</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page-center">
+  <div class="card card-wide" style="text-align:center;">
+    <div class="eyebrow">Piloto completado</div>
+    <h1>¡Gracias por tu tiempo!</h1>
+    <p class="muted">Este es tu resultado preliminar. Recuerda que la tabla de cortes todavía está en validación (Angoff), así que el nivel exacto puede ajustarse.</p>
+
+    <div class="level-badge" id="levelBadge">—</div>
+
+    <div class="result-grid" id="resultGrid"></div>
+
+    <p class="muted" id="alertMsg" style="color:#B23A48;"></p>
+
+    <p class="muted" style="margin-top:28px;">Puedes cerrar esta ventana. Gracias por ayudarnos a calibrar el examen 🙏</p>
+  </div>
+</div>
+
+<script type="module">
+  const results = JSON.parse(sessionStorage.getItem("lastResults") || "null");
+  if (!results) {
+    document.querySelector(".card").innerHTML = "<h1>No hay resultados</h1><p>Parece que llegaste aquí sin completar el examen.</p><a href='index.html'>Volver al inicio</a>";
+  } else {
+    document.getElementById("levelBadge").textContent = results.level;
+
+    const grid = document.getElementById("resultGrid");
+    const labels = { UoL: "Use of Language", Reading: "Reading", Listening: "Listening" };
+    for (const skill of ["UoL", "Reading", "Listening"]) {
+      const div = document.createElement("div");
+      div.className = "result-card" + (results.alerts.includes(skill) ? " alert" : "");
+      div.innerHTML = `<div class="pct mono">${results.pct[skill]}%</div><div class="lbl">${labels[skill]}</div>`;
+      grid.appendChild(div);
+    }
+
+    const finalDiv = document.createElement("div");
+    finalDiv.className = "result-card";
+    finalDiv.style.gridColumn = "1 / -1";
+    finalDiv.innerHTML = `<div class="pct mono">${results.finalScore}%</div><div class="lbl">Nota final ponderada</div>`;
+    grid.appendChild(finalDiv);
+
+    if (results.alerts.length > 0) {
+      document.getElementById("alertMsg").textContent =
+        `⚠ Destreza(s) bajo el 30%: ${results.alerts.join(", ")}. Esto se marca para revisión manual.`;
+    }
+  }
+</script>
+
+</body>
+</html>

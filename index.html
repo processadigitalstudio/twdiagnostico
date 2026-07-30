@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tweetalig — Piloto Examen de Ubicación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page-center">
+  <div class="card">
+    <div class="eyebrow">Piloto · Funcionarios Tweetalig</div>
+    <h1>Examen de ubicación<br>de inglés</h1>
+    <p class="muted">Este es un piloto interno para calibrar el examen antes de aplicarlo a los estudiantes. Toma unos 60 minutos. Ingresa el código que te compartieron.</p>
+
+    <label for="codeInput">Código de acceso</label>
+    <input type="text" id="codeInput" placeholder="EJ: TWT-042" autocomplete="off" maxlength="20">
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <button class="btn-primary" id="startBtn">Ingresar</button>
+  </div>
+</div>
+
+<script type="module">
+  import { validateAccessCode } from "./js/exam-engine.js";
+
+  const btn = document.getElementById("startBtn");
+  const input = document.getElementById("codeInput");
+  const errorMsg = document.getElementById("errorMsg");
+
+  async function attemptLogin() {
+    const code = input.value.trim().toUpperCase();
+    if (!code) {
+      errorMsg.textContent = "Ingresa tu código de acceso.";
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = "Verificando...";
+    errorMsg.textContent = "";
+
+    try {
+      const result = await validateAccessCode(code);
+      if (!result.ok) {
+        errorMsg.textContent = result.reason;
+        btn.disabled = false;
+        btn.textContent = "Ingresar";
+        return;
+      }
+      sessionStorage.setItem("accessCode", code);
+      sessionStorage.setItem("participantName", result.name);
+      window.location.href = "exam.html";
+    } catch (e) {
+      console.error(e);
+      errorMsg.textContent = "Hubo un problema de conexión. Intenta de nuevo.";
+      btn.disabled = false;
+      btn.textContent = "Ingresar";
+    }
+  }
+
+  btn.addEventListener("click", attemptLogin);
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") attemptLogin(); });
+</script>
+
+</body>
+</html>

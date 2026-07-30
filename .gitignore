@@ -1,0 +1,5 @@
+scripts/serviceAccountKey.json
+scripts/names.txt
+scripts/firestore_import.json
+scripts/codes_para_enviar.csv
+.DS_Store
