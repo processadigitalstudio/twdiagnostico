@@ -11,12 +11,12 @@ import { getStorage } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "REEMPLAZA_CON_TU_API_KEY",
-  authDomain: "REEMPLAZA.firebaseapp.com",
-  projectId: "REEMPLAZA",
-  storageBucket: "REEMPLAZA.appspot.com",
-  messagingSenderId: "REEMPLAZA",
-  appId: "REEMPLAZA"
+  apiKey: "AIzaSyCbXuBu-sna6sTJMQ2mDrWkymwFhRniy78",
+  authDomain: "tweetalig-piloto.firebaseapp.com",
+  projectId: "tweetalig-piloto",
+  storageBucket: "tweetalig-piloto.firebasestorage.app",
+  messagingSenderId: "285287227736",
+  appId: "1:285287227736:web:7304cf76d0fd73467fc52d"
 };
 
 export const app = initializeApp(firebaseConfig);
