@@ -19,11 +19,16 @@ export const MAX_AUDIO_PLAYS = 3;
 // Pesos para la nota final
 export const WEIGHTS = { UoL: 0.30, Reading: 0.35, Listening: 0.35 };
 
-// Tabla de conversión PROVISIONAL (a validar/ajustar con Angoff + datos del piloto)
+// Tabla de conversión — proporción de la Cambridge English Scale (80-230),
+// tomando el tramo A1-B2 (100 a 180 en esa escala) y estirándolo a 0-100%.
+// Cada nivel CEFR ocupa 20 puntos parejos en la escala de Cambridge, así que
+// aquí cada nivel ocupa 25% parejo. Esto es un punto de partida más honesto
+// que un número inventado, pero SIGUE siendo provisional — el panel Bookmark
+// con los 5 jueces es lo que da el corte definitivo, calibrado con datos reales.
 export const LEVEL_CUTS = [
   { max: 25, level: "A1" },
-  { max: 45, level: "A2" },
-  { max: 70, level: "B1" },
+  { max: 50, level: "A2" },
+  { max: 75, level: "B1" },
   { max: 100, level: "B2" }
 ];
 

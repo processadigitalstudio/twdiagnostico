@@ -54,7 +54,6 @@
   </div>
 
   <div class="exam-body">
-    <div class="skill-tag" id="skillTag">—</div>
     <div class="item-counter mono" id="itemCounter"></div>
 
     <div id="pageContent"></div>
@@ -71,6 +70,7 @@ import { SECTION_DURATIONS_MIN, MAX_AUDIO_PLAYS } from "./js/exam-config.js";
 
 const username = sessionStorage.getItem("username");
 const participantName = sessionStorage.getItem("participantName") || "";
+const participantEmail = sessionStorage.getItem("participantEmail") || "";
 if (!username) window.location.href = "index.html";
 
 const STORAGE_KEY = `examState_${username}`;
@@ -133,7 +133,7 @@ async function init() {
   if (!state) {
     const banks = await loadAllBanks();
     const plan = buildExamPlan(banks, username);
-    const sessionId = await createSession(username, participantName, plan);
+    const sessionId = await createSession(username, participantName, participantEmail, plan);
     state = {
       sessionId,
       plan,
@@ -276,7 +276,6 @@ function renderOptions(container, question) {
 }
 
 function renderUolPage(item) {
-  document.getElementById("skillTag").textContent = `UoL · Level ${item.level} · ${item.category}`;
   const content = document.getElementById("pageContent");
   content.innerHTML = "";
 
@@ -296,7 +295,6 @@ function renderUolPage(item) {
 }
 
 function renderGroupPage(group, sectionName) {
-  document.getElementById("skillTag").textContent = `${sectionName} · Level ${group.level}`;
   const content = document.getElementById("pageContent");
   content.innerHTML = "";
 

@@ -58,6 +58,7 @@
       }
       sessionStorage.setItem("username", username);
       sessionStorage.setItem("participantName", result.name);
+      sessionStorage.setItem("participantEmail", result.email || "");
       window.location.href = "exam.html";
     } catch (e) {
       console.error(e);

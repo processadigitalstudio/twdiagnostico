@@ -113,6 +113,24 @@ service cloud.firestore {
       // el examen (index.html/exam.html) nunca toca esta colección.
       allow read, write: if request.auth != null;
     }
+
+    match /judge_codes/{username} {
+      allow get: if true;
+      allow list: if request.auth != null;
+      allow create, delete: if request.auth != null;
+      allow update: if request.auth != null
+                    || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+    }
+
+    match /bookmark_order/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /bookmark_judgments/{id} {
+      allow create: if true;
+      allow read: if request.auth != null;
+    }
   }
 }
 ```
@@ -234,3 +252,123 @@ de por qué es aproximado dado que cada persona ve ítems distintos).
     ├── import_to_firestore.js  (opcional, ya no necesario)
     └── analyze_pilot.py
 ```
+
+---
+
+## 7. Envío automático de resultados por correo (EmailJS)
+
+Cuando alguien termina el piloto **sin ninguna alerta**, el dashboard le envía
+automáticamente un correo con su nivel y el % de cada destreza — pero solo
+mientras tengas `admin.html` abierto en una pestaña (no hay servidor real
+detrás, así que es tu dashboard el que "detecta" que alguien terminó). Si
+hay alerta, el correo NO se envía solo — queda retenido con un botón
+**"Liberar y enviar"** para que tú decidas.
+
+### Configurar EmailJS (una sola vez, ~10 min, gratis, sin tarjeta)
+
+1. Ve a [emailjs.com](https://www.emailjs.com) → crea una cuenta gratis (hasta 200 correos/mes)
+2. **Email Services** → **Add New Service** → elige **Gmail** → conecta `examenes.cartagena@tweetalig.edu.co`
+3. Copia el **Service ID** que te da
+4. **Email Templates** → **Create New Template** → escribe el correo usando estas variables (entre llaves dobles):
+   - `{{to_email}}` — destinatario
+   - `{{to_name}}` — nombre de la persona
+   - `{{level}}` — nivel final (A1/A2/B1/B2)
+   - `{{pct_uol}}` `{{pct_reading}}` `{{pct_listening}}` — % por destreza
+
+   Ejemplo de cuerpo:
+   ```
+   Hola {{to_name}},
+
+   Gracias por participar en el piloto del examen de ubicación de inglés.
+
+   Tu resultado:
+   - Nivel: {{level}}
+   - Use of Language: {{pct_uol}}%
+   - Reading: {{pct_reading}}%
+   - Listening: {{pct_listening}}%
+
+   Gracias por tu tiempo.
+   ```
+5. Copia el **Template ID**
+6. **Account** → **General** → copia tu **Public Key**
+7. Pega los 3 valores en `js/emailjs-config.js`, y cambia `EMAILJS_ENABLED` a `true`
+
+### Formato actualizado del panel de accesos
+
+Ahora incluye el correo de cada persona: `Nombre,usuario,correo` (una por línea).
+
+### Roadmap futuro (no implementado)
+
+- **Cámara/proctoring:** técnicamente posible con `getUserMedia()` del navegador
+  para activar la webcam, pero solo tener fotos no es proctoring real — se
+  necesitaría revisión humana o análisis por IA (reconocimiento facial,
+  detección de segunda persona en cuadro) para que aporte valor real. Queda
+  pendiente para una fase posterior si se decide invertir en ello.
+- **Cloud Functions:** si en el futuro se necesita que el envío de correos
+  no dependa de tener el dashboard abierto, la migración natural es a Cloud
+  Functions de Firebase (plan Blaze, gratis hasta 2M ejecuciones/mes).
+
+---
+
+## 8. Panel Bookmark — calibrar los cortes con los 5 jueces
+
+Este es el método para reemplazar el 25/45/70 (puesto "a ojo") por cortes
+respaldados por juicio experto + datos reales del piloto.
+
+### Requisito previo
+
+Necesitas tener **sesiones completadas del piloto** (mientras más, mejor —
+idealmente los 30 funcionarios) y la **clave de respuestas ya cargada**,
+porque el orden de dificultad se calcula con el % de aciertos real de cada
+ítem.
+
+### Pasos, en `admin.html` → pestaña "📊 Panel Bookmark"
+
+1. **Generar orden** — botón que ordena los 560 ítems de más fácil a más
+   difícil usando los datos del piloto, y lo guarda para que los jueces lo usen.
+2. **Crear las 5 cuentas** — formato `Nombre,usuario` (una por línea).
+   Comparte el link de `bookmark.html` + su usuario/contraseña con cada juez.
+3. **Ronda 1** — cada juez entra a `bookmark.html`, revisa la lista ordenada
+   (puede expandir cada ítem para leerlo completo), y marca dónde ubicaría
+   cada una de las 3 fronteras (A1/A2, A2/B1, B1/B2) para un estudiante justo
+   en el límite.
+4. **Sesión de discusión** (esto lo haces tú, en persona/videollamada) —
+   revisa en la tabla "Estado de las calificaciones" dónde hay más
+   desacuerdo entre jueces, y discútanlo en grupo.
+5. **Ronda 2** — cada juez vuelve a entrar (el sistema detecta sola que le
+   toca la ronda 2) y ajusta su calificación si cambió de opinión.
+6. **Resultado** — el dashboard promedia la ronda 2 de los 5 jueces y te da
+   el % de corte sugerido para cada frontera, para que reemplaces
+   `LEVEL_CUTS` en `js/exam-config.js`.
+
+### Nota metodológica honesta
+
+Esto ordena los 560 ítems en **una sola lista combinada** (UoL + Reading +
+Listening juntos), no 3 listas separadas por destreza. Es una simplificación
+razonable para un piloto — el método psicométricamente más riguroso haría
+Bookmark por separado en cada destreza y combinaría los resultados según los
+pesos (30/35/35), pero eso triplica el trabajo de los jueces. Con 5 jueces y
+560 ítems mezclados, el resultado sigue siendo una mejora real sobre el
+25/45/70 actual, solo que menos preciso que la versión completa.
+
+---
+
+## 9. Transparencia de patrón + alerta de inversión (además del % agregado)
+
+El % por destreza (lo que de verdad determina el nivel) suma todos los
+aciertos de esa destreza sin importar el nivel de cada ítem — esto es
+deliberado y está respaldado por teoría de medición clásica (si la
+dificultad de los ítems está bien calibrada, el puntaje bruto total es
+la mejor estimación de habilidad). Pero como el nivel de calibración
+todavía no está validado (eso es justo lo que hace el Bookmark), se
+agregaron dos capas de transparencia que NO cambian la fórmula, pero sí
+dan más contexto a quien toma la decisión final:
+
+- **Desglose por nivel** (pestaña Resultados → "ver"): muestra el % de
+  acierto dentro de cada nivel, por destreza, para cada persona.
+- **Alerta de patrón inconsistente**: se marca automáticamente cuando
+  alguien acierta un nivel "difícil" con un % mucho más alto (≥40 puntos)
+  que uno "fácil" en la misma destreza, con al menos 2 ítems de cada uno.
+  Esto casi siempre es señal de que un ítem está mal calibrado, no de que
+  la persona sea "rara" — y es exactamente el tipo de caso que el panel
+  Bookmark necesita ver para decidir qué ítems corregir.
