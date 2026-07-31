@@ -84,7 +84,7 @@
   <div class="section" id="sessionsSection">
     <button class="btn-secondary" id="exportCsvBtn">⬇ Exportar respuestas (CSV, para Python/Excel)</button>
     <table class="admin-table">
-      <thead><tr><th>Nombre</th><th>Usuario</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Tiempos por sección</th><th>Alertas</th><th>Eventos sospechosos</th></tr></thead>
+      <thead><tr><th>Nombre</th><th>Usuario</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Tiempo UoL</th><th>Tiempo Reading</th><th>Tiempo Listening</th><th>Alertas</th><th>Eventos sospechosos</th></tr></thead>
       <tbody id="sessionsBody"></tbody>
     </table>
   </div>
@@ -261,15 +261,11 @@ function fmtMinSec(seconds) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-function sectionTimingBadges(sectionTimings) {
-  if (!sectionTimings) return "—";
-  return ["UoL", "Reading", "Listening"].map(name => {
-    const t = sectionTimings[name];
-    if (!t) return "";
-    const timeoutMark = t.timedOut ? " ⏱" : "";
-    const cls = t.timedOut ? "high" : "";
-    return `<span class="badge-event ${cls}">${name} ${fmtMinSec(t.elapsedSeconds)}${timeoutMark}</span>`;
-  }).join(" ");
+function sectionTimeCell(sectionTimings, name) {
+  if (!sectionTimings || !sectionTimings[name]) return "—";
+  const t = sectionTimings[name];
+  const timeoutMark = t.timedOut ? ` <span class="flag-bad">⏱ agotado</span>` : "";
+  return `${fmtMinSec(t.elapsedSeconds)}${timeoutMark}`;
 }
 
 // ---------------- RESULTADOS ----------------
@@ -287,7 +283,9 @@ function renderSessionsTable() {
       <td>${r ? r.pct.Listening + "%" : "—"}</td>
       <td><strong>${r ? r.finalScore + "%" : "—"}</strong></td>
       <td>${r ? r.level : "—"}</td>
-      <td>${sectionTimingBadges(s.sectionTimings)}</td>
+      <td class="mono">${sectionTimeCell(s.sectionTimings, "UoL")}</td>
+      <td class="mono">${sectionTimeCell(s.sectionTimings, "Reading")}</td>
+      <td class="mono">${sectionTimeCell(s.sectionTimings, "Listening")}</td>
       <td>${r ? (r.alerts.join(", ") || "—") : "—"}</td>
       <td>${eventBadges(s.suspiciousEvents)}</td>
     `;
