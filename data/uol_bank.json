@@ -13,7 +13,6 @@
    "are",
    "be"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -30,7 +29,6 @@
    "are",
    "be"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -47,7 +45,6 @@
    "are",
    "be"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -64,7 +61,6 @@
    "Are",
    "Be"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -81,7 +77,6 @@
    "am not",
    "not is"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -98,7 +93,6 @@
    "am got",
    "got"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -115,7 +109,6 @@
    "Has",
    "Is"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -132,7 +125,6 @@
    "can",
    "have can"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -149,7 +141,6 @@
    "served",
    "serves"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -166,7 +157,6 @@
    "doesn't eat",
    "isn't eat"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -183,7 +173,6 @@
    "It is",
    "They are"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -200,7 +189,6 @@
    "There are",
    "They is"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -217,7 +205,6 @@
    "the",
    "---"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -234,7 +221,6 @@
    "She",
    "They"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -251,7 +237,6 @@
    "No using",
    "Using not"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -268,7 +253,6 @@
    "grandmother",
    "sister"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -285,7 +269,6 @@
    "teacher",
    "engineer"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -302,7 +285,6 @@
    "office",
    "library"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -319,7 +301,6 @@
    "big",
    "quiet"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -336,7 +317,6 @@
    "cool",
    "cold"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -353,7 +333,6 @@
    "large",
    "low"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -370,7 +349,6 @@
    "night",
    "morning"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -387,7 +365,6 @@
    "hotel",
    "hospital"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -404,7 +381,6 @@
    "bored",
    "tired"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -421,7 +397,6 @@
    "firstly",
    "first"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -438,7 +413,6 @@
    "paid",
    "free"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -455,7 +429,6 @@
    "classroom",
    "canteen"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -472,7 +445,6 @@
    "exciting",
    "difficult"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -489,7 +461,6 @@
    "have",
    "do"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -506,7 +477,6 @@
    "go",
    "take"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -523,7 +493,6 @@
    "go",
    "play"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -540,7 +509,6 @@
    "have",
    "do"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -557,7 +525,6 @@
    "watch",
    "view"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -574,7 +541,6 @@
    "send",
    "post"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -591,7 +557,6 @@
    "lost",
    "found"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -608,7 +573,6 @@
    "catches",
    "rides"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -625,7 +589,6 @@
    "start",
    "create"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -642,7 +605,6 @@
    "waste",
    "spend"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -659,7 +621,6 @@
    "carry",
    "bring"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -676,7 +637,6 @@
    "do",
    "ask"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -693,7 +653,6 @@
    "at",
    "by"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -710,7 +669,6 @@
    "at",
    "by"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -727,7 +685,6 @@
    "in",
    "by"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -744,7 +701,6 @@
    "in",
    "by"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -761,7 +717,6 @@
    "at",
    "by"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -778,7 +733,6 @@
    "next to",
    "between"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -795,7 +749,6 @@
    "between",
    "in front of"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -812,7 +765,6 @@
    "behind",
    "between"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -829,7 +781,6 @@
    "at",
    "by"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -846,7 +797,6 @@
    "between",
    "behind"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -863,7 +813,6 @@
    "was visiting",
    "visited"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -880,7 +829,6 @@
    "was taking",
    "took"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -897,7 +845,6 @@
    "bought",
    "buys"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -914,7 +861,6 @@
    "don't went",
    "wasn't go"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -931,7 +877,6 @@
    "am writing",
    "is writing"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -948,7 +893,6 @@
    "will going",
    "go to"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -965,7 +909,6 @@
    "would",
    "will"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -982,7 +925,6 @@
    "most modern",
    "more modernly"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -999,7 +941,6 @@
    "the best",
    "the goodest"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1016,7 +957,6 @@
    "them",
    "theirs"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1033,7 +973,6 @@
    "never",
    "sometimes"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1050,7 +989,6 @@
    "have to",
    "must to"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1067,7 +1005,6 @@
    "were",
    "was"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1084,7 +1021,6 @@
    "will",
    "going to"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1101,7 +1037,6 @@
    "going to",
    "would"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -1118,7 +1053,6 @@
    "exciting",
    "excited"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1135,7 +1069,6 @@
    "free",
    "expensive"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1152,7 +1085,6 @@
    "headache",
    "cough"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1169,7 +1101,6 @@
    "boringly",
    "boring"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1186,7 +1117,6 @@
    "useful",
    "pointless"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1203,7 +1133,6 @@
    "neighbour",
    "flatmate"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1220,7 +1149,6 @@
    "comfortable",
    "cold"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1237,7 +1165,6 @@
    "informative",
    "information"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1254,7 +1181,6 @@
    "unpopular",
    "popular"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1271,7 +1197,6 @@
    "difficulty",
    "fault"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -1288,7 +1213,6 @@
    "outdated",
    "modern"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1305,7 +1229,6 @@
    "programme",
    "schedule"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1322,7 +1245,6 @@
    "beautify",
    "beautiful"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1339,7 +1261,6 @@
    "submit",
    "upload"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1356,7 +1277,6 @@
    "pass",
    "finish"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1373,7 +1293,6 @@
    "miss",
    "absent"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1390,7 +1309,6 @@
    "heavy",
    "hard"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1407,7 +1325,6 @@
    "deliver",
    "make"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1424,7 +1341,6 @@
    "earn",
    "save"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1441,7 +1357,6 @@
    "invest",
    "spend"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1458,7 +1373,6 @@
    "gain",
    "win"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1475,7 +1389,6 @@
    "join",
    "register"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1492,7 +1405,6 @@
    "breaks",
    "bends"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1509,7 +1421,6 @@
    "reach",
    "climb to"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1526,7 +1437,6 @@
    "grow",
    "build"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -1543,7 +1453,6 @@
    "at",
    "for"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1560,7 +1469,6 @@
    "on",
    "in"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1577,7 +1485,6 @@
    "of",
    "for"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1594,7 +1501,6 @@
    "from",
    "with"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1611,7 +1517,6 @@
    "on",
    "in"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1628,7 +1533,6 @@
    "of",
    "with"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1645,7 +1549,6 @@
    "with",
    "about"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1662,7 +1565,6 @@
    "from",
    "to"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1679,7 +1581,6 @@
    "at",
    "for"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1696,7 +1597,6 @@
    "at",
    "about"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1713,7 +1613,6 @@
    "since",
    "ago"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1730,7 +1629,6 @@
    "ever",
    "already"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1747,7 +1645,6 @@
    "would used to",
    "used to"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1764,7 +1661,6 @@
    "will lose",
    "are losing"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1781,7 +1677,6 @@
    "will choose",
    "chose"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -1798,7 +1693,6 @@
    "must",
    "might"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1815,7 +1709,6 @@
    "that",
    "who"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1832,7 +1725,6 @@
    "were recording",
    "record"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1849,7 +1741,6 @@
    "participated",
    "participating"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1866,7 +1757,6 @@
    "is considered",
    "considered"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1883,7 +1773,6 @@
    "were rising",
    "have risen"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1900,7 +1789,6 @@
    "However",
    "Because"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1917,7 +1805,6 @@
    "are working",
    "had worked"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -1934,7 +1821,6 @@
    "too",
    "much"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -1951,7 +1837,6 @@
    "so",
    "enough"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -1968,7 +1853,6 @@
    "opportunistic",
    "opportunely"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -1985,7 +1869,6 @@
    "affecting",
    "negative"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -2002,7 +1885,6 @@
    "respond",
    "responsibility"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2019,7 +1901,6 @@
    "informative",
    "informed"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2036,7 +1917,6 @@
    "risen",
    "raise"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2053,7 +1933,6 @@
    "postponed",
    "delayed"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2070,7 +1949,6 @@
    "achievement",
    "performance"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2087,7 +1965,6 @@
    "successfully",
    "successful"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2104,7 +1981,6 @@
    "expensive",
    "difficult"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2121,7 +1997,6 @@
    "evidence",
    "data"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2138,7 +2013,6 @@
    "economically",
    "economical"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2155,7 +2029,6 @@
    "heavy",
    "old"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2172,7 +2045,6 @@
    "improving",
    "improved"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2189,7 +2061,6 @@
    "deliver",
    "make"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2206,7 +2077,6 @@
    "make",
    "take"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2223,7 +2093,6 @@
    "acquire",
    "develop"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2240,7 +2109,6 @@
    "raised",
    "brought"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2257,7 +2125,6 @@
    "make",
    "catch"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2274,7 +2141,6 @@
    "overcome",
    "avoid"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2291,7 +2157,6 @@
    "achieved",
    "completed"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2308,7 +2173,6 @@
    "make",
    "catch"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2325,7 +2189,6 @@
    "say",
    "speak"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2342,7 +2205,6 @@
    "maintain",
    "ensure"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2359,7 +2221,6 @@
    "expand",
    "increase"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2376,7 +2237,6 @@
    "seek",
    "pursue"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2393,7 +2253,6 @@
    "with",
    "for"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2410,7 +2269,6 @@
    "on",
    "from"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2427,7 +2285,6 @@
    "to",
    "in"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2444,7 +2301,6 @@
    "in",
    "for"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2461,7 +2317,6 @@
    "on",
    "with"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2478,7 +2333,6 @@
    "for",
    "with"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2495,7 +2349,6 @@
    "about",
    "on"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2512,7 +2365,6 @@
    "take part",
    "participate"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2529,7 +2381,6 @@
    "with",
    "about"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2546,7 +2397,6 @@
    "at",
    "about"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2563,7 +2413,6 @@
    "would test",
    "has tested"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -2580,7 +2429,6 @@
    "had taken",
    "would take"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2597,7 +2445,6 @@
    "will allocate",
    "has allocated"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -2614,7 +2461,6 @@
    "had spent",
    "would spend"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2631,7 +2477,6 @@
    "published",
    "is publishing"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -2648,7 +2493,6 @@
    "should pass",
    "ought pass"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -2665,7 +2509,6 @@
    "had been",
    "would have been"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2682,7 +2525,6 @@
    "who",
    "whom"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -2699,7 +2541,6 @@
    "Despite of having",
    "In spite having"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2716,7 +2557,6 @@
    "off",
    "through"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2733,7 +2573,6 @@
    "should have spent",
    "might have spent"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -2750,7 +2589,6 @@
    "couldn't proofread",
    "shouldn't have proofread"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2767,7 +2605,6 @@
    "been having",
    "made"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2784,7 +2621,6 @@
    "did she",
    "does she"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2801,7 +2637,6 @@
    "is completing",
    "would complete"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -2818,7 +2653,6 @@
    "occasional",
    "unclear"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2835,7 +2669,6 @@
    "occasional",
    "reluctant"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2852,7 +2685,6 @@
    "principle",
    "principal"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2869,7 +2701,6 @@
    "rejected",
    "didn't accept"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2886,7 +2717,6 @@
    "historian",
    "historic"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -2903,7 +2733,6 @@
    "significant",
    "large"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2920,7 +2749,6 @@
    "undermine",
    "break"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -2937,7 +2765,6 @@
    "qualified",
    "responsible"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2954,7 +2781,6 @@
    "reluctant",
    "confident"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2971,7 +2797,6 @@
    "celebrate",
    "delay"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -2988,7 +2813,6 @@
    "acknowledged",
    "accepted"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3005,7 +2829,6 @@
    "ensure",
    "guarantee"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3022,7 +2845,6 @@
    "transparent",
    "clear"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3039,7 +2861,6 @@
    "make",
    "take"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -3056,7 +2877,6 @@
    "yield",
    "show"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3073,7 +2893,6 @@
    "make",
    "take"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -3090,7 +2909,6 @@
    "bridge",
    "narrow"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3107,7 +2925,6 @@
    "make",
    "take"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -3124,7 +2941,6 @@
    "address",
    "handle"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3141,7 +2957,6 @@
    "boost",
    "increase"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3158,7 +2973,6 @@
    "make",
    "take"
   ],
-  "correct": 0,
   "audio_id": null
  },
  {
@@ -3175,7 +2989,6 @@
    "secured",
    "received"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3192,7 +3005,6 @@
    "deepen",
    "enhance"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -3209,7 +3021,6 @@
    "demonstrate",
    "express"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3226,7 +3037,6 @@
    "phase out",
    "eliminate"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3243,7 +3053,6 @@
    "about",
    "of"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -3260,7 +3069,6 @@
    "for",
    "on"
   ],
-  "correct": 3,
   "audio_id": null
  },
  {
@@ -3277,7 +3085,6 @@
    "consists in",
    "consist from"
   ],
-  "correct": 1,
   "audio_id": null
  },
  {
@@ -3294,7 +3101,6 @@
    "invest",
    "place"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3311,7 +3117,6 @@
    "contributes",
    "provides"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3328,7 +3133,6 @@
    "comply",
    "agree"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3345,7 +3149,6 @@
    "objected",
    "protested"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3362,7 +3165,6 @@
    "build",
    "draw"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3379,7 +3181,6 @@
    "carried",
    "performed"
   ],
-  "correct": 2,
   "audio_id": null
  },
  {
@@ -3396,7 +3197,6 @@
    "drew",
    "built"
   ],
-  "correct": 2,
   "audio_id": null
  }
 ]

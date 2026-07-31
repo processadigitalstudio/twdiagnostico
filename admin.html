@@ -27,6 +27,11 @@
   .item-detail-row { background: var(--bg); font-size: 13px; color: var(--ink-soft); }
   .item-detail-row td { padding: 12px 16px !important; }
   .toggle-detail { cursor: pointer; color: var(--teal-dark); font-size: 12px; text-decoration: underline; }
+  .key-banner {
+    background: #FDF3E7; border: 1.5px solid var(--gold); border-radius: 8px;
+    padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  .key-banner.ok { background: #EAF4EF; border-color: var(--good); }
 </style>
 </head>
 <body>
@@ -48,6 +53,17 @@
   <div class="eyebrow">Tweetalig · Piloto</div>
   <h1>Dashboard del piloto</h1>
 
+  <div class="key-banner" id="keyBanner" style="display:none;">
+    <div>
+      <strong id="keyBannerText">Cargando estado de la clave de respuestas...</strong>
+      <div class="muted" style="margin-top:4px;">La clave nunca se sube a GitHub — solo vive aquí, protegida, en Firestore.</div>
+    </div>
+    <div>
+      <input type="file" id="keyFileInput" accept=".json" style="display:none;">
+      <button class="btn-secondary" id="keyUploadBtn">📤 Cargar answer_key_PRIVADO_NO_SUBIR.json</button>
+    </div>
+  </div>
+
   <div class="stat-row" id="summaryRow"></div>
 
   <div class="tabs">
@@ -57,7 +73,6 @@
     <div class="tab" data-tab="access">Gestionar accesos</div>
   </div>
 
-  <!-- ============ EN VIVO ============ -->
   <div class="section active" id="liveSection">
     <p class="muted"><span class="live-dot"></span>Actualiza en tiempo real mientras las personas responden.</p>
     <table class="admin-table">
@@ -66,25 +81,22 @@
     </table>
   </div>
 
-  <!-- ============ RESULTADOS ============ -->
   <div class="section" id="sessionsSection">
     <button class="btn-secondary" id="exportCsvBtn">⬇ Exportar respuestas (CSV, para Python/Excel)</button>
     <table class="admin-table">
-      <thead><tr><th>Nombre</th><th>Usuario</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Alertas</th><th>Eventos sospechosos</th></tr></thead>
+      <thead><tr><th>Nombre</th><th>Usuario</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Tiempos por sección</th><th>Alertas</th><th>Eventos sospechosos</th></tr></thead>
       <tbody id="sessionsBody"></tbody>
     </table>
   </div>
 
-  <!-- ============ ANALISIS POR ITEM ============ -->
   <div class="section" id="itemsSection">
-    <p class="muted">p = % que respondió bien · disc = discriminación punto-biserial. Click en un ítem para ver el enunciado completo, las opciones, y la respuesta correcta.</p>
+    <p class="muted">p = % que respondió bien · disc = discriminación punto-biserial. Click en "ver" para el enunciado completo, opciones, y la respuesta correcta.</p>
     <table class="admin-table">
       <thead><tr><th></th><th>ID</th><th>Destreza</th><th>Nivel</th><th>Categoría</th><th>n</th><th>p</th><th>disc.</th><th>Estado</th></tr></thead>
       <tbody id="itemsBody"></tbody>
     </table>
   </div>
 
-  <!-- ============ GESTIONAR ACCESOS ============ -->
   <div class="section" id="accessSection">
     <p class="muted">Escribe una persona por línea, en formato <code>Nombre,usuario</code> (tú eliges el usuario). La contraseña se genera automáticamente.</p>
     <textarea class="access-input" id="accessInput" placeholder="Rossana Restrepo,rossana&#10;Julio Perez,julio&#10;..."></textarea>
@@ -102,13 +114,11 @@
 
 <script type="module">
 import { db, auth } from "./js/firebase-config.js";
-import { generateRandomPassword, loadAllBanks } from "./js/exam-engine.js";
+import { generateRandomPassword, loadAllBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults } from "./js/exam-engine.js";
 import {
   collection, getDocs, query, where, onSnapshot, setDoc, doc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import {
-  signInWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
 document.getElementById("pwBtn").addEventListener("click", async () => {
   const email = document.getElementById("emailInput").value.trim();
@@ -138,11 +148,53 @@ document.querySelectorAll(".tab").forEach(tab => {
 
 let allSessions = [];
 let banksCache = null;
+let answerKey = null;
+let computedById = {}; // sessionId -> resultado calculado
+
+// ---------------- clave de respuestas ----------------
+async function checkAnswerKey() {
+  answerKey = await loadAnswerKey();
+  const banner = document.getElementById("keyBanner");
+  const text = document.getElementById("keyBannerText");
+  banner.style.display = "flex";
+  if (answerKey) {
+    banner.classList.add("ok");
+    text.textContent = `✅ Clave de respuestas cargada (${Object.keys(answerKey).length} ítems).`;
+  } else {
+    banner.classList.remove("ok");
+    text.textContent = "⚠ Aún no has cargado la clave de respuestas. Los resultados no se pueden calcular sin ella.";
+  }
+}
+
+document.getElementById("keyUploadBtn").addEventListener("click", () => {
+  document.getElementById("keyFileInput").click();
+});
+document.getElementById("keyFileInput").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  try {
+    const parsed = JSON.parse(text);
+    await uploadAnswerKey(parsed);
+    await checkAnswerKey();
+    await loadDashboard();
+    alert("Clave de respuestas cargada correctamente.");
+  } catch (err) {
+    alert("El archivo no parece un JSON válido. Revisa que sea answer_key_PRIVADO_NO_SUBIR.json.");
+    console.error(err);
+  }
+});
 
 async function loadDashboard() {
+  await checkAnswerKey();
   const q = query(collection(db, "sessions"), where("status", "==", "completed"));
   const snap = await getDocs(q);
   allSessions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  computedById = {};
+  if (answerKey) {
+    for (const s of allSessions) computedById[s.id] = computeSessionResults(s, answerKey);
+  }
 
   renderSummary();
   renderSessionsTable();
@@ -151,9 +203,9 @@ async function loadDashboard() {
 
 function renderSummary() {
   const n = allSessions.length;
-  const avg = n > 0 ? (allSessions.reduce((s, x) => s + (x.finalScore || 0), 0) / n).toFixed(1) : "—";
-  const row = document.getElementById("summaryRow");
-  row.innerHTML = `
+  const scores = allSessions.map(s => computedById[s.id]?.finalScore).filter(x => x !== undefined);
+  const avg = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : "—";
+  document.getElementById("summaryRow").innerHTML = `
     <div class="stat-pill"><div class="n mono">${n}</div><div class="l">Sesiones completadas</div></div>
     <div class="stat-pill"><div class="n mono">${avg}%</div><div class="l">Nota final promedio</div></div>
   `;
@@ -164,14 +216,9 @@ function eventBadges(events) {
   const counts = {};
   for (const e of events) counts[e.type] = (counts[e.type] || 0) + 1;
   const labels = {
-    tab_hidden: "cambió de pestaña",
-    copy_attempt: "intentó copiar",
-    cut_attempt: "intentó cortar",
-    paste_attempt: "intentó pegar",
-    right_click: "click derecho",
-    keyboard_copy_paste: "atajo copiar/pegar",
-    print_screen_key: "tecla Print Screen",
-    browser_translate_detected: "⚠ usó traductor del navegador"
+    tab_hidden: "cambió de pestaña", copy_attempt: "intentó copiar", cut_attempt: "intentó cortar",
+    paste_attempt: "intentó pegar", right_click: "click derecho", keyboard_copy_paste: "atajo copiar/pegar",
+    print_screen_key: "tecla Print Screen", browser_translate_detected: "⚠ usó traductor"
   };
   return Object.entries(counts).map(([type, count]) => {
     const high = type === "browser_translate_detected" || type === "tab_hidden";
@@ -207,49 +254,65 @@ function startLiveListener() {
   });
 }
 
+function fmtMinSec(seconds) {
+  if (seconds === undefined || seconds === null) return "—";
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+function sectionTimingBadges(sectionTimings) {
+  if (!sectionTimings) return "—";
+  return ["UoL", "Reading", "Listening"].map(name => {
+    const t = sectionTimings[name];
+    if (!t) return "";
+    const timeoutMark = t.timedOut ? " ⏱" : "";
+    const cls = t.timedOut ? "high" : "";
+    return `<span class="badge-event ${cls}">${name} ${fmtMinSec(t.elapsedSeconds)}${timeoutMark}</span>`;
+  }).join(" ");
+}
+
 // ---------------- RESULTADOS ----------------
 function renderSessionsTable() {
   const tbody = document.getElementById("sessionsBody");
   tbody.innerHTML = "";
   for (const s of allSessions) {
+    const r = computedById[s.id];
     const tr = document.createElement("tr");
-    const pct = s.pct || {};
     tr.innerHTML = `
       <td>${s.name || "—"}</td>
       <td class="mono">${s.username || "—"}</td>
-      <td>${pct.UoL ?? "—"}%</td>
-      <td>${pct.Reading ?? "—"}%</td>
-      <td>${pct.Listening ?? "—"}%</td>
-      <td><strong>${s.finalScore ?? "—"}%</strong></td>
-      <td>${s.level ?? "—"}</td>
-      <td>${(s.alerts || []).join(", ") || "—"}</td>
+      <td>${r ? r.pct.UoL + "%" : "—"}</td>
+      <td>${r ? r.pct.Reading + "%" : "—"}</td>
+      <td>${r ? r.pct.Listening + "%" : "—"}</td>
+      <td><strong>${r ? r.finalScore + "%" : "—"}</strong></td>
+      <td>${r ? r.level : "—"}</td>
+      <td>${sectionTimingBadges(s.sectionTimings)}</td>
+      <td>${r ? (r.alerts.join(", ") || "—") : "—"}</td>
       <td>${eventBadges(s.suspiciousEvents)}</td>
     `;
     tbody.appendChild(tr);
   }
 }
 
-// ---------------- ANALISIS POR ITEM (con info completa) ----------------
+// ---------------- ANALISIS POR ITEM ----------------
 async function renderItemAnalysis() {
+  if (!answerKey) { document.getElementById("itemsBody").innerHTML = "<tr><td colspan='9'>Carga la clave de respuestas primero.</td></tr>"; return; }
   if (!banksCache) banksCache = await loadAllBanks();
   const allItemsById = {};
-  for (const skill of Object.keys(banksCache)) {
-    for (const it of banksCache[skill]) allItemsById[it.id] = it;
-  }
+  for (const skill of Object.keys(banksCache)) for (const it of banksCache[skill]) allItemsById[it.id] = it;
 
   const itemData = {};
   for (const s of allSessions) {
-    const responses = s.responses || {};
-    const finalScore = s.finalScore ?? 0;
-    for (const [itemId, r] of Object.entries(responses)) {
-      if (!itemData[itemId]) {
-        itemData[itemId] = { skill: r.skill, level: r.level, category: r.category, results: [] };
-      }
-      itemData[itemId].results.push({ correct: r.correct ? 1 : 0, finalScore });
+    const r = computedById[s.id];
+    if (!r) continue;
+    for (const [itemId, info] of Object.entries(r.perItem)) {
+      if (!itemData[itemId]) itemData[itemId] = { skill: info.skill, level: info.level, category: info.category, results: [] };
+      itemData[itemId].results.push({ correct: info.correct ? 1 : 0, finalScore: r.finalScore });
     }
   }
 
-  const allFinalScores = allSessions.map(s => s.finalScore ?? 0);
+  const allFinalScores = allSessions.map(s => computedById[s.id]?.finalScore).filter(x => x !== undefined);
   const mean = allFinalScores.reduce((a, b) => a + b, 0) / (allFinalScores.length || 1);
   const variance = allFinalScores.reduce((a, b) => a + (b - mean) ** 2, 0) / (allFinalScores.length || 1);
   const sd = Math.sqrt(variance);
@@ -266,11 +329,9 @@ async function renderItemAnalysis() {
     const q = 1 - p;
     const disc = (sd > 0 && correctScores.length > 0 && wrongScores.length > 0)
       ? ((m1 - m0) / sd) * Math.sqrt(p * q) : null;
-
     let status = "OK", flagClass = "flag-ok";
     if (p > 0.9 || p < 0.2 || (disc !== null && disc < 0.1)) { status = "Revisar"; flagClass = "flag-bad"; }
-
-    rows.push({ itemId, ...data, n, p, disc, status, flagClass, full: allItemsById[itemId] });
+    rows.push({ itemId, ...data, n, p, disc, status, flagClass, full: allItemsById[itemId], key: answerKey[itemId] });
   }
   rows.sort((a, b) => a.itemId.localeCompare(b.itemId));
 
@@ -280,13 +341,8 @@ async function renderItemAnalysis() {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><span class="toggle-detail" data-id="${r.itemId}">ver</span></td>
-      <td class="mono">${r.itemId}</td>
-      <td>${r.skill}</td>
-      <td>${r.level}</td>
-      <td>${r.category}</td>
-      <td>${r.n}</td>
-      <td>${(r.p * 100).toFixed(0)}%</td>
-      <td>${r.disc !== null ? r.disc.toFixed(2) : "—"}</td>
+      <td class="mono">${r.itemId}</td><td>${r.skill}</td><td>${r.level}</td><td>${r.category}</td>
+      <td>${r.n}</td><td>${(r.p * 100).toFixed(0)}%</td><td>${r.disc !== null ? r.disc.toFixed(2) : "—"}</td>
       <td class="${r.flagClass}">${r.status}</td>
     `;
     tbody.appendChild(tr);
@@ -297,13 +353,11 @@ async function renderItemAnalysis() {
     detailTr.id = `detail-${r.itemId}`;
     const full = r.full;
     if (full) {
-      const optsHtml = full.options.map((o, i) =>
-        `${i === full.correct ? "✅" : "•"} ${o}`
-      ).join("<br>");
+      const correctIdx = r.key ? r.key.correct : -1;
+      const optsHtml = full.options.map((o, i) => `${i === correctIdx ? "✅" : "•"} ${o}`).join("<br>");
       detailTr.innerHTML = `<td colspan="9">
         ${full.context ? `<em>${full.context}</em><br><br>` : (full.audio_id ? `<em>🎧 Audio: ${full.audio_id} — ${full.audio_title || ""}</em><br><br>` : "")}
-        <strong>${full.stem}</strong><br><br>
-        ${optsHtml}
+        <strong>${full.stem}</strong><br><br>${optsHtml}
       </td>`;
     } else {
       detailTr.innerHTML = `<td colspan="9">No se encontró info completa para este ítem.</td>`;
@@ -317,19 +371,23 @@ async function renderItemAnalysis() {
       row.style.display = row.style.display === "none" ? "table-row" : "none";
     });
   });
-
-  window._itemRows = rows;
 }
 
 document.getElementById("exportCsvBtn").addEventListener("click", () => {
-  const lines = ["session_id,username,name,item_id,skill,level,category,selected,correct,time_ms,final_score,level_assigned,suspicious_events_count"];
+  const lines = ["session_id,username,name,item_id,skill,level,category,selected,correct,time_ms,final_score,level_assigned,suspicious_events_count,time_uol_sec,time_reading_sec,time_listening_sec,uol_timed_out,reading_timed_out,listening_timed_out"];
   for (const s of allSessions) {
-    const responses = s.responses || {};
+    const r = computedById[s.id];
+    if (!r) continue;
     const eventCount = (s.suspiciousEvents || []).length;
-    for (const [itemId, r] of Object.entries(responses)) {
+    const st = s.sectionTimings || {};
+    const timingCols = [
+      st.UoL?.elapsedSeconds ?? "", st.Reading?.elapsedSeconds ?? "", st.Listening?.elapsedSeconds ?? "",
+      st.UoL?.timedOut ? 1 : 0, st.Reading?.timedOut ? 1 : 0, st.Listening?.timedOut ? 1 : 0
+    ];
+    for (const [itemId, info] of Object.entries(r.perItem)) {
       lines.push([
-        s.id, s.username, (s.name || "").replace(/,/g, " "), itemId, r.skill, r.level, r.category,
-        r.selected, r.correct ? 1 : 0, r.timeMs ?? "", s.finalScore ?? "", s.level ?? "", eventCount
+        s.id, s.username, (s.name || "").replace(/,/g, " "), itemId, info.skill, info.level, info.category,
+        "", info.correct ? 1 : 0, info.timeMs ?? "", r.finalScore, r.level, eventCount, ...timingCols
       ].join(","));
     }
   }
@@ -343,23 +401,18 @@ document.getElementById("exportCsvBtn").addEventListener("click", () => {
 
 // ---------------- GESTIONAR ACCESOS ----------------
 let lastGenerated = [];
-
 document.getElementById("generateBtn").addEventListener("click", async () => {
   const raw = document.getElementById("accessInput").value.trim();
   if (!raw) return;
   const lines = raw.split("\n").map(l => l.trim()).filter(Boolean);
-
   lastGenerated = [];
   for (const line of lines) {
     const [name, username] = line.split(",").map(s => s.trim());
     if (!name || !username) continue;
     const password = generateRandomPassword(8);
-    await setDoc(doc(db, "access_codes", username), {
-      name, password, status: "not_started"
-    });
+    await setDoc(doc(db, "access_codes", username), { name, password, status: "not_started" });
     lastGenerated.push({ name, username, password });
   }
-
   const tbody = document.getElementById("accessResultBody");
   tbody.innerHTML = "";
   for (const r of lastGenerated) {

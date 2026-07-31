@@ -2,18 +2,43 @@
 
 Piloto interno (30 funcionarios) para validar el examen antes de subirlo a Moodle.
 Bancos: UoL (200), Reading (200), Listening (160/59 audios) = 560 ítems totales.
-Cada persona ve 54 preguntas (18 por destreza), en 60 minutos.
+Cada persona ve ~80 preguntas (18 UoL + ~38 Reading + ~24 Listening), en 65 minutos (un solo reloj global, no hay tiempo separado por sección).
 
 **Novedades de esta versión:** login con usuario/contraseña que tú generas desde el
 dashboard, aviso de integridad académica antes de empezar, detección de cambio de
 pestaña (con blur), detección de traductor del navegador, bloqueo de copiar/pegar/
-click derecho, dashboard en vivo, y análisis por ítem con el contenido completo de
-cada pregunta.
+click derecho, dashboard en vivo, análisis por ítem con el contenido completo de
+cada pregunta, **y las respuestas correctas ya no viajan al navegador** (se
+calculan solo en el dashboard, con la clave protegida).
+
+**Estructura del examen (actualizada):** 3 secciones, cada una con su propia
+pantalla de instrucciones en inglés antes de empezar, **y su propio timer
+independiente**:
+- **Use of Language** — 15 min, 18 ítems individuales (5-5-4-4 por nivel)
+- **Reading** — 30 min, 2 textos por nivel (8 en total, ~38 preguntas). Se lee
+  el texto una vez y se responden todas sus preguntas juntas, en la misma página.
+- **Listening** — 20 min, 2 audios por nivel (8 en total, ~24 preguntas). Cada
+  audio se puede reproducir hasta 3 veces; el reproductor muestra cuántas
+  repeticiones quedan.
+
+**Cuando se acaba el tiempo de una sección, avanza sola a la siguiente**
+(guardando lo que ya se alcanzó a responder) — esto además queda registrado
+como dato: si alguien "se pasó del tiempo" en una destreza específica, eso en
+sí mismo es una señal de nivel (ej. alguien que no termina Reading a tiempo
+probablemente no lee con la fluidez que ese nivel requiere). Esto se ve en la
+pestaña "Resultados" del dashboard (columna "Tiempos por sección", con ⏱ si
+se agotó el tiempo) y en el CSV exportable.
+
+**No hay botón "Anterior"** — una vez que se avanza a un texto/audio/ítem nuevo,
+no se puede regresar. Total: ~80 ítems, 65 minutos repartidos en 3 tiempos
+independientes (15+30+20).
 
 ---
 
 ## ⚠️ Léelo primero: qué SÍ y qué NO hace esto
 
+- **SÍ** protege las respuestas correctas: el navegador de quien hace el examen
+  nunca las recibe — viven solo en Firestore, protegidas por tu login.
 - **SÍ** bloquea copiar/cortar/pegar/click derecho dentro de la página.
 - **SÍ** detecta cuando alguien cambia de pestaña o minimiza la ventana, y difumina
   la pantalla del examen hasta que regrese — y lo registra.
@@ -22,11 +47,13 @@ cada pregunta.
   basados en el mismo motor, y solo detecta, no bloquea.
 - **NO** puede impedir capturas de pantalla (Print Screen, herramienta de recorte,
   o una foto con el celular a la pantalla). Ningún sitio web puede hacer esto —
-  es una limitación de cómo funciona un navegador, no de este código. Lo único que
-  se puede hacer es detectar la tecla Print Screen (parcialmente) y confiar en el
-  aviso de integridad + la naturaleza de bajo riesgo de un piloto interno.
+  es una limitación de cómo funciona un navegador, no de este código.
 - **NO** puede impedir que alguien use un traductor en su teléfono, o le pida ayuda
   a otra persona en la misma sala.
+- **Consecuencia de proteger las respuestas:** la persona que hace el examen ya
+  NO ve su puntaje al terminar — solo un mensaje de agradecimiento. El resultado
+  real solo lo ves tú, en el dashboard, una vez cargues la clave de respuestas
+  (ver sección 1.3 más abajo).
 
 Esto es exactamente lo mismo que enfrentan Moodle, IELTS online, y cualquier examen
 web — la seguridad real de un examen serio viene de la supervisión humana (proctor),
@@ -80,6 +107,12 @@ service cloud.firestore {
       // pero solo tú (autenticada) puedes LEER las sesiones (para el dashboard)
       allow read: if request.auth != null;
     }
+
+    match /answer_key/{doc} {
+      // la clave de respuestas SOLO la puede leer o escribir tu sesión autenticada.
+      // el examen (index.html/exam.html) nunca toca esta colección.
+      allow read, write: if request.auth != null;
+    }
   }
 }
 ```
@@ -87,11 +120,31 @@ service cloud.firestore {
 > Esto es más seguro que la versión anterior: ahora que se guardan contraseñas
 > reales de personas, nadie puede "listar" (dump) la colección completa de
 > `access_codes` ni leer las `sessions` de otros sin haber iniciado sesión como
-> administradora. Sigue habiendo un límite conocido: como el examen corre 100%
-> en el navegador, alguien con conocimientos técnicos podría, en teoría, inspeccionar
-> el banco de preguntas descargado (`data/*.json`) y ver las respuestas correctas.
-> Es aceptable para un piloto interno de 30 personas de confianza; Moodle no tiene
-> este problema porque califica del lado del servidor.
+> administradora. **Y las respuestas correctas del examen (colección `answer_key`)
+> tampoco se pueden leer sin tu login** — ver la siguiente sección.
+
+---
+
+## 1.3 Cargar la clave de respuestas (SOLO TÚ tienes este archivo)
+
+Junto con este zip recibiste un archivo llamado `answer_key_PRIVADO_NO_SUBIR.json`
+con las 560 respuestas correctas. **Este archivo NUNCA debe subirse a GitHub**
+(por eso ya está en `.gitignore`) — el examen que ven los funcionarios descarga
+los bancos de preguntas SIN esa información, así que aunque alguien abra las
+herramientas de desarrollador mientras hace el examen, no va a encontrar ahí
+la respuesta correcta.
+
+Para que el dashboard pueda calificar, súbelo una sola vez:
+
+1. Entra a `admin.html`, inicia sesión con tu correo/contraseña
+2. Vas a ver un aviso amarillo arriba: **"Aún no has cargado la clave de respuestas"**
+3. Click en **"📤 Cargar answer_key_PRIVADO_NO_SUBIR.json"**
+4. Selecciona ese archivo desde tu computadora
+5. El aviso se pone verde: **"✅ Clave de respuestas cargada (560 ítems)"**
+
+A partir de ahí, el dashboard calcula automáticamente los resultados de todas
+las sesiones — nunca hace falta volver a subirlo, salvo que cambies el banco
+de preguntas más adelante.
 
 ### Reglas de Storage (si subes audios por ahí en vez del repo)
 

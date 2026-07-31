@@ -13,7 +13,6 @@
    "Wednesday",
    "Thursday"
   ],
-  "correct": 1,
   "audio_id": "A1L01",
   "audio_title": "Voicemail: gym schedule change",
   "audio_format": "Monólogo",
@@ -33,7 +32,6 @@
    "Eight p.m.",
    "Five p.m."
   ],
-  "correct": 1,
   "audio_id": "A1L01",
   "audio_title": "Voicemail: gym schedule change",
   "audio_format": "Monólogo",
@@ -53,7 +51,6 @@
    "Twenty degrees",
    "Twenty-two degrees"
   ],
-  "correct": 1,
   "audio_id": "A1L02",
   "audio_title": "Weather forecast (radio)",
   "audio_format": "Monólogo",
@@ -73,7 +70,6 @@
    "Sunny",
    "Windy"
   ],
-  "correct": 2,
   "audio_id": "A1L02",
   "audio_title": "Weather forecast (radio)",
   "audio_format": "Monólogo",
@@ -93,7 +89,6 @@
    "Green Hill",
    "Lakeview"
   ],
-  "correct": 1,
   "audio_id": "A1L03",
   "audio_title": "Bus delay announcement",
   "audio_format": "Monólogo",
@@ -113,7 +108,6 @@
    "Nine thirty-five",
    "Ten fifteen"
   ],
-  "correct": 1,
   "audio_id": "A1L03",
   "audio_title": "Bus delay announcement",
   "audio_format": "Monólogo",
@@ -133,7 +127,6 @@
    "A juice and a sandwich",
    "A coffee and a cake"
   ],
-  "correct": 1,
   "audio_id": "A1L04",
   "audio_title": "Ordering at a coffee shop",
   "audio_format": "Diálogo",
@@ -153,7 +146,6 @@
    "Five dollars",
    "Six dollars"
   ],
-  "correct": 2,
   "audio_id": "A1L04",
   "audio_title": "Ordering at a coffee shop",
   "audio_format": "Diálogo",
@@ -173,7 +165,6 @@
    "At the park",
    "At the corner"
   ],
-  "correct": 1,
   "audio_id": "A1L05",
   "audio_title": "Asking directions to the library",
   "audio_format": "Diálogo",
@@ -193,7 +184,6 @@
    "The park",
    "The station"
   ],
-  "correct": 2,
   "audio_id": "A1L05",
   "audio_title": "Asking directions to the library",
   "audio_format": "Diálogo",
@@ -213,7 +203,6 @@
    "Elena",
    "Marco"
   ],
-  "correct": 0,
   "audio_id": "A1L06",
   "audio_title": "Describing my family",
   "audio_format": "Monólogo",
@@ -233,7 +222,6 @@
    "In a big house near the beach",
    "In an apartment near the university"
   ],
-  "correct": 1,
   "audio_id": "A1L06",
   "audio_title": "Describing my family",
   "audio_format": "Monólogo",
@@ -253,7 +241,6 @@
    "Eight o'clock",
    "Five o'clock"
   ],
-  "correct": 1,
   "audio_id": "A1L07",
   "audio_title": "My daily routine",
   "audio_format": "Monólogo",
@@ -273,7 +260,6 @@
    "By bike",
    "On foot"
   ],
-  "correct": 1,
   "audio_id": "A1L07",
   "audio_title": "My daily routine",
   "audio_format": "Monólogo",
@@ -293,7 +279,6 @@
    "Wednesday",
    "Saturday"
   ],
-  "correct": 1,
   "audio_id": "A1L08",
   "audio_title": "Making a doctor's appointment",
   "audio_format": "Diálogo",
@@ -313,7 +298,6 @@
    "Eleven o'clock",
    "Twelve o'clock"
   ],
-  "correct": 1,
   "audio_id": "A1L08",
   "audio_title": "Making a doctor's appointment",
   "audio_format": "Diálogo",
@@ -333,7 +317,6 @@
    "Sunday",
    "Monday"
   ],
-  "correct": 1,
   "audio_id": "A1L09",
   "audio_title": "Inviting a friend to a party",
   "audio_format": "Diálogo",
@@ -353,7 +336,6 @@
    "Riverside Park",
    "Green Park"
   ],
-  "correct": 1,
   "audio_id": "A1L09",
   "audio_title": "Inviting a friend to a party",
   "audio_format": "Diálogo",
@@ -373,7 +355,6 @@
    "Nine o'clock",
    "Ten o'clock"
   ],
-  "correct": 1,
   "audio_id": "A1L10",
   "audio_title": "Talking about my job",
   "audio_format": "Monólogo",
@@ -393,7 +374,6 @@
    "Because it's close to home",
    "Because the hours are short"
   ],
-  "correct": 1,
   "audio_id": "A1L10",
   "audio_title": "Talking about my job",
   "audio_format": "Monólogo",
@@ -413,7 +393,6 @@
    "A hat",
    "Shoes"
   ],
-  "correct": 1,
   "audio_id": "A1L11",
   "audio_title": "Buying clothes",
   "audio_format": "Diálogo",
@@ -433,7 +412,6 @@
    "Forty dollars",
    "Fifty dollars"
   ],
-  "correct": 1,
   "audio_id": "A1L11",
   "audio_title": "Buying clothes",
   "audio_format": "Diálogo",
@@ -453,7 +431,6 @@
    "Ten o'clock",
    "Six o'clock"
   ],
-  "correct": 1,
   "audio_id": "A1L12",
   "audio_title": "Library opening hours",
   "audio_format": "Diálogo",
@@ -473,7 +450,6 @@
    "Two o'clock",
    "Six o'clock"
   ],
-  "correct": 2,
   "audio_id": "A1L12",
   "audio_title": "Library opening hours",
   "audio_format": "Diálogo",
@@ -493,7 +469,6 @@
    "Playing the piano",
    "Painting"
   ],
-  "correct": 1,
   "audio_id": "A1L13",
   "audio_title": "Simple interview: favorite hobby",
   "audio_format": "Diálogo",
@@ -513,7 +488,6 @@
    "Two hours",
    "Ten minutes"
   ],
-  "correct": 1,
   "audio_id": "A1L13",
   "audio_title": "Simple interview: favorite hobby",
   "audio_format": "Diálogo",
@@ -533,7 +507,6 @@
    "Room 10",
    "Room 5"
   ],
-  "correct": 1,
   "audio_id": "A1L14",
   "audio_title": "Classroom change announcement",
   "audio_format": "Monólogo",
@@ -553,7 +526,6 @@
    "Ten o'clock",
    "Twelve o'clock"
   ],
-  "correct": 1,
   "audio_id": "A1L14",
   "audio_title": "Classroom change announcement",
   "audio_format": "Monólogo",
@@ -573,7 +545,6 @@
    "Pasta",
    "A salad"
   ],
-  "correct": 1,
   "audio_id": "A1L15",
   "audio_title": "Confirming a food order",
   "audio_format": "Diálogo",
@@ -593,7 +564,6 @@
    "Twenty minutes",
    "Thirty minutes"
   ],
-  "correct": 1,
   "audio_id": "A1L15",
   "audio_title": "Confirming a food order",
   "audio_format": "Diálogo",
@@ -613,7 +583,6 @@
    "Twenty Main Street",
    "Twelve Bank Street"
   ],
-  "correct": 0,
   "audio_id": "A1L16",
   "audio_title": "Calling for a taxi",
   "audio_format": "Diálogo",
@@ -633,7 +602,6 @@
    "Ten thirty",
    "Eleven o'clock"
   ],
-  "correct": 1,
   "audio_id": "A1L16",
   "audio_title": "Calling for a taxi",
   "audio_format": "Diálogo",
@@ -653,7 +621,6 @@
    "Go shopping",
    "Go to a restaurant"
   ],
-  "correct": 0,
   "audio_id": "A1L17",
   "audio_title": "Calling a friend to plan the weekend",
   "audio_format": "Diálogo",
@@ -673,7 +640,6 @@
    "Saturday at eight",
    "Sunday at seven"
   ],
-  "correct": 1,
   "audio_id": "A1L17",
   "audio_title": "Calling a friend to plan the weekend",
   "audio_format": "Diálogo",
@@ -693,7 +659,6 @@
    "Four",
    "Five"
   ],
-  "correct": 2,
   "audio_id": "A1L18",
   "audio_title": "Booking a table at a restaurant",
   "audio_format": "Diálogo",
@@ -713,7 +678,6 @@
    "Nine o'clock",
    "Six o'clock"
   ],
-  "correct": 1,
   "audio_id": "A1L18",
   "audio_title": "Booking a table at a restaurant",
   "audio_format": "Diálogo",
@@ -733,7 +697,6 @@
    "The zoo",
    "The park"
   ],
-  "correct": 1,
   "audio_id": "A1L19",
   "audio_title": "School announcement: field trip reminder",
   "audio_format": "Monólogo",
@@ -753,7 +716,6 @@
    "Nine o'clock",
    "Seven thirty"
   ],
-  "correct": 1,
   "audio_id": "A1L19",
   "audio_title": "School announcement: field trip reminder",
   "audio_format": "Monólogo",
@@ -773,7 +735,6 @@
    "Fernandez",
    "Gonzalez"
   ],
-  "correct": 0,
   "audio_id": "A1L20",
   "audio_title": "Hotel check-in",
   "audio_format": "Diálogo",
@@ -793,7 +754,6 @@
    "Two-fourteen",
    "Two-forty"
   ],
-  "correct": 1,
   "audio_id": "A1L20",
   "audio_title": "Hotel check-in",
   "audio_format": "Diálogo",
@@ -813,7 +773,6 @@
    "A weather problem",
    "A broken package"
   ],
-  "correct": 1,
   "audio_id": "A2L01",
   "audio_title": "Voicemail: lost package",
   "audio_format": "Monólogo",
@@ -833,7 +792,6 @@
    "Within a week",
    "Within a month"
   ],
-  "correct": 1,
   "audio_id": "A2L01",
   "audio_title": "Voicemail: lost package",
   "audio_format": "Monólogo",
@@ -853,7 +811,6 @@
    "To ask for payment",
    "To offer a discount"
   ],
-  "correct": 1,
   "audio_id": "A2L01",
   "audio_title": "Voicemail: lost package",
   "audio_format": "Monólogo",
@@ -873,7 +830,6 @@
    "A parking lot",
    "A farm"
   ],
-  "correct": 1,
   "audio_id": "A2L02",
   "audio_title": "Radio interview: new city park",
   "audio_format": "Diálogo",
@@ -893,7 +849,6 @@
    "Next year",
    "In two weeks"
   ],
-  "correct": 1,
   "audio_id": "A2L02",
   "audio_title": "Radio interview: new city park",
   "audio_format": "Diálogo",
@@ -913,7 +868,6 @@
    "Ten dollars",
    "It depends on the day"
   ],
-  "correct": 1,
   "audio_id": "A2L02",
   "audio_title": "Radio interview: new city park",
   "audio_format": "Diálogo",
@@ -933,7 +887,6 @@
    "To ask for donations",
    "To advertise a private business"
   ],
-  "correct": 1,
   "audio_id": "A2L02",
   "audio_title": "Radio interview: new city park",
   "audio_format": "Diálogo",
@@ -953,7 +906,6 @@
    "Second floor",
    "Fourth floor"
   ],
-  "correct": 1,
   "audio_id": "A2L03",
   "audio_title": "Calling to rent an apartment",
   "audio_format": "Diálogo",
@@ -973,7 +925,6 @@
    "Internet",
    "Furniture"
   ],
-  "correct": 1,
   "audio_id": "A2L03",
   "audio_title": "Calling to rent an apartment",
   "audio_format": "Diálogo",
@@ -993,7 +944,6 @@
    "To sell an apartment",
    "To report a problem with electricity"
   ],
-  "correct": 1,
   "audio_id": "A2L03",
   "audio_title": "Calling to rent an apartment",
   "audio_format": "Diálogo",
@@ -1013,7 +963,6 @@
    "Gate twenty-one",
    "Gate eight"
   ],
-  "correct": 1,
   "audio_id": "A2L04",
   "audio_title": "Airport announcement: gate change",
   "audio_format": "Monólogo",
@@ -1033,7 +982,6 @@
    "A security issue",
    "A staff problem"
   ],
-  "correct": 1,
   "audio_id": "A2L04",
   "audio_title": "Airport announcement: gate change",
   "audio_format": "Monólogo",
@@ -1053,7 +1001,6 @@
    "To welcome passengers aboard",
    "To announce a delay of several hours"
   ],
-  "correct": 1,
   "audio_id": "A2L04",
   "audio_title": "Airport announcement: gate change",
   "audio_format": "Monólogo",
@@ -1073,7 +1020,6 @@
    "Stomach pain",
    "Back pain"
   ],
-  "correct": 1,
   "audio_id": "A2L05",
   "audio_title": "At the pharmacy asking for advice",
   "audio_format": "Diálogo",
@@ -1093,7 +1039,6 @@
    "Once a day",
    "Every twelve hours"
   ],
-  "correct": 1,
   "audio_id": "A2L05",
   "audio_title": "At the pharmacy asking for advice",
   "audio_format": "Diálogo",
@@ -1113,7 +1058,6 @@
    "To complain about a product",
    "To request a doctor's appointment directly"
   ],
-  "correct": 1,
   "audio_id": "A2L05",
   "audio_title": "At the pharmacy asking for advice",
   "audio_format": "Diálogo",
@@ -1133,7 +1077,6 @@
    "The city",
    "A lake"
   ],
-  "correct": 1,
   "audio_id": "A2L06",
   "audio_title": "Planning a weekend trip",
   "audio_format": "Diálogo",
@@ -1153,7 +1096,6 @@
    "By bus",
    "By plane"
   ],
-  "correct": 1,
   "audio_id": "A2L06",
   "audio_title": "Planning a weekend trip",
   "audio_format": "Diálogo",
@@ -1173,7 +1115,6 @@
    "To complain about traffic",
    "To book a hotel online"
   ],
-  "correct": 1,
   "audio_id": "A2L06",
   "audio_title": "Planning a weekend trip",
   "audio_format": "Diálogo",
@@ -1193,7 +1134,6 @@
    "Seafood pasta",
    "Beef pasta"
   ],
-  "correct": 1,
   "audio_id": "A2L07",
   "audio_title": "Complaining at a restaurant",
   "audio_format": "Diálogo",
@@ -1213,7 +1153,6 @@
    "A free dessert",
    "Nothing extra"
   ],
-  "correct": 1,
   "audio_id": "A2L07",
   "audio_title": "Complaining at a restaurant",
   "audio_format": "Diálogo",
@@ -1233,7 +1172,6 @@
    "To ask for the menu",
    "To pay the bill"
   ],
-  "correct": 1,
   "audio_id": "A2L07",
   "audio_title": "Complaining at a restaurant",
   "audio_format": "Diálogo",
@@ -1253,7 +1191,6 @@
    "Thirty minutes",
    "One hour"
   ],
-  "correct": 1,
   "audio_id": "A2L08",
   "audio_title": "Podcast: healthy habits",
   "audio_format": "Monólogo",
@@ -1273,7 +1210,6 @@
    "Sleep less on weekdays",
    "Take naps during the day"
   ],
-  "correct": 1,
   "audio_id": "A2L08",
   "audio_title": "Podcast: healthy habits",
   "audio_format": "Monólogo",
@@ -1293,7 +1229,6 @@
    "To criticize modern lifestyles",
    "To interview a doctor"
   ],
-  "correct": 1,
   "audio_id": "A2L08",
   "audio_title": "Podcast: healthy habits",
   "audio_format": "Monólogo",
@@ -1313,7 +1248,6 @@
    "Nine at night",
    "Midnight"
   ],
-  "correct": 1,
   "audio_id": "A2L09",
   "audio_title": "University orientation for new students",
   "audio_format": "Monólogo",
@@ -1333,7 +1267,6 @@
    "Third floor of the science building",
    "Ground floor of the cafeteria"
   ],
-  "correct": 1,
   "audio_id": "A2L09",
   "audio_title": "University orientation for new students",
   "audio_format": "Monólogo",
@@ -1353,7 +1286,6 @@
    "To recruit students for a club",
    "To explain course grading"
   ],
-  "correct": 1,
   "audio_id": "A2L09",
   "audio_title": "University orientation for new students",
   "audio_format": "Monólogo",
@@ -1373,7 +1305,6 @@
    "Forty-five dollars",
    "Fifty dollars"
   ],
-  "correct": 1,
   "audio_id": "A2L10",
   "audio_title": "Asking about a gym membership",
   "audio_format": "Diálogo",
@@ -1393,7 +1324,6 @@
    "Nine in the evening",
    "It's closed on Sunday"
   ],
-  "correct": 0,
   "audio_id": "A2L10",
   "audio_title": "Asking about a gym membership",
   "audio_format": "Diálogo",
@@ -1413,7 +1343,6 @@
    "To complain about the gym",
    "To ask for a refund"
   ],
-  "correct": 1,
   "audio_id": "A2L10",
   "audio_title": "Asking about a gym membership",
   "audio_format": "Diálogo",
@@ -1433,7 +1362,6 @@
    "Ten in the morning",
    "Noon"
   ],
-  "correct": 1,
   "audio_id": "A2L11",
   "audio_title": "Community announcement: weekend market",
   "audio_format": "Monólogo",
@@ -1453,7 +1381,6 @@
    "It moves to next weekend",
    "Nothing changes"
   ],
-  "correct": 1,
   "audio_id": "A2L11",
   "audio_title": "Community announcement: weekend market",
   "audio_format": "Monólogo",
@@ -1473,7 +1400,6 @@
    "To ask for volunteers",
    "To announce road closures"
   ],
-  "correct": 1,
   "audio_id": "A2L11",
   "audio_title": "Community announcement: weekend market",
   "audio_format": "Monólogo",
@@ -1493,7 +1419,6 @@
    "They forgot about it",
    "The office is closed"
   ],
-  "correct": 1,
   "audio_id": "A2L12",
   "audio_title": "Work call: rescheduling a meeting",
   "audio_format": "Diálogo",
@@ -1513,7 +1438,6 @@
    "Friday",
    "Monday"
   ],
-  "correct": 1,
   "audio_id": "A2L12",
   "audio_title": "Work call: rescheduling a meeting",
   "audio_format": "Diálogo",
@@ -1533,7 +1457,6 @@
    "To ask for a raise",
    "To complain about a colleague"
   ],
-  "correct": 1,
   "audio_id": "A2L12",
   "audio_title": "Work call: rescheduling a meeting",
   "audio_format": "Diálogo",
@@ -1553,7 +1476,6 @@
    "Friday and Saturday",
    "Only Sunday"
   ],
-  "correct": 1,
   "audio_id": "A2L13",
   "audio_title": "Weather forecast with recommendations",
   "audio_format": "Monólogo",
@@ -1573,7 +1495,6 @@
    "Thirty degrees",
    "Twenty degrees"
   ],
-  "correct": 1,
   "audio_id": "A2L13",
   "audio_title": "Weather forecast with recommendations",
   "audio_format": "Monólogo",
@@ -1593,7 +1514,6 @@
    "To cancel outdoor events",
    "To advertise umbrellas"
   ],
-  "correct": 1,
   "audio_id": "A2L13",
   "audio_title": "Weather forecast with recommendations",
   "audio_format": "Monólogo",
@@ -1613,7 +1533,6 @@
    "Free lunch at home",
    "Shorter work weeks"
   ],
-  "correct": 1,
   "audio_id": "B1L01",
   "audio_title": "Podcast: the rise of remote work",
   "audio_format": "Monólogo",
@@ -1633,7 +1552,6 @@
    "Neutral and indifferent",
    "Confused about the topic"
   ],
-  "correct": 1,
   "audio_id": "B1L01",
   "audio_title": "Podcast: the rise of remote work",
   "audio_format": "Monólogo",
@@ -1653,7 +1571,6 @@
    "Separating work and personal time",
    "Trouble with internet access"
   ],
-  "correct": 3,
   "audio_id": "B1L01",
   "audio_title": "Podcast: the rise of remote work",
   "audio_format": "Monólogo",
@@ -1673,7 +1590,6 @@
    "Ten years ago",
    "One year ago"
   ],
-  "correct": 1,
   "audio_id": "B1L02",
   "audio_title": "Interview: local business owner",
   "audio_format": "Diálogo",
@@ -1693,7 +1609,6 @@
    "Three",
    "Four"
   ],
-  "correct": 1,
   "audio_id": "B1L02",
   "audio_title": "Interview: local business owner",
   "audio_format": "Diálogo",
@@ -1713,7 +1628,6 @@
    "Completely confident with no concerns",
    "Uninterested in the business now"
   ],
-  "correct": 1,
   "audio_id": "B1L02",
   "audio_title": "Interview: local business owner",
   "audio_format": "Diálogo",
@@ -1733,7 +1647,6 @@
    "Increased competition",
    "Problems with suppliers"
   ],
-  "correct": 3,
   "audio_id": "B1L02",
   "audio_title": "Interview: local business owner",
   "audio_format": "Diálogo",
@@ -1753,7 +1666,6 @@
    "Three weeks",
    "One month"
   ],
-  "correct": 1,
   "audio_id": "B1L03",
   "audio_title": "Work meeting: project delay",
   "audio_format": "Diálogo",
@@ -1773,7 +1685,6 @@
    "Angry at Brian",
    "Indifferent"
   ],
-  "correct": 1,
   "audio_id": "B1L03",
   "audio_title": "Work meeting: project delay",
   "audio_format": "Diálogo",
@@ -1793,7 +1704,6 @@
    "An employee being sick",
    "Lack of budget for the project"
   ],
-  "correct": 3,
   "audio_id": "B1L03",
   "audio_title": "Work meeting: project delay",
   "audio_format": "Diálogo",
@@ -1813,7 +1723,6 @@
    "Twenty-two degrees",
    "Twenty-five degrees"
   ],
-  "correct": 1,
   "audio_id": "B1L04",
   "audio_title": "Podcast: tips for sleeping better",
   "audio_format": "Monólogo",
@@ -1833,7 +1742,6 @@
    "Bored and indifferent",
    "Angry and frustrated"
   ],
-  "correct": 1,
   "audio_id": "B1L04",
   "audio_title": "Podcast: tips for sleeping better",
   "audio_format": "Monólogo",
@@ -1853,7 +1761,6 @@
    "Exercising in the morning",
    "Keeping the room cool"
   ],
-  "correct": 2,
   "audio_id": "B1L04",
   "audio_title": "Podcast: tips for sleeping better",
   "audio_format": "Monólogo",
@@ -1873,7 +1780,6 @@
    "Two weeks",
    "One month"
   ],
-  "correct": 1,
   "audio_id": "B1L05",
   "audio_title": "Customer service call: defective product",
   "audio_format": "Diálogo",
@@ -1893,7 +1799,6 @@
    "Confused",
    "Indifferent"
   ],
-  "correct": 1,
   "audio_id": "B1L05",
   "audio_title": "Customer service call: defective product",
   "audio_format": "Diálogo",
@@ -1913,7 +1818,6 @@
    "A burning smell before it stopped",
    "It stopped working completely"
   ],
-  "correct": 2,
   "audio_id": "B1L05",
   "audio_title": "Customer service call: defective product",
   "audio_format": "Diálogo",
@@ -1933,7 +1837,6 @@
    "One year",
    "Two months"
   ],
-  "correct": 1,
   "audio_id": "B1L06",
   "audio_title": "Interview: student who did an exchange",
   "audio_format": "Diálogo",
@@ -1953,7 +1856,6 @@
    "Indifferent",
    "Mostly negative"
   ],
-  "correct": 1,
   "audio_id": "B1L06",
   "audio_title": "Interview: student who did an exchange",
   "audio_format": "Diálogo",
@@ -1973,7 +1875,6 @@
    "Adjusting to a different academic system",
    "Running out of money during the trip"
   ],
-  "correct": 3,
   "audio_id": "B1L06",
   "audio_title": "Interview: student who did an exchange",
   "audio_format": "Diálogo",
@@ -1993,7 +1894,6 @@
    "Every twenty minutes",
    "Every twenty-five minutes"
   ],
-  "correct": 1,
   "audio_id": "B1L07",
   "audio_title": "Radio announcement: public transport changes",
   "audio_format": "Monólogo",
@@ -2013,7 +1913,6 @@
    "Angry and critical",
    "Humorous and casual"
   ],
-  "correct": 1,
   "audio_id": "B1L07",
   "audio_title": "Radio announcement: public transport changes",
   "audio_format": "Monólogo",
@@ -2033,7 +1932,6 @@
    "A temporary suspension of route eight",
    "An increase in ticket prices"
   ],
-  "correct": 3,
   "audio_id": "B1L07",
   "audio_title": "Radio announcement: public transport changes",
   "audio_format": "Monólogo",
@@ -2053,7 +1951,6 @@
    "Fifty percent",
    "Ten percent"
   ],
-  "correct": 1,
   "audio_id": "B1L08",
   "audio_title": "Conversation: deciding to move to another city",
   "audio_format": "Diálogo",
@@ -2073,7 +1970,6 @@
    "Excited from the very beginning",
    "Angry and refusing to discuss it"
   ],
-  "correct": 1,
   "audio_id": "B1L08",
   "audio_title": "Conversation: deciding to move to another city",
   "audio_format": "Diálogo",
@@ -2093,7 +1989,6 @@
    "The cost of living",
    "The quality of local schools"
   ],
-  "correct": 3,
   "audio_id": "B1L08",
   "audio_title": "Conversation: deciding to move to another city",
   "audio_format": "Diálogo",
@@ -2113,7 +2008,6 @@
    "More than five hours",
    "More than ten hours"
   ],
-  "correct": 1,
   "audio_id": "B1L09",
   "audio_title": "Podcast: social media risks for young people",
   "audio_format": "Monólogo",
@@ -2133,7 +2027,6 @@
    "Completely dismissive of the issue",
    "Excited and celebratory"
   ],
-  "correct": 1,
   "audio_id": "B1L09",
   "audio_title": "Podcast: social media risks for young people",
   "audio_format": "Monólogo",
@@ -2153,7 +2046,6 @@
    "Exposure to unrealistic beauty standards",
    "Cyberbullying from other users"
   ],
-  "correct": 3,
   "audio_id": "B1L09",
   "audio_title": "Podcast: social media risks for young people",
   "audio_format": "Monólogo",
@@ -2173,7 +2065,6 @@
    "Fifty percent",
    "Twenty percent"
   ],
-  "correct": 1,
   "audio_id": "B1L10",
   "audio_title": "Job interview: questions about experience",
   "audio_format": "Diálogo",
@@ -2193,7 +2084,6 @@
    "Angry and defensive",
    "Bored and uninterested"
   ],
-  "correct": 1,
   "audio_id": "B1L10",
   "audio_title": "Job interview: questions about experience",
   "audio_format": "Diálogo",
@@ -2213,7 +2103,6 @@
    "How she handles tight deadlines",
    "Her expected salary for the new role"
   ],
-  "correct": 3,
   "audio_id": "B1L10",
   "audio_title": "Job interview: questions about experience",
   "audio_format": "Diálogo",
@@ -2233,7 +2122,6 @@
    "Seven nights",
    "Four nights"
   ],
-  "correct": 1,
   "audio_id": "B1L11",
   "audio_title": "Booking a trip with a travel agency",
   "audio_format": "Diálogo",
@@ -2253,7 +2141,6 @@
    "Confused",
    "Indifferent"
   ],
-  "correct": 1,
   "audio_id": "B1L11",
   "audio_title": "Booking a trip with a travel agency",
   "audio_format": "Diálogo",
@@ -2273,7 +2160,6 @@
    "A guided boat tour",
    "A rental car"
   ],
-  "correct": 3,
   "audio_id": "B1L11",
   "audio_title": "Booking a trip with a travel agency",
   "audio_format": "Diálogo",
@@ -2293,7 +2179,6 @@
    "Five years ago",
    "Six months ago"
   ],
-  "correct": 1,
   "audio_id": "B1L12",
   "audio_title": "Podcast: the value of learning a new language",
   "audio_format": "Monólogo",
@@ -2313,7 +2198,6 @@
    "Bored and repetitive",
    "Critical of language learning apps"
   ],
-  "correct": 1,
   "audio_id": "B1L12",
   "audio_title": "Podcast: the value of learning a new language",
   "audio_format": "Monólogo",
@@ -2333,7 +2217,6 @@
    "Making new friends through the process",
    "Earning a higher salary at work"
   ],
-  "correct": 3,
   "audio_id": "B1L12",
   "audio_title": "Podcast: the value of learning a new language",
   "audio_format": "Monólogo",
@@ -2353,7 +2236,6 @@
    "Ten thousand dollars",
    "Three thousand dollars"
   ],
-  "correct": 1,
   "audio_id": "B1L13",
   "audio_title": "Discussion: buying a used car vs. a new one",
   "audio_format": "Diálogo",
@@ -2373,7 +2255,6 @@
    "He starts against cars entirely",
    "He becomes angry at George"
   ],
-  "correct": 1,
   "audio_id": "B1L13",
   "audio_title": "Discussion: buying a used car vs. a new one",
   "audio_format": "Diálogo",
@@ -2393,7 +2274,6 @@
    "The price difference between used and new",
    "The cost of car insurance"
   ],
-  "correct": 3,
   "audio_id": "B1L13",
   "audio_title": "Discussion: buying a used car vs. a new one",
   "audio_format": "Diálogo",
@@ -2413,7 +2293,6 @@
    "Completely neutral with no opinion",
    "Enthusiastic about how well it works"
   ],
-  "correct": 1,
   "audio_id": "B2L01",
   "audio_title": "Conference keynote: the hidden economics of music streaming",
   "audio_format": "Monólogo",
@@ -2433,7 +2312,6 @@
    "The technology to change it doesn't exist yet",
    "Only small platforms are legally allowed to use it"
   ],
-  "correct": 1,
   "audio_id": "B2L01",
   "audio_title": "Conference keynote: the hidden economics of music streaming",
   "audio_format": "Monólogo",
@@ -2453,7 +2331,6 @@
    "Smaller platforms testing alternative models",
    "Government regulations requiring fair payment"
   ],
-  "correct": 3,
   "audio_id": "B2L01",
   "audio_title": "Conference keynote: the hidden economics of music streaming",
   "audio_format": "Monólogo",
@@ -2473,7 +2350,6 @@
    "Dismissive of the topic",
    "Frustrated and annoyed"
   ],
-  "correct": 1,
   "audio_id": "B2L02",
   "audio_title": "Two friends: why songs get stuck in our heads",
   "audio_format": "Diálogo",
@@ -2493,7 +2369,6 @@
    "Because avoiding songs makes people feel guilty",
    "Because scientists have proven avoidance increases stress"
   ],
-  "correct": 1,
   "audio_id": "B2L02",
   "audio_title": "Two friends: why songs get stuck in our heads",
   "audio_format": "Diálogo",
@@ -2513,7 +2388,6 @@
    "Playing a completely different, louder song",
    "The brain seeking to resolve the musical pattern"
   ],
-  "correct": 2,
   "audio_id": "B2L02",
   "audio_title": "Two friends: why songs get stuck in our heads",
   "audio_format": "Diálogo",
@@ -2533,7 +2407,6 @@
    "He is confirming that the situation is completely under control",
    "He is criticizing the panel for asking difficult questions"
   ],
-  "correct": 1,
   "audio_id": "B2L03",
   "audio_title": "Presenting to a funding panel: coral reef restoration",
   "audio_format": "Diálogo",
@@ -2553,7 +2426,6 @@
    "Because governments only fund restoration projects",
    "Because scientists prefer restoration work over climate policy"
   ],
-  "correct": 1,
   "audio_id": "B2L03",
   "audio_title": "Presenting to a funding panel: coral reef restoration",
   "audio_format": "Diálogo",
@@ -2573,7 +2445,6 @@
    "Learning which coral species resist heat better",
    "The exact financial cost of restoration projects"
   ],
-  "correct": 3,
   "audio_id": "B2L03",
   "audio_title": "Presenting to a funding panel: coral reef restoration",
   "audio_format": "Diálogo",
@@ -2593,7 +2464,6 @@
    "He believes Charlotte is lying to him",
    "He wants Charlotte to feel guilty"
   ],
-  "correct": 1,
   "audio_id": "B2L04",
   "audio_title": "A parent and their child discuss a career in esports",
   "audio_format": "Diálogo",
@@ -2613,7 +2483,6 @@
    "Because sponsors stop paying older players automatically",
    "Because government regulations limit player age"
   ],
-  "correct": 1,
   "audio_id": "B2L04",
   "audio_title": "A parent and their child discuss a career in esports",
   "audio_format": "Diálogo",
@@ -2633,7 +2502,6 @@
    "University scholarships for esports athletes",
    "The risk of burnout among players"
   ],
-  "correct": 2,
   "audio_id": "B2L04",
   "audio_title": "A parent and their child discuss a career in esports",
   "audio_format": "Diálogo",
@@ -2653,7 +2521,6 @@
    "Completely confident nothing is ever lost in translation",
    "Indifferent to the challenges of the job"
   ],
-  "correct": 1,
   "audio_id": "B2L05",
   "audio_title": "Coffee break chat: the hardest part of translating literature",
   "audio_format": "Diálogo",
@@ -2673,7 +2540,6 @@
    "Meaning should always be sacrificed for rhythm",
    "Rhythm is irrelevant to good translation"
   ],
-  "correct": 1,
   "audio_id": "B2L05",
   "audio_title": "Coffee break chat: the hardest part of translating literature",
   "audio_format": "Diálogo",
@@ -2693,7 +2559,6 @@
    "The number of languages the translator can speak",
    "Translation as an imperfect \"bridge\" between languages"
   ],
-  "correct": 2,
   "audio_id": "B2L05",
   "audio_title": "Coffee break chat: the hardest part of translating literature",
   "audio_format": "Diálogo",
@@ -2713,7 +2578,6 @@
    "Indifferent to how the media covers the topic",
    "Angry at journalists for lying"
   ],
-  "correct": 1,
   "audio_id": "B2L06",
   "audio_title": "Public talk at the observatory: the search for exoplanets",
   "audio_format": "Diálogo",
@@ -2733,7 +2597,6 @@
    "She believes no exoplanets will ever be habitable",
    "She believes the habitable zone concept is meaningless"
   ],
-  "correct": 1,
   "audio_id": "B2L06",
   "audio_title": "Public talk at the observatory: the search for exoplanets",
   "audio_format": "Diálogo",
@@ -2753,7 +2616,6 @@
    "The name of the star system with the most known exoplanets",
    "Upcoming telescopes that could analyze atmospheres"
   ],
-  "correct": 2,
   "audio_id": "B2L06",
   "audio_title": "Public talk at the observatory: the search for exoplanets",
   "audio_format": "Diálogo",
@@ -2773,7 +2635,6 @@
    "They are arguing angrily with no common ground at all",
    "One speaker completely changes their position by the end"
   ],
-  "correct": 1,
   "audio_id": "B2L07",
   "audio_title": "Office debate: should the company use facial recognition?",
   "audio_format": "Diálogo",
@@ -2793,7 +2654,6 @@
    "He is planning to escalate the disagreement further",
    "He has completely changed his mind to agree with Charlotte"
   ],
-  "correct": 1,
   "audio_id": "B2L07",
   "audio_title": "Office debate: should the company use facial recognition?",
   "audio_format": "Diálogo",
@@ -2813,7 +2673,6 @@
    "Because governments require them to deploy it immediately",
    "Because accuracy problems only affect a tiny, insignificant number of people"
   ],
-  "correct": 1,
   "audio_id": "B2L07",
   "audio_title": "Office debate: should the company use facial recognition?",
   "audio_format": "Diálogo",
@@ -2833,7 +2692,6 @@
    "The financial cost of implementing these systems",
    "The lack of a unified legal framework across departments"
   ],
-  "correct": 2,
   "audio_id": "B2L07",
   "audio_title": "Office debate: should the company use facial recognition?",
   "audio_format": "Diálogo",
@@ -2853,7 +2711,6 @@
    "Critical of the perfume industry",
    "Confused about the topic"
   ],
-  "correct": 1,
   "audio_id": "B2L08",
   "audio_title": "Museum audio guide: the art and science of perfume",
   "audio_format": "Monólogo",
@@ -2873,7 +2730,6 @@
    "Because it makes the perfume cheaper to produce",
    "Because customers demand specific memories"
   ],
-  "correct": 1,
   "audio_id": "B2L08",
   "audio_title": "Museum audio guide: the art and science of perfume",
   "audio_format": "Monólogo",
@@ -2893,7 +2749,6 @@
    "The average retail price of perfume bottles",
    "The connection between smell and memory"
   ],
-  "correct": 2,
   "audio_id": "B2L08",
   "audio_title": "Museum audio guide: the art and science of perfume",
   "audio_format": "Monólogo",
@@ -2913,7 +2768,6 @@
    "He believes Charlotte is comforting him on purpose",
    "He wants to reassure Charlotte"
   ],
-  "correct": 1,
   "audio_id": "B2L09",
   "audio_title": "Neighbors discuss the new pedestrian street",
   "audio_format": "Diálogo",
@@ -2933,7 +2787,6 @@
    "Because the government cancelled funding",
    "Because pedestrians refused to use the new streets"
   ],
-  "correct": 1,
   "audio_id": "B2L09",
   "audio_title": "Neighbors discuss the new pedestrian street",
   "audio_format": "Diálogo",
@@ -2953,7 +2806,6 @@
    "The exact budget required for these redesign projects",
    "The importance of community input before redesigns"
   ],
-  "correct": 2,
   "audio_id": "B2L09",
   "audio_title": "Neighbors discuss the new pedestrian street",
   "audio_format": "Diálogo",
@@ -2973,7 +2825,6 @@
    "Indifferent to historical accuracy entirely",
    "Focused only on making instruments sound modern"
   ],
-  "correct": 1,
   "audio_id": "B2L10",
   "audio_title": "Bringing a family heirloom violin to be restored",
   "audio_format": "Diálogo",
@@ -2993,7 +2844,6 @@
    "Because no one manufactures instrument materials anymore",
    "Because customers refuse to pay for proper materials"
   ],
-  "correct": 1,
   "audio_id": "B2L10",
   "audio_title": "Bringing a family heirloom violin to be restored",
   "audio_format": "Diálogo",
@@ -3013,7 +2863,6 @@
    "The specific country where he trained as a restorer",
    "His case-by-case approach depending on the instrument"
   ],
-  "correct": 2,
   "audio_id": "B2L10",
   "audio_title": "Bringing a family heirloom violin to be restored",
   "audio_format": "Diálogo",
@@ -3033,7 +2882,6 @@
    "She is criticizing George for exaggerating",
    "She believes museums should stop trying entirely"
   ],
-  "correct": 1,
   "audio_id": "B2L11",
   "audio_title": "Friends debate: should museums return artifacts?",
   "audio_format": "Diálogo",
@@ -3053,7 +2901,6 @@
    "He believes all countries already have sufficient museum infrastructure",
    "He believes Alice is lying about her true opinion"
   ],
-  "correct": 1,
   "audio_id": "B2L11",
   "audio_title": "Friends debate: should museums return artifacts?",
   "audio_format": "Diálogo",
@@ -3073,7 +2920,6 @@
    "A specific artifact or museum named as an example",
    "The idea of phased returns with international support"
   ],
-  "correct": 2,
   "audio_id": "B2L11",
   "audio_title": "Friends debate: should museums return artifacts?",
   "audio_format": "Diálogo",
@@ -3093,7 +2939,6 @@
    "Indifferent to how the public perceives his field",
    "Amused by the inaccuracies with no real concern"
   ],
-  "correct": 1,
   "audio_id": "B2L12",
   "audio_title": "University careers panel: what forensic science really involves",
   "audio_format": "Diálogo",
@@ -3113,7 +2958,6 @@
    "Because television shows exposed fraud in forensic labs",
    "Because DNA evidence has become completely obsolete"
   ],
-  "correct": 1,
   "audio_id": "B2L12",
   "audio_title": "University careers panel: what forensic science really involves",
   "audio_format": "Diálogo",
@@ -3133,7 +2977,6 @@
    "The exact number of wrongful convictions linked to these methods",
    "Reforms like more rigorous standards and peer review"
   ],
-  "correct": 2,
   "audio_id": "B2L12",
   "audio_title": "University careers panel: what forensic science really involves",
   "audio_format": "Diálogo",
@@ -3153,7 +2996,6 @@
    "Indifferent to the topic",
    "Critical of how much time these athletes dedicate to training"
   ],
-  "correct": 1,
   "audio_id": "B2L13",
   "audio_title": "University lecture: the competitive world of memory athletes",
   "audio_format": "Monólogo",
@@ -3173,7 +3015,6 @@
    "It suggests memorization should no longer be taught in schools",
    "It suggests brain structure differences make training pointless"
   ],
-  "correct": 1,
   "audio_id": "B2L13",
   "audio_title": "University lecture: the competitive world of memory athletes",
   "audio_format": "Monólogo",
@@ -3193,7 +3034,6 @@
    "The exact age most memory athletes begin training",
    "The large time investment required to compete"
   ],
-  "correct": 2,
   "audio_id": "B2L13",
   "audio_title": "University lecture: the competitive world of memory athletes",
   "audio_format": "Monólogo",

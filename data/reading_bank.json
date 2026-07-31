@@ -13,7 +13,6 @@
    "7:15",
    "8:00"
   ],
-  "correct": 2,
   "audio_id": null,
   "text_title": "Marta's daily routine"
  },
@@ -31,7 +30,6 @@
    "At the shop",
    "At a restaurant"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Marta's daily routine"
  },
@@ -49,7 +47,6 @@
    "They live together",
    "She doesn't like calling her"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Marta's daily routine"
  },
@@ -67,7 +64,6 @@
    "angry",
    "hungry"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Marta's daily routine"
  },
@@ -85,7 +81,6 @@
    "2",
    "3"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Regional train schedule"
  },
@@ -103,7 +98,6 @@
    "$4",
    "$4.50"
   ],
-  "correct": 2,
   "audio_id": null,
   "text_title": "Regional train schedule"
  },
@@ -121,7 +115,6 @@
    "1:15 PM",
    "6:45 PM"
   ],
-  "correct": 3,
   "audio_id": null,
   "text_title": "Regional train schedule"
  },
@@ -139,7 +132,6 @@
    "is more expensive",
    "arrives late"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Regional train schedule"
  },
@@ -157,7 +149,6 @@
    "Visit grandparents",
    "Play outside"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Torres family weekend"
  },
@@ -175,7 +166,6 @@
    "At the beach",
    "In the mountains"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Torres family weekend"
  },
@@ -193,7 +183,6 @@
    "Because grandpa is tired",
    "Because the children are sick"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Torres family weekend"
  },
@@ -211,7 +200,6 @@
    "travels far",
    "cooks dinner"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Torres family weekend"
  },
@@ -229,7 +217,6 @@
    "$8",
    "$1.50"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Grocery store receipt"
  },
@@ -247,7 +234,6 @@
    "Check",
    "App"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Grocery store receipt"
  },
@@ -265,7 +251,6 @@
    "$19",
    "$21"
   ],
-  "correct": 2,
   "audio_id": null,
   "text_title": "Grocery store receipt"
  },
@@ -283,7 +268,6 @@
    "a payment method",
    "a shopping list"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Grocery store receipt"
  },
@@ -301,7 +285,6 @@
    "Sunrise Health",
    "Ana Torres"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Clinic appointment card"
  },
@@ -319,7 +302,6 @@
    "A gift",
    "Medicine"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Clinic appointment card"
  },
@@ -337,7 +319,6 @@
    "3:30 PM",
    "3:45 PM"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Clinic appointment card"
  },
@@ -355,7 +336,6 @@
    "a type of payment",
    "an emergency visit"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Clinic appointment card"
  },
@@ -373,7 +353,6 @@
    "Friday",
    "Sunday"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Julia's painting class"
  },
@@ -391,7 +370,6 @@
    "Elena",
    "Julia's father"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "Julia's painting class"
  },
@@ -409,7 +387,6 @@
    "She thinks it's boring",
    "She is the best student"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Julia's painting class"
  },
@@ -427,7 +404,6 @@
    "is strict",
    "is impatient"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Julia's painting class"
  },
@@ -445,7 +421,6 @@
    "10:00 AM",
    "4:00 PM"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "Weekend trip itinerary"
  },
@@ -463,7 +438,6 @@
    "Green Hill",
    "Lakeview"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Weekend trip itinerary"
  },
@@ -481,7 +455,6 @@
    "2.5 hours",
    "3.5 hours"
   ],
-  "correct": 2,
   "audio_id": null,
   "text_title": "Weekend trip itinerary"
  },
@@ -499,7 +472,6 @@
    "must stay at the hotel",
    "have a guided tour"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Weekend trip itinerary"
  },
@@ -517,7 +489,6 @@
    "Rex",
    "Sofia"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Camila's cat Luna"
  },
@@ -535,7 +506,6 @@
    "A toy",
    "A new cat"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Camila's cat Luna"
  },
@@ -553,7 +523,6 @@
    "Because Luna was lost",
    "Because the vet called her"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Camila's cat Luna"
  },
@@ -571,7 +540,6 @@
    "angry",
    "bored"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Camila's cat Luna"
  },
@@ -589,7 +557,6 @@
    "History",
    "Science"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Westfield School week"
  },
@@ -607,7 +574,6 @@
    "City Park",
    "Zoo"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "Westfield School week"
  },
@@ -625,7 +591,6 @@
    "Art supplies, for the museum",
    "Nothing special"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Westfield School week"
  },
@@ -643,7 +608,6 @@
    "a sports competition",
    "a homework assignment"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Westfield School week"
  },
@@ -661,7 +625,6 @@
    "10 AM",
    "7 AM"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Riverside community notice board"
  },
@@ -679,7 +642,6 @@
    "Orange",
    "White"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Riverside community notice board"
  },
@@ -697,7 +659,6 @@
    "Wait until Sunday",
    "Call 555-0192"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Riverside community notice board"
  },
@@ -715,7 +676,6 @@
    "only for children",
    "cancelled"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Riverside community notice board"
  },
@@ -733,7 +693,6 @@
    "7:00 AM",
    "8:00 AM"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "Pedro's bakery job"
  },
@@ -751,7 +710,6 @@
    "Visits the bakery",
    "Cleans the shop"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Pedro's bakery job"
  },
@@ -769,7 +727,6 @@
    "Talking to customers",
    "Cleaning"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Pedro's bakery job"
  },
@@ -787,7 +744,6 @@
    "low prices",
    "few products"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Pedro's bakery job"
  },
@@ -805,7 +761,6 @@
    "20°C",
    "22°C"
   ],
-  "correct": 2,
   "audio_id": null,
   "text_title": "Weekly weather in Riverton"
  },
@@ -823,7 +778,6 @@
    "Thursday",
    "Friday"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Weekly weather in Riverton"
  },
@@ -841,7 +795,6 @@
    "Thursday",
    "Friday"
   ],
-  "correct": 3,
   "audio_id": null,
   "text_title": "Weekly weather in Riverton"
  },
@@ -859,7 +812,6 @@
    "strong wind",
    "low temperature"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "Weekly weather in Riverton"
  },
@@ -877,7 +829,6 @@
    "75",
    "80"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Grandpa's birthday"
  },
@@ -895,7 +846,6 @@
    "Angry",
    "Nervous"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Grandpa's birthday"
  },
@@ -913,7 +863,6 @@
    "Four",
    "Five"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Daniel's remote work change"
  },
@@ -931,7 +880,6 @@
    "Exercises",
    "Finishes his tasks"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Daniel's remote work change"
  },
@@ -949,7 +897,6 @@
    "forget",
    "avoid"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Daniel's remote work change"
  },
@@ -967,7 +914,6 @@
    "He works fewer hours in total",
    "He dislikes his new schedule"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Daniel's remote work change"
  },
@@ -985,7 +931,6 @@
    "He started exercising more",
    "He finished his tasks by 5 PM"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Daniel's remote work change"
  },
@@ -1003,7 +948,6 @@
    "Five years",
    "Two years"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Riverdale Hawks' championship"
  },
@@ -1021,7 +965,6 @@
    "0-0",
    "2-0"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Riverdale Hawks' championship"
  },
@@ -1039,7 +982,6 @@
    "watched the game",
    "bought the team"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Riverdale Hawks' championship"
  },
@@ -1057,7 +999,6 @@
    "Because the season was shorter",
    "Because they changed cities"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Riverdale Hawks' championship"
  },
@@ -1075,7 +1016,6 @@
    "The season began",
    "The team lost several matches"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Riverdale Hawks' championship"
  },
@@ -1093,7 +1033,6 @@
    "Snacks only",
    "Sandwiches"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Ana's bakery decision"
  },
@@ -1111,7 +1050,6 @@
    "She closed the afternoon shop",
    "She lowered all prices"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Ana's bakery decision"
  },
@@ -1129,7 +1067,6 @@
    "a type of bread",
    "a type of customer"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Ana's bakery decision"
  },
@@ -1147,7 +1084,6 @@
    "Because she wanted to close the bakery",
    "Because the trial month failed completely"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Ana's bakery decision"
  },
@@ -1165,7 +1101,6 @@
    "Hired new employees",
    "Increased all her prices"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Ana's bakery decision"
  },
@@ -1183,7 +1118,6 @@
    "Exercise at night",
    "Drink less coffee"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "A simple habit for better sleep"
  },
@@ -1201,7 +1135,6 @@
    "In the kitchen",
    "At work"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "A simple habit for better sleep"
  },
@@ -1219,7 +1152,6 @@
    "is very cheap",
    "happens often"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "A simple habit for better sleep"
  },
@@ -1237,7 +1169,6 @@
    "Because his friend asked him to",
    "Because he read about it in a book"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "A simple habit for better sleep"
  },
@@ -1255,7 +1186,6 @@
    "He stopped the habit quickly",
    "He bought a new phone"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "A simple habit for better sleep"
  },
@@ -1273,7 +1203,6 @@
    "Yellow",
    "Red"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Neighborhood recycling program"
  },
@@ -1291,7 +1220,6 @@
    "It closed the program",
    "It gave fines"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Neighborhood recycling program"
  },
@@ -1309,7 +1237,6 @@
    "angry",
    "tired"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Neighborhood recycling program"
  },
@@ -1327,7 +1254,6 @@
    "Volunteers are not helpful",
    "People never learn new habits"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Neighborhood recycling program"
  },
@@ -1345,7 +1271,6 @@
    "Fined the neighbors",
    "Ended the program"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Neighborhood recycling program"
  },
@@ -1363,7 +1288,6 @@
    "She quit her job",
    "She stopped using the app"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Learning a new app for work"
  },
@@ -1381,7 +1305,6 @@
    "She asked her boss to do it",
    "She read the manual only"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Learning a new app for work"
  },
@@ -1399,7 +1322,6 @@
    "angrily",
    "secretly"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Learning a new app for work"
  },
@@ -1417,7 +1339,6 @@
    "She dislikes technology completely",
    "She never asks for help"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Learning a new app for work"
  },
@@ -1435,7 +1356,6 @@
    "She was fired",
    "She stopped attending meetings"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Learning a new app for work"
  },
@@ -1453,7 +1373,6 @@
    "A book sale",
    "A marathon"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "A community charity event"
  },
@@ -1471,7 +1390,6 @@
    "Build a new building",
    "Give it to volunteers"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "A community charity event"
  },
@@ -1489,7 +1407,6 @@
    "borrowed something",
    "bought something"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "A community charity event"
  },
@@ -1507,7 +1424,6 @@
    "Because the hospital paid for it",
    "Because it lasted longer"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "A community charity event"
  },
@@ -1525,7 +1441,6 @@
    "The event ended",
    "Money was already given to the hospital"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "A community charity event"
  },
@@ -1543,7 +1458,6 @@
    "SK140",
    "SK221"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Flight e-ticket with connection"
  },
@@ -1561,7 +1475,6 @@
    "No checked bags",
    "1 bag (30kg)"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Flight e-ticket with connection"
  },
@@ -1579,7 +1492,6 @@
    "an extra fee",
    "a type of luggage"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Flight e-ticket with connection"
  },
@@ -1597,7 +1509,6 @@
    "One week before",
    "She cannot check in online"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Flight e-ticket with connection"
  },
@@ -1615,7 +1526,6 @@
    "Laura changes airlines",
    "Laura's flight is cancelled"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Flight e-ticket with connection"
  },
@@ -1633,7 +1543,6 @@
    "3",
    "4"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Gym membership application"
  },
@@ -1651,7 +1560,6 @@
    "$40",
    "$60"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Gym membership application"
  },
@@ -1669,7 +1577,6 @@
    "upgrade",
    "renew"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Gym membership application"
  },
@@ -1687,7 +1594,6 @@
    "He gets a full refund",
    "He must pay double"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Gym membership application"
  },
@@ -1705,7 +1611,6 @@
    "Freeze his membership first",
    "Pay an extra fee"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Gym membership application"
  },
@@ -1723,7 +1628,6 @@
    "10:00",
    "11:30"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Conference day program"
  },
@@ -1741,7 +1645,6 @@
    "Local Business",
    "Cities of Tomorrow"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Conference day program"
  },
@@ -1759,7 +1662,6 @@
    "after the event",
    "only for members"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Conference day program"
  },
@@ -1777,7 +1679,6 @@
    "It is too expensive",
    "It is cancelled every year"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Conference day program"
  },
@@ -1795,7 +1696,6 @@
    "Panel discussion",
    "Closing remarks"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Conference day program"
  },
@@ -1813,7 +1713,6 @@
    "It was closed to traffic",
    "It was made stronger"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Bridge That Learned to Dance"
  },
@@ -1831,7 +1730,6 @@
    "Heavy traffic",
    "A construction error"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Bridge That Learned to Dance"
  },
@@ -1849,7 +1747,6 @@
    "To reduce construction costs",
    "To support heavier traffic"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Bridge That Learned to Dance"
  },
@@ -1867,7 +1764,6 @@
    "An unexpected failure led to better understanding of bridge design",
    "Wind tunnels are no longer necessary"
   ],
-  "correct": 2,
   "audio_id": null,
   "text_title": "The Bridge That Learned to Dance"
  },
@@ -1885,7 +1781,6 @@
    "became stronger",
    "disappeared completely"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Bridge That Learned to Dance"
  },
@@ -1903,7 +1798,6 @@
    "A stomach illness",
    "An allergic reaction"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Customer Who Sued Over a Cup of Coffee"
  },
@@ -1921,7 +1815,6 @@
    "Hundreds",
    "Thousands"
   ],
-  "correct": 2,
   "audio_id": null,
   "text_title": "The Customer Who Sued Over a Cup of Coffee"
  },
@@ -1939,7 +1832,6 @@
    "Because the customer worked for the company",
    "Because there was no evidence"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Customer Who Sued Over a Cup of Coffee"
  },
@@ -1957,7 +1849,6 @@
    "Completely uninterested",
    "Angry at the restaurant"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Customer Who Sued Over a Cup of Coffee"
  },
@@ -1975,7 +1866,6 @@
    "a court building",
    "a type of injury"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Customer Who Sued Over a Cup of Coffee"
  },
@@ -1993,7 +1883,6 @@
    "One month",
    "A full year"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Shipping Box That Changed the World"
  },
@@ -2011,7 +1900,6 @@
    "Weight and size",
    "Fuel use and speed"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Shipping Box That Changed the World"
  },
@@ -2029,7 +1917,6 @@
    "Because ships became bigger",
    "Because trade agreements changed"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Shipping Box That Changed the World"
  },
@@ -2047,7 +1934,6 @@
    "Ports no longer need workers",
    "Ships are the only way to trade goods"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Shipping Box That Changed the World"
  },
@@ -2065,7 +1951,6 @@
    "very expensive",
    "difficult to lift"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Shipping Box That Changed the World"
  },
@@ -2083,7 +1968,6 @@
    "An old photograph",
    "A handwriting test"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "When a Painting Ended Up in Court"
  },
@@ -2101,7 +1985,6 @@
    "Return the painting for free",
    "Pay the full amount back"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "When a Painting Ended Up in Court"
  },
@@ -2119,7 +2002,6 @@
    "Because the collector didn't pay enough",
    "Because the case was dismissed immediately"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "When a Painting Ended Up in Court"
  },
@@ -2137,7 +2019,6 @@
    "Whether galleries should close",
    "How much paintings should cost"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "When a Painting Ended Up in Court"
  },
@@ -2155,7 +2036,6 @@
    "treated kindly",
    "ignored completely"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "When a Painting Ended Up in Court"
  },
@@ -2173,7 +2053,6 @@
    "Only in-person visits",
    "Email only"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Hospital That Talks by Text Message"
  },
@@ -2191,7 +2070,6 @@
    "Only send medication",
    "Wait a week to respond"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Hospital That Talks by Text Message"
  },
@@ -2209,7 +2087,6 @@
    "They believed it was too expensive",
    "They didn't understand technology"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Hospital That Talks by Text Message"
  },
@@ -2227,7 +2104,6 @@
    "Neutral and indifferent",
    "Extremely critical"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Hospital That Talks by Text Message"
  },
@@ -2245,7 +2121,6 @@
    "a written test",
    "a legal document"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Hospital That Talks by Text Message"
  },
@@ -2263,7 +2138,6 @@
    "One year",
    "Two years"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Four-Day Week Experiment"
  },
@@ -2281,7 +2155,6 @@
    "Human resources",
    "Engineering"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Four-Day Week Experiment"
  },
@@ -2299,7 +2172,6 @@
    "Because there were fewer employees",
    "Because meetings were banned"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Four-Day Week Experiment"
  },
@@ -2317,7 +2189,6 @@
    "Only customer service liked the new schedule",
    "Employee salaries were reduced significantly"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Four-Day Week Experiment"
  },
@@ -2335,7 +2206,6 @@
    "A neutral experiment with no clear result",
    "A disaster for employee morale"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Four-Day Week Experiment"
  },
@@ -2353,7 +2223,6 @@
    "Ignored the criticism",
    "Fired the marketing team"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Ad That Backfired"
  },
@@ -2371,7 +2240,6 @@
    "It never spread widely",
    "After a year"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Ad That Backfired"
  },
@@ -2389,7 +2257,6 @@
    "Because it used the wrong colors",
    "Because it was too long"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Ad That Backfired"
  },
@@ -2407,7 +2274,6 @@
    "As irrelevant to the outcome",
    "As too slow to matter"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Ad That Backfired"
  },
@@ -2425,7 +2291,6 @@
    "sold the advertisement",
    "translated the advertisement"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Ad That Backfired"
  },
@@ -2443,7 +2308,6 @@
    "Coordinators",
    "Government regulators"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Office With No Bosses"
  },
@@ -2461,7 +2325,6 @@
    "Investors",
    "Consultants"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Office With No Bosses"
  },
@@ -2479,7 +2342,6 @@
    "Because the company was too small",
    "Because clients complained"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Office With No Bosses"
  },
@@ -2497,7 +2359,6 @@
    "The system failed completely and was abandoned",
    "Employees preferred having a single boss"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Office With No Bosses"
  },
@@ -2515,7 +2376,6 @@
    "less interested in their tasks",
    "unpaid for their work"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Office With No Bosses"
  },
@@ -2533,7 +2393,6 @@
    "Vision loss",
    "Hearing problems"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Invisible Cost of Burnout"
  },
@@ -2551,7 +2410,6 @@
    "Reducing all employee benefits",
    "Closing affected departments"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Invisible Cost of Burnout"
  },
@@ -2569,7 +2427,6 @@
    "Because salaries increase automatically",
    "Because of new government rules"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Invisible Cost of Burnout"
  },
@@ -2587,7 +2444,6 @@
    "Only weak employees experience burnout",
    "Burnout only affects physical health"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Invisible Cost of Burnout"
  },
@@ -2605,7 +2461,6 @@
    "As something that will never change public opinion",
    "As a passing trend with no real impact"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Invisible Cost of Burnout"
  },
@@ -2623,7 +2478,6 @@
    "They were too quiet",
    "They were too expensive"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Delivery Robot Problem"
  },
@@ -2641,7 +2495,6 @@
    "Nothing at all",
    "A public vote"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Delivery Robot Problem"
  },
@@ -2659,7 +2512,6 @@
    "Because robots were too expensive to regulate",
    "Because companies refused to cooperate"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Delivery Robot Problem"
  },
@@ -2677,7 +2529,6 @@
    "Sidewalks should be redesigned everywhere",
    "All cities should ban delivery robots"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Delivery Robot Problem"
  },
@@ -2695,7 +2546,6 @@
    "very slow",
    "very safe"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Delivery Robot Problem"
  },
@@ -2713,7 +2563,6 @@
    "24",
    "48"
   ],
-  "correct": 2,
   "audio_id": null,
   "text_title": "The Paradox of Choice in the Modern Supermarket"
  },
@@ -2731,7 +2580,6 @@
    "It was placed near the entrance",
    "It had better quality jams"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Paradox of Choice in the Modern Supermarket"
  },
@@ -2749,7 +2597,6 @@
    "Supermarkets should remove all variety",
    "Cognitive load only affects grocery shopping"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Paradox of Choice in the Modern Supermarket"
  },
@@ -2767,7 +2614,6 @@
    "No, the author presents both benefits and criticisms without a firm conclusion",
    "The author only discusses grocery stores, with no opinions at all"
   ],
-  "correct": 2,
   "audio_id": null,
   "text_title": "The Paradox of Choice in the Modern Supermarket"
  },
@@ -2785,7 +2631,6 @@
    "encourages more consumer freedom",
    "is scientifically proven"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Paradox of Choice in the Modern Supermarket"
  },
@@ -2803,7 +2648,6 @@
    "Approve everyone equally",
    "Replace all bank employees"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "When Algorithms Decide Who Gets the Loan"
  },
@@ -2821,7 +2665,6 @@
    "Because banks manually override the algorithm",
    "Because applicants from that area apply less often"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "When Algorithms Decide Who Gets the Loan"
  },
@@ -2839,7 +2682,6 @@
    "Completely dismissive of any benefits",
    "Neutral, with no clear perspective at all"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "When Algorithms Decide Who Gets the Loan"
  },
@@ -2857,7 +2699,6 @@
    "Human loan officers are always fairer than algorithms",
    "Banks no longer use any automated systems"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "When Algorithms Decide Who Gets the Loan"
  },
@@ -2875,7 +2716,6 @@
    "guarantee loan approval",
    "are illegal to use in any system"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "When Algorithms Decide Who Gets the Loan"
  },
@@ -2893,7 +2733,6 @@
    "None are affected",
    "They multiply faster"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Silent Epidemic: Antibiotic Resistance Explained"
  },
@@ -2911,7 +2750,6 @@
    "It makes the antibiotic more effective",
    "It cures the infection faster"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Silent Epidemic: Antibiotic Resistance Explained"
  },
@@ -2929,7 +2767,6 @@
    "Only hospitals are affected by resistant bacteria",
    "Pharmaceutical companies have already solved the problem"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Silent Epidemic: Antibiotic Resistance Explained"
  },
@@ -2947,7 +2784,6 @@
    "As an issue that has already been fully resolved",
    "As something only wealthy countries need to worry about"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Silent Epidemic: Antibiotic Resistance Explained"
  },
@@ -2965,7 +2801,6 @@
    "is extremely popular among investors",
    "has no scientific value"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Silent Epidemic: Antibiotic Resistance Explained"
  },
@@ -2983,7 +2818,6 @@
    "Because both inventors always stole the idea from someone else",
    "Because patents are rarely granted in such cases"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Who Owns an Idea? The Strange History of Patent Disputes"
  },
@@ -3001,7 +2835,6 @@
    "Because it guarantees automatic approval of all patents",
    "Because it only affects individual inventors, not companies"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Who Owns an Idea? The Strange History of Patent Disputes"
  },
@@ -3019,7 +2852,6 @@
    "No, the author presents both perspectives without taking a clear side",
    "The author only discusses historical cases, with no policy opinions"
   ],
-  "correct": 2,
   "audio_id": null,
   "text_title": "Who Owns an Idea? The Strange History of Patent Disputes"
  },
@@ -3037,7 +2869,6 @@
    "a type of financial reward for inventors",
    "a legal process for merging companies"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "Who Owns an Idea? The Strange History of Patent Disputes"
  },
@@ -3055,7 +2886,6 @@
    "completely false",
    "irrelevant to the discussion"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "Who Owns an Idea? The Strange History of Patent Disputes"
  },
@@ -3073,7 +2903,6 @@
    "A marketing mistake",
    "A missing signature on a contract"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Engineer Who Said No"
  },
@@ -3091,7 +2920,6 @@
    "They had no knowledge of the flaw",
    "They agreed with her from the beginning"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Engineer Who Said No"
  },
@@ -3109,7 +2937,6 @@
    "How organizations should weigh statistical risk against guaranteed costs, and who holds final authority",
    "Competitors always eventually fail due to safety issues"
   ],
-  "correct": 2,
   "audio_id": null,
   "text_title": "The Engineer Who Said No"
  },
@@ -3127,7 +2954,6 @@
    "As irrelevant to the eventual outcome",
    "As a decision the author criticizes throughout"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Engineer Who Said No"
  },
@@ -3145,7 +2971,6 @@
    "completely impossible to measure",
    "guaranteed to happen"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Engineer Who Said No"
  },
@@ -3163,7 +2988,6 @@
    "Resumes from applicants over 50",
    "Resumes without a college degree"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Hidden Bias in Hiring Algorithms"
  },
@@ -3181,7 +3005,6 @@
    "It malfunctioned due to a technical error",
    "It was designed by biased engineers intentionally"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Hidden Bias in Hiring Algorithms"
  },
@@ -3199,7 +3022,6 @@
    "Human recruiters are always less biased than software",
    "Companies have stopped using hiring algorithms altogether"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Hidden Bias in Hiring Algorithms"
  },
@@ -3217,7 +3039,6 @@
    "Indifferent to the topic",
    "Enthusiastically optimistic about all algorithms"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Hidden Bias in Hiring Algorithms"
  },
@@ -3235,7 +3056,6 @@
    "completely automated with no human input",
    "legally required to be public"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Hidden Bias in Hiring Algorithms"
  },
@@ -3253,7 +3073,6 @@
    "Advertising space only",
    "Physical office space"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Economics of Attention"
  },
@@ -3271,7 +3090,6 @@
    "Because users demand longer sessions",
    "Because it reduces production costs"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Economics of Attention"
  },
@@ -3289,7 +3107,6 @@
    "No, presents both perspectives without a firm resolution",
    "The author does not mention any opposing views"
   ],
-  "correct": 2,
   "audio_id": null,
   "text_title": "The Economics of Attention"
  },
@@ -3307,7 +3124,6 @@
    "Infinite scrolling was an accidental design feature",
    "Government regulation has already solved this issue"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Economics of Attention"
  },
@@ -3325,7 +3141,6 @@
    "legally protected from use",
    "only available to government agencies"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Economics of Attention"
  },
@@ -3343,7 +3158,6 @@
    "That they belong only to governments",
    "That they cannot be sold or transferred"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "When the Sea Takes the Land Back"
  },
@@ -3361,7 +3175,6 @@
    "Because submerged land automatically becomes government property",
    "Because insurance companies request it"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "When the Sea Takes the Land Back"
  },
@@ -3379,7 +3192,6 @@
    "Legal scholars have already solved this issue completely",
    "Only wealthy landowners are affected by rising seas"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "When the Sea Takes the Land Back"
  },
@@ -3397,7 +3209,6 @@
    "Completely indifferent to the legal implications",
    "Optimistic that no changes are needed"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "When the Sea Takes the Land Back"
  },
@@ -3415,7 +3226,6 @@
    "a legal punishment for owners",
    "a government tax"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "When the Sea Takes the Land Back"
  },
@@ -3433,7 +3243,6 @@
    "Because multitasking increases available memory",
    "Because it eliminates the need for breaks"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Myth of Multitasking"
  },
@@ -3451,7 +3260,6 @@
    "People who multitask are always the most skilled workers",
    "Cognitive science has no relevant findings about multitasking"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Myth of Multitasking"
  },
@@ -3469,7 +3277,6 @@
    "Completely neutral with no implied judgment",
    "Uncertain and undecided about the topic"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Myth of Multitasking"
  },
@@ -3487,7 +3294,6 @@
    "is extremely long and detailed",
    "is related to cognitive fatigue"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Myth of Multitasking"
  },
@@ -3505,7 +3311,6 @@
    "is physically exhausting",
    "is completely automatic"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Myth of Multitasking"
  },
@@ -3523,7 +3328,6 @@
    "Several months",
    "Exactly one day"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Container Ship Stuck in the Canal"
  },
@@ -3541,7 +3345,6 @@
    "Because the ship was carrying illegal goods",
    "Because only one company used that canal"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Container Ship Stuck in the Canal"
  },
@@ -3559,7 +3362,6 @@
    "No, presents both perspectives without a definitive conclusion",
    "The author does not discuss any potential solutions"
   ],
-  "correct": 2,
   "audio_id": null,
   "text_title": "The Container Ship Stuck in the Canal"
  },
@@ -3577,7 +3379,6 @@
    "Shipping canals are no longer necessary for global trade",
    "The event was entirely predictable years in advance"
   ],
-  "correct": 1,
   "audio_id": null,
   "text_title": "The Container Ship Stuck in the Canal"
  },
@@ -3595,7 +3396,6 @@
    "a legal penalty for shipping companies",
    "a financial bonus for sailors"
   ],
-  "correct": 0,
   "audio_id": null,
   "text_title": "The Container Ship Stuck in the Canal"
  }
