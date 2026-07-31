@@ -198,6 +198,26 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
   width: 100%;
 }
 
+.exam-header-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 500;
+}
+
+.exam-body.wide { max-width: 1180px; }
+
+.split-layout { display: flex; gap: 40px; align-items: flex-start; }
+.split-questions { flex: 1.1; min-width: 0; }
+.split-media {
+  flex: 0.9; min-width: 0; position: sticky; top: 96px;
+  max-height: calc(100vh - 130px); overflow-y: auto;
+  padding-right: 6px;
+}
+@media (max-width: 900px) {
+  .split-layout { flex-direction: column; }
+  .split-media { position: static; max-height: none; order: -1; }
+}
+
 .skill-tag {
   display: inline-block;
   font-family: "IBM Plex Mono", monospace;
