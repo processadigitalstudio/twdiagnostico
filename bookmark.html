@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Bookmark — Tweetalig</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .wrap { max-width: 900px; margin: 0 auto; padding: 32px 20px 140px 20px; }
+  .bm-row {
+    background: var(--bg-panel); border: 1.5px solid var(--line); border-radius: 8px;
+    padding: 12px 16px; margin-bottom: 8px; cursor: pointer;
+  }
+  .bm-row.expanded { border-color: var(--teal); }
+  .bm-row-head { display: flex; align-items: center; gap: 12px; }
+  .bm-rank { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--ink-soft); min-width: 34px; }
+  .bm-skill { font-family: "IBM Plex Mono", monospace; font-size: 11px; padding: 3px 8px; border-radius: 10px; background: var(--gold-soft); color: var(--gold); flex-shrink: 0; }
+  .bm-preview { font-size: 14px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bm-detail { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; }
+  .bm-detail .ctx { color: var(--ink-soft); font-style: italic; margin-bottom: 10px; white-space: pre-wrap; }
+  .bm-opts { margin-top: 8px; padding-left: 4px; }
+  .bm-opts div { padding: 3px 0; }
+  .bm-boundary-btns { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .bm-boundary-btns button { font-size: 12px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; }
+  .bm-boundary-btns button.set { background: var(--teal-dark); color: #fff; border-color: var(--teal-dark); }
+  .bm-marker { border-left: 4px solid var(--gold); padding-left: 12px; margin: 4px 0; font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--gold); font-weight: 600; }
+  .bm-footer {
+    position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-panel);
+    border-top: 1.5px solid var(--line); padding: 14px 24px; display: flex;
+    align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  .bm-footer .status { font-size: 13px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<div class="page-center" id="loginGate">
+  <div class="card">
+    <div class="eyebrow">Panel Bookmark · Solo jueces</div>
+    <h1>Calibración de niveles</h1>
+    <p class="muted">Vas a revisar los 560 ítems del examen, ordenados de más fácil a más difícil según los datos reales del piloto. Tu tarea: marcar en qué punto un estudiante "límite" empieza a fallar en cada transición de nivel.</p>
+    <label for="userInput">Usuario</label>
+    <input type="text" id="userInput" autocomplete="off">
+    <label for="passInput">Contraseña</label>
+    <input type="text" id="passInput" autocomplete="off">
+    <div class="error-msg" id="errorMsg"></div>
+    <button class="btn-primary" id="loginBtn">Entrar</button>
+  </div>
+</div>
+
+<div class="wrap" id="taskWrap" style="display:none;">
+  <div class="eyebrow">Panel Bookmark</div>
+  <h1 id="welcomeTitle">—</h1>
+  <p class="muted" id="roundInfo"></p>
+
+  <div class="card" style="max-width:100%; margin-bottom:24px;">
+    <h3 style="margin-bottom:10px;">Instrucciones</h3>
+    <p class="muted" style="font-size:14px;">
+      Piensa en un estudiante que está justo en el límite de cada nivel (ni claramente por encima, ni por debajo).
+      Lee los ítems en orden. Cuando llegues al punto donde sientas que ese estudiante límite empezaría a fallar
+      más de la mitad de las veces, marca ahí la frontera correspondiente usando los botones. Puedes cambiar de
+      opinión y volver a marcar en otro ítem las veces que quieras antes de enviar.
+    </p>
+  </div>
+
+  <div id="itemsList"></div>
+</div>
+
+<div class="bm-footer" id="footer" style="display:none;">
+  <div class="status mono" id="footerStatus">A1→A2: — · A2→B1: — · B1→B2: —</div>
+  <button class="btn-primary" id="submitBtn" style="width:auto; margin-top:0;" disabled>Enviar calificación</button>
+</div>
+
+<script type="module">
+import { validateJudgeLogin, loadBookmarkOrder, submitBookmarkJudgment } from "./js/bookmark-engine.js";
+
+let judgeUsername = "";
+let judgeName = "";
+let round = 1;
+let items = [];
+let boundaries = { A1_A2: null, A2_B1: null, B1_B2: null };
+
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const username = document.getElementById("userInput").value.trim();
+  const password = document.getElementById("passInput").value.trim();
+  const errEl = document.getElementById("errorMsg");
+  errEl.textContent = "";
+  if (!username || !password) { errEl.textContent = "Ingresa usuario y contraseña."; return; }
+
+  const result = await validateJudgeLogin(username, password);
+  if (!result.ok) { errEl.textContent = result.reason; return; }
+
+  if (result.status === "round2_done") {
+    document.getElementById("loginGate").innerHTML =
+      `<div class="card" style="text-align:center;"><h1>¡Ya completaste las dos rondas!</h1><p class="muted">Gracias por tu tiempo. No hace falta que hagas nada más aquí.</p></div>`;
+    return;
+  }
+
+  judgeUsername = username;
+  judgeName = result.name;
+  round = result.status === "round1_done" ? 2 : 1;
+
+  items = await loadBookmarkOrder();
+  if (!items) {
+    document.getElementById("loginGate").innerHTML =
+      `<div class="card" style="text-align:center;"><h1>Todavía no está listo</h1><p class="muted">La lista ordenada de preguntas aún no ha sido generada. Avísale a Rox y vuelve más tarde.</p></div>`;
+    return;
+  }
+
+  document.getElementById("loginGate").style.display = "none";
+  document.getElementById("taskWrap").style.display = "block";
+  document.getElementById("footer").style.display = "flex";
+  document.getElementById("welcomeTitle").textContent = `Hola, ${judgeName}`;
+  document.getElementById("roundInfo").textContent =
+    round === 1 ? "Ronda 1 de 2 — tu primera calificación, independiente." :
+                  "Ronda 2 de 2 — ya se discutieron los desacuerdos de la ronda 1, ajusta si cambiaste de opinión.";
+
+  renderItems();
+});
+
+function renderItems() {
+  const container = document.getElementById("itemsList");
+  container.innerHTML = "";
+  items.forEach((item, idx) => {
+    const rank = idx + 1;
+    const row = document.createElement("div");
+    row.className = "bm-row";
+    row.id = `bm-row-${rank}`;
+
+    const head = document.createElement("div");
+    head.className = "bm-row-head";
+    const preview = item.context ? item.context.slice(0, 90) : item.stem.slice(0, 90);
+    head.innerHTML = `
+      <span class="bm-rank">#${rank}</span>
+      <span class="bm-skill">${item.skill}</span>
+      <span class="bm-preview">${preview}...</span>
+    `;
+    row.appendChild(head);
+
+    const detail = document.createElement("div");
+    detail.className = "bm-detail";
+    detail.style.display = "none";
+
+    let mediaHtml = "";
+    if (item.context) {
+      mediaHtml = `<div class="ctx">${item.context}</div>`;
+    } else if (item.audio_id) {
+      mediaHtml = `<div class="ctx">🎧 ${item.audio_title || item.audio_id}</div><audio controls src="audio/${item.audio_id}.mp3" style="width:100%;"></audio>`;
+    }
+
+    const optsHtml = item.options.map(o => `<div>• ${o}</div>`).join("");
+
+    detail.innerHTML = `
+      ${mediaHtml}
+      <strong>${item.stem}</strong>
+      <div class="bm-opts">${optsHtml}</div>
+      <div class="bm-boundary-btns">
+        <button data-b="A1_A2" data-rank="${rank}">A1 → A2 aquí</button>
+        <button data-b="A2_B1" data-rank="${rank}">A2 → B1 aquí</button>
+        <button data-b="B1_B2" data-rank="${rank}">B1 → B2 aquí</button>
+      </div>
+    `;
+    row.appendChild(detail);
+
+    row.addEventListener("click", (e) => {
+      if (e.target.tagName === "BUTTON" || e.target.tagName === "AUDIO") return;
+      const isOpen = detail.style.display !== "none";
+      detail.style.display = isOpen ? "none" : "block";
+      row.classList.toggle("expanded", !isOpen);
+    });
+
+    detail.querySelectorAll("button[data-b]").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        setBoundary(btn.dataset.b, parseInt(btn.dataset.rank));
+      });
+    });
+
+    container.appendChild(row);
+  });
+}
+
+function setBoundary(key, rank) {
+  boundaries[key] = rank;
+  updateFooter();
+  updateMarkers();
+}
+
+function updateMarkers() {
+  document.querySelectorAll(".bm-marker").forEach(el => el.remove());
+  const labels = { A1_A2: "↑ Frontera A1 / A2", A2_B1: "↑ Frontera A2 / B1", B1_B2: "↑ Frontera B1 / B2" };
+  for (const [key, rank] of Object.entries(boundaries)) {
+    if (rank === null) continue;
+    const row = document.getElementById(`bm-row-${rank}`);
+    if (!row) continue;
+    const marker = document.createElement("div");
+    marker.className = "bm-marker";
+    marker.textContent = labels[key];
+    row.after(marker);
+  }
+  document.querySelectorAll("button[data-b]").forEach(btn => {
+    const key = btn.dataset.b;
+    btn.classList.toggle("set", boundaries[key] === parseInt(btn.dataset.rank));
+  });
+}
+
+function updateFooter() {
+  const fmt = (v) => v === null ? "—" : `#${v}`;
+  document.getElementById("footerStatus").textContent =
+    `A1→A2: ${fmt(boundaries.A1_A2)} · A2→B1: ${fmt(boundaries.A2_B1)} · B1→B2: ${fmt(boundaries.B1_B2)}`;
+  const allSet = boundaries.A1_A2 !== null && boundaries.A2_B1 !== null && boundaries.B1_B2 !== null;
+  const orderOk = allSet && boundaries.A1_A2 < boundaries.A2_B1 && boundaries.A2_B1 < boundaries.B1_B2;
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = !orderOk;
+  btn.textContent = allSet && !orderOk ? "Las fronteras deben ir en orden (A1<A2<B1)" : "Enviar calificación";
+}
+
+document.getElementById("submitBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  btn.textContent = "Enviando...";
+  await submitBookmarkJudgment(judgeUsername, judgeName, round, boundaries);
+  document.body.innerHTML = `<div class="page-center"><div class="card" style="text-align:center;"><h1>¡Gracias!</h1><p class="muted">Tu calificación de la ronda ${round} quedó guardada.</p></div></div>`;
+});
+</script>
+
+</body>
+</html>

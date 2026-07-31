@@ -71,6 +71,7 @@
     <div class="tab" data-tab="sessions">Resultados</div>
     <div class="tab" data-tab="items">Análisis por ítem</div>
     <div class="tab" data-tab="access">Gestionar accesos</div>
+    <div class="tab" data-tab="bookmark">📊 Panel Bookmark</div>
   </div>
 
   <div class="section active" id="liveSection">
@@ -118,11 +119,47 @@
       <tbody id="allAccessBody"></tbody>
     </table>
   </div>
+
+  <div class="section" id="bookmarkSection">
+    <h3>1. Generar el orden de dificultad</h3>
+    <p class="muted">Usa los datos reales del piloto (p-value) para ordenar los 560 ítems de más fácil a más difícil. Necesitas la clave de respuestas cargada y suficientes sesiones completadas para que el orden tenga sentido.</p>
+    <button class="btn-primary" id="generateOrderBtn" style="width:auto;">Generar orden para Bookmark</button>
+    <p class="muted" id="orderStatus" style="margin-top:10px;"></p>
+
+    <h3 style="margin-top:32px;">2. Crear las cuentas de los 5 jueces</h3>
+    <p class="muted">Formato: <code>Nombre,usuario</code> (una persona por línea). La contraseña se genera sola.</p>
+    <textarea class="access-input" id="judgeInput" placeholder="Rossana Restrepo,rossana-juez&#10;Profesor 1,profesor1&#10;..."></textarea>
+    <br><br>
+    <button class="btn-primary" id="generateJudgesBtn" style="width:auto;">Generar accesos de jueces</button>
+    <div id="judgeResultWrap" style="margin-top:20px; display:none;">
+      <button class="btn-secondary" id="downloadJudgesCsvBtn">⬇ Descargar CSV</button>
+      <table class="admin-table">
+        <thead><tr><th>Nombre</th><th>Usuario</th><th>Contraseña</th></tr></thead>
+        <tbody id="judgeResultBody"></tbody>
+      </table>
+      <p class="muted">Link para los jueces: <code id="bookmarkLink"></code></p>
+    </div>
+
+    <h3 style="margin-top:32px;">3. Estado de las calificaciones</h3>
+    <table class="admin-table">
+      <thead><tr><th>Juez</th><th>Usuario</th><th>Ronda 1</th><th>Ronda 2</th></tr></thead>
+      <tbody id="judgeStatusBody"></tbody>
+    </table>
+
+    <h3 style="margin-top:32px;">4. Resultado — fronteras promedio</h3>
+    <p class="muted">Promedio de dónde cada juez ubicó cada frontera (posición en la lista de 560), y el % de corte sugerido que reemplazaría al 25/45/70 actual.</p>
+    <div class="stat-row" id="bookmarkResultRow"></div>
+    <table class="admin-table" id="bookmarkDetailTable" style="margin-top:16px;">
+      <thead><tr><th>Juez</th><th>Ronda</th><th>A1→A2</th><th>A2→B1</th><th>B1→B2</th></tr></thead>
+      <tbody id="bookmarkDetailBody"></tbody>
+    </table>
+  </div>
 </div>
 
 <script type="module">
 import { db, auth } from "./js/firebase-config.js";
 import { generateRandomPassword, loadAllBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery } from "./js/exam-engine.js";
+import { buildBookmarkOrder, saveBookmarkOrder, loadAllJudgments, loadAllJudgeCodes } from "./js/bookmark-engine.js";
 import { EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY, EMAILJS_ENABLED } from "./js/emailjs-config.js";
 import {
   collection, getDocs, query, where, onSnapshot, setDoc, doc, deleteDoc
@@ -212,6 +249,7 @@ async function loadDashboard() {
   renderSessionsTable();
   await renderItemAnalysis();
   await loadAllAccessCodes();
+  await loadJudgeStatus();
 }
 
 async function loadAllAccessCodes() {
@@ -550,6 +588,125 @@ document.getElementById("downloadAccessCsvBtn").addEventListener("click", () => 
   a.download = "accesos_piloto.csv";
   a.click();
 });
+
+// ---------------- PANEL BOOKMARK ----------------
+document.getElementById("generateOrderBtn").addEventListener("click", async () => {
+  const statusEl = document.getElementById("orderStatus");
+  if (!answerKey) { statusEl.textContent = "⚠ Carga primero la clave de respuestas (arriba)."; return; }
+  statusEl.textContent = "Generando...";
+  if (!banksCache) banksCache = await loadAllBanks();
+  const order = buildBookmarkOrder(allSessions, answerKey, banksCache);
+  await saveBookmarkOrder(order);
+  const conDatos = order.filter(it => it.p !== null).length;
+  statusEl.textContent = `✅ Orden generado: ${order.length} ítems (${conDatos} con datos reales del piloto, ${order.length - conDatos} todavía sin respuestas — quedaron al final de la lista).`;
+});
+
+let lastGeneratedJudges = [];
+document.getElementById("generateJudgesBtn").addEventListener("click", async () => {
+  const raw = document.getElementById("judgeInput").value.trim();
+  if (!raw) return;
+  const lines = raw.split("\n").map(l => l.trim()).filter(Boolean);
+  lastGeneratedJudges = [];
+  for (const line of lines) {
+    const [name, username] = line.split(",").map(s => s.trim());
+    if (!name || !username) continue;
+    const password = generateRandomPassword(8);
+    await setDoc(doc(db, "judge_codes", username), { name, password, status: "not_started" });
+    lastGeneratedJudges.push({ name, username, password });
+  }
+  const tbody = document.getElementById("judgeResultBody");
+  tbody.innerHTML = "";
+  for (const r of lastGeneratedJudges) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.name}</td><td class="mono">${r.username}</td><td class="mono">${r.password}</td>`;
+    tbody.appendChild(tr);
+  }
+  document.getElementById("judgeResultWrap").style.display = "block";
+  document.getElementById("bookmarkLink").textContent =
+    window.location.href.replace("admin.html", "bookmark.html");
+  await loadJudgeStatus();
+});
+
+document.getElementById("downloadJudgesCsvBtn").addEventListener("click", () => {
+  const lines = ["nombre,usuario,contraseña", ...lastGeneratedJudges.map(r => `${r.name},${r.username},${r.password}`)];
+  const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "accesos_jueces.csv";
+  a.click();
+});
+
+async function loadJudgeStatus() {
+  const judges = await loadAllJudgeCodes();
+  const tbody = document.getElementById("judgeStatusBody");
+  tbody.innerHTML = "";
+  const labels = { not_started: "⚪ Pendiente", round1_done: "✅ Lista", round2_done: "✅ Lista" };
+  for (const j of judges) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${j.name}</td>
+      <td class="mono">${j.username}</td>
+      <td>${j.status === "not_started" ? "⚪ Pendiente" : "✅ Lista"}</td>
+      <td>${j.status === "round2_done" ? "✅ Lista" : (j.status === "round1_done" ? "⚪ Pendiente" : "⚪ Pendiente")}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+  await loadBookmarkResults();
+}
+
+async function loadBookmarkResults() {
+  const judgments = await loadAllJudgments();
+  const detailBody = document.getElementById("bookmarkDetailBody");
+  detailBody.innerHTML = "";
+  for (const j of judgments) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${j.name}</td><td>Ronda ${j.round}</td>
+      <td class="mono">#${j.boundaries.A1_A2 ?? "—"}</td>
+      <td class="mono">#${j.boundaries.A2_B1 ?? "—"}</td>
+      <td class="mono">#${j.boundaries.B1_B2 ?? "—"}</td>
+    `;
+    detailBody.appendChild(tr);
+  }
+
+  // promedio usando SOLO la ronda 2 de cada juez (la definitiva); si alguien
+  // no ha hecho ronda 2 todavía, se usa su ronda 1 como respaldo temporal
+  const byJudge = {};
+  for (const j of judgments) {
+    if (!byJudge[j.username] || j.round > byJudge[j.username].round) byJudge[j.username] = j;
+  }
+  const finals = Object.values(byJudge);
+  const totalItems = (await loadBookmarkOrderLength()) || 560;
+
+  const row = document.getElementById("bookmarkResultRow");
+  if (finals.length === 0) {
+    row.innerHTML = `<div class="stat-pill"><div class="l">Todavía no hay calificaciones enviadas.</div></div>`;
+    return;
+  }
+
+  const avg = (key) => {
+    const vals = finals.map(f => f.boundaries[key]).filter(v => v !== null && v !== undefined);
+    return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+  };
+  const a1a2 = avg("A1_A2"), a2b1 = avg("A2_B1"), b1b2 = avg("B1_B2");
+  const toPct = (rank) => rank === null ? "—" : Math.round((rank / totalItems) * 100);
+
+  row.innerHTML = `
+    <div class="stat-pill"><div class="n mono">${finals.length}</div><div class="l">Jueces con calificación final</div></div>
+    <div class="stat-pill"><div class="n mono">${toPct(a1a2)}%</div><div class="l">Corte A1/A2 sugerido (era 25%)</div></div>
+    <div class="stat-pill"><div class="n mono">${toPct(a2b1)}%</div><div class="l">Corte A2/B1 sugerido (era 45%)</div></div>
+    <div class="stat-pill"><div class="n mono">${toPct(b1b2)}%</div><div class="l">Corte B1/B2 sugerido (era 70%)</div></div>
+  `;
+}
+
+async function loadBookmarkOrderLength() {
+  try {
+    const snap = await getDocs(collection(db, "bookmark_order"));
+    const doc0 = snap.docs.find(d => d.id === "current");
+    return doc0 ? doc0.data().totalItems : null;
+  } catch { return null; }
+}
 </script>
 
 </body>
