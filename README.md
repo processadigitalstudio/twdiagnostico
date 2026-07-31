@@ -350,3 +350,25 @@ Bookmark por separado en cada destreza y combinaría los resultados según los
 pesos (30/35/35), pero eso triplica el trabajo de los jueces. Con 5 jueces y
 560 ítems mezclados, el resultado sigue siendo una mejora real sobre el
 25/45/70 actual, solo que menos preciso que la versión completa.
+
+---
+
+## 9. Transparencia de patrón + alerta de inversión (además del % agregado)
+
+El % por destreza (lo que de verdad determina el nivel) suma todos los
+aciertos de esa destreza sin importar el nivel de cada ítem — esto es
+deliberado y está respaldado por teoría de medición clásica (si la
+dificultad de los ítems está bien calibrada, el puntaje bruto total es
+la mejor estimación de habilidad). Pero como el nivel de calibración
+todavía no está validado (eso es justo lo que hace el Bookmark), se
+agregaron dos capas de transparencia que NO cambian la fórmula, pero sí
+dan más contexto a quien toma la decisión final:
+
+- **Desglose por nivel** (pestaña Resultados → "ver"): muestra el % de
+  acierto dentro de cada nivel, por destreza, para cada persona.
+- **Alerta de patrón inconsistente**: se marca automáticamente cuando
+  alguien acierta un nivel "difícil" con un % mucho más alto (≥40 puntos)
+  que uno "fácil" en la misma destreza, con al menos 2 ítems de cada uno.
+  Esto casi siempre es señal de que un ítem está mal calibrado, no de que
+  la persona sea "rara" — y es exactamente el tipo de caso que el panel
+  Bookmark necesita ver para decidir qué ítems corregir.

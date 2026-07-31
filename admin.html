@@ -85,7 +85,7 @@
   <div class="section" id="sessionsSection">
     <button class="btn-secondary" id="exportCsvBtn">⬇ Exportar respuestas (CSV, para Python/Excel)</button>
     <table class="admin-table">
-      <thead><tr><th>Nombre</th><th>Usuario</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Tiempo UoL</th><th>Tiempo Reading</th><th>Tiempo Listening</th><th>Entrega del resultado</th><th>Alertas</th><th>Eventos sospechosos</th></tr></thead>
+      <thead><tr><th></th><th>Nombre</th><th>Usuario</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Tiempo UoL</th><th>Tiempo Reading</th><th>Tiempo Listening</th><th>Entrega del resultado</th><th>Alertas (destreza &lt;30%)</th><th>Patrón inconsistente</th><th>Eventos sospechosos</th></tr></thead>
       <tbody id="sessionsBody"></tbody>
     </table>
   </div>
@@ -425,6 +425,27 @@ function deliveryStatusCell(session) {
 }
 
 // ---------------- RESULTADOS ----------------
+function patternAlertBadges(patternAlerts) {
+  if (!patternAlerts || patternAlerts.length === 0) return "—";
+  return patternAlerts.map(a =>
+    `<span class="badge-event high">${a.skill}: ${a.higherLevel} (${a.higherPct}%) > ${a.lowerLevel} (${a.lowerPct}%)</span>`
+  ).join(" ");
+}
+
+function levelBreakdownTable(levelBreakdown) {
+  if (!levelBreakdown) return "";
+  const skills = ["UoL", "Reading", "Listening"];
+  let html = `<table class="admin-table" style="margin:0;"><thead><tr><th>Destreza</th><th>A1</th><th>A2</th><th>B1</th><th>B2</th></tr></thead><tbody>`;
+  for (const skill of skills) {
+    const row = levelBreakdown[skill] || {};
+    html += `<tr><td>${skill}</td>` +
+      ["A1", "A2", "B1", "B2"].map(l => `<td>${row[l] === null || row[l] === undefined ? "—" : row[l] + "%"}</td>`).join("") +
+      `</tr>`;
+  }
+  html += `</tbody></table>`;
+  return html;
+}
+
 function renderSessionsTable() {
   const tbody = document.getElementById("sessionsBody");
   tbody.innerHTML = "";
@@ -432,6 +453,7 @@ function renderSessionsTable() {
     const r = computedById[s.id];
     const tr = document.createElement("tr");
     tr.innerHTML = `
+      <td><span class="toggle-detail" data-session="${s.id}">ver</span></td>
       <td>${s.name || "—"}</td>
       <td class="mono">${s.username || "—"}</td>
       <td>${r ? r.pct.UoL + "%" : "—"}</td>
@@ -444,10 +466,28 @@ function renderSessionsTable() {
       <td class="mono">${sectionTimeCell(s.sectionTimings, "Listening")}</td>
       <td>${deliveryStatusCell(s)}</td>
       <td>${r ? (r.alerts.join(", ") || "—") : "—"}</td>
+      <td>${r ? patternAlertBadges(r.patternAlerts) : "—"}</td>
       <td>${eventBadges(s.suspiciousEvents)}</td>
     `;
     tbody.appendChild(tr);
+
+    const detailTr = document.createElement("tr");
+    detailTr.className = "item-detail-row";
+    detailTr.style.display = "none";
+    detailTr.id = `session-detail-${s.id}`;
+    detailTr.innerHTML = `<td colspan="15">
+      <strong>Desglose por nivel dentro de cada destreza:</strong><br><br>
+      ${r ? levelBreakdownTable(r.levelBreakdown) : "Sin datos"}
+    </td>`;
+    tbody.appendChild(detailTr);
   }
+
+  document.querySelectorAll("[data-session]").forEach(el => {
+    el.addEventListener("click", () => {
+      const row = document.getElementById(`session-detail-${el.dataset.session}`);
+      row.style.display = row.style.display === "none" ? "table-row" : "none";
+    });
+  });
 }
 
 // ---------------- ANALISIS POR ITEM ----------------
@@ -529,7 +569,7 @@ async function renderItemAnalysis() {
 }
 
 document.getElementById("exportCsvBtn").addEventListener("click", () => {
-  const lines = ["session_id,username,name,item_id,skill,level,category,selected,correct,time_ms,final_score,level_assigned,suspicious_events_count,time_uol_sec,time_reading_sec,time_listening_sec,uol_timed_out,reading_timed_out,listening_timed_out"];
+  const lines = ["session_id,username,name,item_id,skill,level,category,selected,correct,time_ms,final_score,level_assigned,suspicious_events_count,time_uol_sec,time_reading_sec,time_listening_sec,uol_timed_out,reading_timed_out,listening_timed_out,pattern_alerts_count,uol_A1,uol_A2,uol_B1,uol_B2,reading_A1,reading_A2,reading_B1,reading_B2,listening_A1,listening_A2,listening_B1,listening_B2"];
   for (const s of allSessions) {
     const r = computedById[s.id];
     if (!r) continue;
@@ -539,10 +579,15 @@ document.getElementById("exportCsvBtn").addEventListener("click", () => {
       st.UoL?.elapsedSeconds ?? "", st.Reading?.elapsedSeconds ?? "", st.Listening?.elapsedSeconds ?? "",
       st.UoL?.timedOut ? 1 : 0, st.Reading?.timedOut ? 1 : 0, st.Listening?.timedOut ? 1 : 0
     ];
+    const lb = r.levelBreakdown;
+    const breakdownCols = ["UoL", "Reading", "Listening"].flatMap(skill =>
+      ["A1", "A2", "B1", "B2"].map(l => lb[skill][l] ?? "")
+    );
     for (const [itemId, info] of Object.entries(r.perItem)) {
       lines.push([
         s.id, s.username, (s.name || "").replace(/,/g, " "), itemId, info.skill, info.level, info.category,
-        "", info.correct ? 1 : 0, info.timeMs ?? "", r.finalScore, r.level, eventCount, ...timingCols
+        "", info.correct ? 1 : 0, info.timeMs ?? "", r.finalScore, r.level, eventCount, ...timingCols,
+        r.patternAlerts.length, ...breakdownCols
       ].join(","));
     }
   }
