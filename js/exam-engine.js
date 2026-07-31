@@ -157,20 +157,21 @@ export async function validateLogin(username, password) {
   const data = snap.data();
   if (data.password !== password.trim()) return { ok: false, reason: "Contraseña incorrecta." };
   if (data.status === "completed") return { ok: false, reason: "Este usuario ya completó el examen." };
-  return { ok: true, name: data.name || "" };
+  return { ok: true, name: data.name || "", email: data.email || "" };
 }
 
 // ---------- crear sesión ----------
-export async function createSession(username, name, plan) {
+export async function createSession(username, name, email, plan) {
   const sessionId = `${username}_${Date.now()}`;
   const ref = doc(db, "sessions", sessionId);
   await setDoc(ref, {
-    username, name,
+    username, name, email,
     itemIds: allItemIdsFromPlan(plan),
     startedAt: serverTimestamp(),
     status: "in_progress",
     durationMin: EXAM_DURATION_MIN,
-    suspiciousEvents: []
+    suspiciousEvents: [],
+    resultDelivery: { status: "pending" }
   });
   await updateDoc(doc(db, "access_codes", username), { status: "in_progress", usedAt: serverTimestamp() });
   return sessionId;
@@ -228,7 +229,13 @@ export async function uploadAnswerKey(keyObject) {
 }
 
 export function computeSessionResults(session, answerKey) {
+  const LEVELS = ["A1", "A2", "B1", "B2"];
   const bySkill = { UoL: { correct: 0, total: 0 }, Reading: { correct: 0, total: 0 }, Listening: { correct: 0, total: 0 } };
+  const byLevelWithinSkill = {
+    UoL: { A1: { c: 0, t: 0 }, A2: { c: 0, t: 0 }, B1: { c: 0, t: 0 }, B2: { c: 0, t: 0 } },
+    Reading: { A1: { c: 0, t: 0 }, A2: { c: 0, t: 0 }, B1: { c: 0, t: 0 }, B2: { c: 0, t: 0 } },
+    Listening: { A1: { c: 0, t: 0 }, A2: { c: 0, t: 0 }, B1: { c: 0, t: 0 }, B2: { c: 0, t: 0 } }
+  };
   const perItem = {};
 
   for (const [itemId, r] of Object.entries(session.responses || {})) {
@@ -237,6 +244,10 @@ export function computeSessionResults(session, answerKey) {
     const correct = r.selected === key.correct;
     bySkill[r.skill].total += 1;
     if (correct) bySkill[r.skill].correct += 1;
+    if (byLevelWithinSkill[r.skill] && byLevelWithinSkill[r.skill][r.level]) {
+      byLevelWithinSkill[r.skill][r.level].t += 1;
+      if (correct) byLevelWithinSkill[r.skill][r.level].c += 1;
+    }
     perItem[itemId] = { correct, skill: r.skill, level: r.level, category: r.category, timeMs: r.timeMs };
   }
 
@@ -246,12 +257,48 @@ export function computeSessionResults(session, answerKey) {
     pct[skill] = total > 0 ? Math.round((correct / total) * 1000) / 10 : 0;
   }
 
+  // desglose por nivel dentro de cada destreza (transparencia)
+  const levelBreakdown = {};
+  for (const skill of Object.keys(byLevelWithinSkill)) {
+    levelBreakdown[skill] = {};
+    for (const lvl of LEVELS) {
+      const { c, t } = byLevelWithinSkill[skill][lvl];
+      levelBreakdown[skill][lvl] = t > 0 ? Math.round((c / t) * 1000) / 10 : null;
+    }
+  }
+
+  // bandera de patrón inconsistente: un nivel "más difícil" con acierto muy
+  // por ENCIMA de uno "más fácil" en la misma destreza (posible ítem mal
+  // calibrado, no necesariamente un problema de la persona). Solo se marca
+  // con al menos 2 ítems de cada nivel, para no disparar por una pregunta suelta.
+  const MIN_ITEMS_FOR_FLAG = 2;
+  const INVERSION_THRESHOLD_PP = 40;
+  const patternAlerts = [];
+  for (const skill of Object.keys(byLevelWithinSkill)) {
+    for (let i = 0; i < LEVELS.length; i++) {
+      for (let j = i + 1; j < LEVELS.length; j++) {
+        const lower = byLevelWithinSkill[skill][LEVELS[i]];
+        const higher = byLevelWithinSkill[skill][LEVELS[j]];
+        if (lower.t >= MIN_ITEMS_FOR_FLAG && higher.t >= MIN_ITEMS_FOR_FLAG) {
+          const lowerPct = (lower.c / lower.t) * 100;
+          const higherPct = (higher.c / higher.t) * 100;
+          if (higherPct - lowerPct >= INVERSION_THRESHOLD_PP) {
+            patternAlerts.push({
+              skill, lowerLevel: LEVELS[i], higherLevel: LEVELS[j],
+              lowerPct: Math.round(lowerPct), higherPct: Math.round(higherPct)
+            });
+          }
+        }
+      }
+    }
+  }
+
   const finalScore = pct.UoL * WEIGHTS.UoL + pct.Reading * WEIGHTS.Reading + pct.Listening * WEIGHTS.Listening;
   const finalScoreRounded = Math.round(finalScore * 10) / 10;
   const level = scoreToLevel(finalScoreRounded);
   const alerts = Object.keys(pct).filter(skill => pct[skill] < ALERT_THRESHOLD);
 
-  return { pct, finalScore: finalScoreRounded, level, alerts, perItem };
+  return { pct, finalScore: finalScoreRounded, level, alerts, perItem, levelBreakdown, patternAlerts };
 }
 
 export function generateRandomPassword(length = 8) {
@@ -259,4 +306,11 @@ export function generateRandomPassword(length = 8) {
   let pass = "";
   for (let i = 0; i < length; i++) pass += chars[Math.floor(Math.random() * chars.length)];
   return pass;
+}
+
+// ---------- marcar cómo quedó la entrega del resultado ----------
+export async function setResultDelivery(sessionId, status, extra = {}) {
+  await updateDoc(doc(db, "sessions", sessionId), {
+    resultDelivery: { status, ...extra, updatedAt: serverTimestamp() }
+  });
 }
