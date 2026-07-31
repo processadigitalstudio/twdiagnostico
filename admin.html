@@ -84,7 +84,7 @@
   <div class="section" id="sessionsSection">
     <button class="btn-secondary" id="exportCsvBtn">⬇ Exportar respuestas (CSV, para Python/Excel)</button>
     <table class="admin-table">
-      <thead><tr><th>Nombre</th><th>Usuario</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Tiempo UoL</th><th>Tiempo Reading</th><th>Tiempo Listening</th><th>Alertas</th><th>Eventos sospechosos</th></tr></thead>
+      <thead><tr><th>Nombre</th><th>Usuario</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Tiempo UoL</th><th>Tiempo Reading</th><th>Tiempo Listening</th><th>Entrega del resultado</th><th>Alertas</th><th>Eventos sospechosos</th></tr></thead>
       <tbody id="sessionsBody"></tbody>
     </table>
   </div>
@@ -98,27 +98,39 @@
   </div>
 
   <div class="section" id="accessSection">
-    <p class="muted">Escribe una persona por línea, en formato <code>Nombre,usuario</code> (tú eliges el usuario). La contraseña se genera automáticamente.</p>
-    <textarea class="access-input" id="accessInput" placeholder="Rossana Restrepo,rossana&#10;Julio Perez,julio&#10;..."></textarea>
+    <p class="muted">Escribe una persona por línea, en formato <code>Nombre,usuario,correo</code> (tú eliges el usuario). La contraseña se genera automáticamente.</p>
+    <textarea class="access-input" id="accessInput" placeholder="Rossana Restrepo,rossana,rossana@tweetalig.edu.co&#10;Julio Perez,julio,julio@tweetalig.edu.co&#10;..."></textarea>
     <br><br>
     <button class="btn-primary" id="generateBtn" style="width:auto;">Generar accesos</button>
     <div id="accessResultWrap" style="margin-top:24px; display:none;">
+      <p class="muted"><strong>Recién generados en esta sesión</strong> (guarda este CSV ahora, la contraseña no se vuelve a mostrar después):</p>
       <button class="btn-secondary" id="downloadAccessCsvBtn">⬇ Descargar CSV (nombre, usuario, contraseña)</button>
       <table class="admin-table">
-        <thead><tr><th>Nombre</th><th>Usuario</th><th>Contraseña</th></tr></thead>
+        <thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Contraseña</th></tr></thead>
         <tbody id="accessResultBody"></tbody>
       </table>
     </div>
+
+    <h3 style="margin-top:36px;">Todos los accesos existentes</h3>
+    <p class="muted">Por seguridad, las contraseñas ya generadas no se vuelven a mostrar aquí — si alguien perdió la suya, bórrala (🗑) y créala de nuevo.</p>
+    <table class="admin-table">
+      <thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="allAccessBody"></tbody>
+    </table>
   </div>
 </div>
 
 <script type="module">
 import { db, auth } from "./js/firebase-config.js";
-import { generateRandomPassword, loadAllBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults } from "./js/exam-engine.js";
+import { generateRandomPassword, loadAllBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery } from "./js/exam-engine.js";
+import { EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY, EMAILJS_ENABLED } from "./js/emailjs-config.js";
 import {
-  collection, getDocs, query, where, onSnapshot, setDoc, doc
+  collection, getDocs, query, where, onSnapshot, setDoc, doc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import emailjs from "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm";
+
+if (EMAILJS_ENABLED) emailjs.init(EMAILJS_PUBLIC_KEY);
 
 document.getElementById("pwBtn").addEventListener("click", async () => {
   const email = document.getElementById("emailInput").value.trim();
@@ -199,6 +211,34 @@ async function loadDashboard() {
   renderSummary();
   renderSessionsTable();
   await renderItemAnalysis();
+  await loadAllAccessCodes();
+}
+
+async function loadAllAccessCodes() {
+  const snap = await getDocs(collection(db, "access_codes"));
+  const tbody = document.getElementById("allAccessBody");
+  tbody.innerHTML = "";
+  const statusLabels = { not_started: "⚪ No ha empezado", in_progress: "🟡 En curso", completed: "✅ Completado" };
+  const rows = snap.docs.map(d => ({ username: d.id, ...d.data() }))
+    .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+  for (const r of rows) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.name || "—"}</td>
+      <td class="mono">${r.username}</td>
+      <td class="mono">${r.email || "—"}</td>
+      <td>${statusLabels[r.status] || r.status || "—"}</td>
+      <td><span class="toggle-detail" data-del="${r.username}" style="color:var(--bad);">🗑 borrar</span></td>
+    `;
+    tbody.appendChild(tr);
+  }
+  document.querySelectorAll("[data-del]").forEach(el => {
+    el.addEventListener("click", async () => {
+      if (!confirm(`¿Borrar el acceso de "${el.dataset.del}"? Esto no se puede deshacer.`)) return;
+      await deleteDoc(doc(db, "access_codes", el.dataset.del));
+      await loadAllAccessCodes();
+    });
+  });
 }
 
 function renderSummary() {
@@ -230,6 +270,12 @@ function eventBadges(events) {
 function startLiveListener() {
   onSnapshot(collection(db, "sessions"), (snap) => {
     const sessions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // dispara el envío/retención automático para sesiones recién completadas
+    for (const s of sessions) {
+      if (s.status === "completed") processOneSessionDelivery(s).catch(console.error);
+    }
+
     const tbody = document.getElementById("liveBody");
     tbody.innerHTML = "";
     sessions
@@ -268,6 +314,78 @@ function sectionTimeCell(sectionTimings, name) {
   return `${fmtMinSec(t.elapsedSeconds)}${timeoutMark}`;
 }
 
+// ---------------- ENTREGA DE RESULTADOS (EmailJS) ----------------
+async function processOneSessionDelivery(session) {
+  if (!answerKey) return;
+  const currentStatus = session.resultDelivery?.status || "pending";
+  if (currentStatus !== "pending") return;
+
+  const r = computeSessionResults(session, answerKey);
+
+  if (r.alerts.length === 0) {
+    if (EMAILJS_ENABLED && session.email) {
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          to_email: session.email,
+          to_name: session.name || session.username,
+          level: r.level,
+          pct_uol: r.pct.UoL,
+          pct_reading: r.pct.Reading,
+          pct_listening: r.pct.Listening
+        });
+        await setResultDelivery(session.id, "sent", { finalScore: r.finalScore, level: r.level });
+      } catch (e) {
+        console.error("Error enviando correo:", e);
+        await setResultDelivery(session.id, "error", { errorMsg: String(e) });
+      }
+    } else {
+      await setResultDelivery(session.id, "ready_no_email", { finalScore: r.finalScore, level: r.level });
+    }
+  } else {
+    await setResultDelivery(session.id, "held_for_review", { finalScore: r.finalScore, level: r.level, alerts: r.alerts });
+  }
+}
+
+async function manualRelease(sessionId) {
+  const session = allSessions.find(s => s.id === sessionId);
+  const r = computedById[sessionId];
+  if (!session || !r) return;
+  if (EMAILJS_ENABLED && session.email) {
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        to_email: session.email, to_name: session.name || session.username, level: r.level,
+        pct_uol: r.pct.UoL, pct_reading: r.pct.Reading, pct_listening: r.pct.Listening
+      });
+      await setResultDelivery(sessionId, "sent_after_review", { finalScore: r.finalScore, level: r.level });
+    } catch (e) {
+      alert("Error enviando el correo: " + e);
+      return;
+    }
+  } else {
+    alert(EMAILJS_ENABLED ? "Esta persona no tiene correo registrado." : "Configura EmailJS en js/emailjs-config.js primero.");
+    return;
+  }
+  await loadDashboard();
+}
+window.manualRelease = manualRelease;
+
+function deliveryStatusCell(session) {
+  const status = session.resultDelivery?.status || "pending";
+  const labels = {
+    pending: "⏳ Procesando...",
+    sent: "✅ Enviado automáticamente",
+    sent_after_review: "✅ Enviado (tras tu revisión)",
+    ready_no_email: "⚠ Sin alertas, pero falta configurar EmailJS o el correo",
+    error: "❌ Error al enviar — revisa EmailJS",
+    held_for_review: `⏸ Retenido por alerta`
+  };
+  let html = labels[status] || status;
+  if (status === "held_for_review" || status === "ready_no_email" || status === "error") {
+    html += `<br><button class="btn-secondary" style="margin-top:6px; padding:6px 10px; font-size:12px;" onclick="manualRelease('${session.id}')">Liberar y enviar</button>`;
+  }
+  return html;
+}
+
 // ---------------- RESULTADOS ----------------
 function renderSessionsTable() {
   const tbody = document.getElementById("sessionsBody");
@@ -286,6 +404,7 @@ function renderSessionsTable() {
       <td class="mono">${sectionTimeCell(s.sectionTimings, "UoL")}</td>
       <td class="mono">${sectionTimeCell(s.sectionTimings, "Reading")}</td>
       <td class="mono">${sectionTimeCell(s.sectionTimings, "Listening")}</td>
+      <td>${deliveryStatusCell(s)}</td>
       <td>${r ? (r.alerts.join(", ") || "—") : "—"}</td>
       <td>${eventBadges(s.suspiciousEvents)}</td>
     `;
@@ -405,24 +524,25 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
   const lines = raw.split("\n").map(l => l.trim()).filter(Boolean);
   lastGenerated = [];
   for (const line of lines) {
-    const [name, username] = line.split(",").map(s => s.trim());
+    const [name, username, email] = line.split(",").map(s => s.trim());
     if (!name || !username) continue;
     const password = generateRandomPassword(8);
-    await setDoc(doc(db, "access_codes", username), { name, password, status: "not_started" });
-    lastGenerated.push({ name, username, password });
+    await setDoc(doc(db, "access_codes", username), { name, password, email: email || "", status: "not_started" });
+    lastGenerated.push({ name, username, email: email || "", password });
   }
   const tbody = document.getElementById("accessResultBody");
   tbody.innerHTML = "";
   for (const r of lastGenerated) {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${r.name}</td><td class="mono">${r.username}</td><td class="mono">${r.password}</td>`;
+    tr.innerHTML = `<td>${r.name}</td><td class="mono">${r.username}</td><td class="mono">${r.email}</td><td class="mono">${r.password}</td>`;
     tbody.appendChild(tr);
   }
   document.getElementById("accessResultWrap").style.display = "block";
+  await loadAllAccessCodes();
 });
 
 document.getElementById("downloadAccessCsvBtn").addEventListener("click", () => {
-  const lines = ["nombre,usuario,contraseña", ...lastGenerated.map(r => `${r.name},${r.username},${r.password}`)];
+  const lines = ["nombre,usuario,correo,contraseña", ...lastGenerated.map(r => `${r.name},${r.username},${r.email},${r.password}`)];
   const blob = new Blob([lines.join("\n")], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");

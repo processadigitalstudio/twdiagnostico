@@ -54,7 +54,6 @@
   </div>
 
   <div class="exam-body">
-    <div class="skill-tag" id="skillTag">—</div>
     <div class="item-counter mono" id="itemCounter"></div>
 
     <div id="pageContent"></div>
@@ -276,7 +275,6 @@ function renderOptions(container, question) {
 }
 
 function renderUolPage(item) {
-  document.getElementById("skillTag").textContent = `UoL · Level ${item.level} · ${item.category}`;
   const content = document.getElementById("pageContent");
   content.innerHTML = "";
 
@@ -296,7 +294,6 @@ function renderUolPage(item) {
 }
 
 function renderGroupPage(group, sectionName) {
-  document.getElementById("skillTag").textContent = `${sectionName} · Level ${group.level}`;
   const content = document.getElementById("pageContent");
   content.innerHTML = "";
 
