@@ -38,27 +38,42 @@
     --c-uol: #2F6F6B;
     --c-reading: #B8912B;
     --c-listening: #6B5B95;
+    --sev-high: #B23A48;
+    --sev-med: #D9822B;
+    --sev-low: #C9A227;
   }
-  .skill-cell { display: flex; align-items: center; gap: 8px; min-width: 110px; }
-  .skill-cell .pct-label { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; font-weight: 700; min-width: 34px; }
-  .mini-bar { flex: 1; height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; min-width: 60px; }
-  .mini-bar > div { height: 100%; border-radius: 4px; }
-  .skill-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+  .skill-bar-wrap { position: relative; height: 26px; border-radius: 13px; overflow: hidden; background: var(--line); min-width: 130px; }
+  .skill-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; }
+  .skill-bar-chip {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    background: rgba(22,48,43,0.82); color: #fff; padding: 2px 10px; border-radius: 10px;
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 700; white-space: nowrap;
+  }
+
+  .alert-icon-dash { color: var(--ink-soft); font-size: 15px; }
+  .alert-icon { font-size: 17px; font-weight: 700; }
+
+  .sev-badges { display: flex; gap: 6px; align-items: center; }
+  .sev-badge { display: inline-flex; align-items: center; gap: 3px; font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px; color: #fff; }
 
   .status-icon { font-size: 16px; cursor: default; }
-  .status-icon.warn { cursor: pointer; }
 
   .detail-panel { background: var(--bg); padding: 20px 24px; }
-  .detail-panel h4 { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin: 18px 0 10px 0; }
-  .detail-panel h4:first-child { margin-top: 0; }
+  .detail-panel h4 { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin: 20px 0 10px 0; padding-top: 14px; border-top: 1px solid var(--line); }
+  .detail-panel h4:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+  .level-compact-table { width: 100%; max-width: 560px; border-collapse: collapse; font-size: 12.5px; }
+  .level-compact-table th, .level-compact-table td { padding: 6px 12px; text-align: center; border-bottom: 1px solid var(--line); }
+  .level-compact-table th { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; text-transform: uppercase; color: var(--ink-soft); }
+  .level-compact-table td:first-child, .level-compact-table th:first-child { text-align: left; font-weight: 700; }
   .detail-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
   .detail-bar-row .lbl { min-width: 130px; font-size: 12.5px; color: var(--ink); }
   .detail-bar-row .bar { flex: 1; height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; max-width: 320px; }
   .detail-bar-row .bar > div { height: 100%; }
   .detail-bar-row .val { font-family: "IBM Plex Mono", monospace; font-size: 12px; min-width: 70px; }
   .timeout-tag { color: var(--bad); font-weight: 700; font-size: 11px; margin-left: 6px; }
-  .event-line { padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; display: flex; justify-content: space-between; }
+  .event-line { padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; display: flex; justify-content: space-between; align-items: center; }
   .event-line:last-child { border-bottom: none; }
+  .event-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 8px; }
   .empty-note { color: var(--good); font-size: 13px; }
 </style>
 </head>
@@ -113,7 +128,7 @@
   <div class="section" id="sessionsSection">
     <button class="btn-secondary" id="exportCsvBtn">⬇ Exportar respuestas (CSV, para Python/Excel)</button>
     <table class="admin-table">
-      <thead><tr><th></th><th>Nombre</th><th>Usuario</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Entrega</th><th>Alertas</th><th>Eventos</th></tr></thead>
+      <thead><tr><th></th><th>Nombre</th><th>Usuario</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Alertas</th><th>Eventos</th></tr></thead>
       <tbody id="sessionsBody"></tbody>
     </table>
   </div>
@@ -373,36 +388,64 @@ function fmtMinSec(seconds) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-const SKILL_COLOR = { UoL: "var(--c-uol)", Reading: "var(--c-reading)", Listening: "var(--c-listening)" };
 const SKILL_COLOR_HEX = { UoL: "#2F6F6B", Reading: "#B8912B", Listening: "#6B5B95" };
+const SKILL_SHORT = { UoL: "UoL", Reading: "Reading", Listening: "Listening" };
+
+// severidad de cada tipo de evento sospechoso
+const EVENT_TIER = {
+  tab_hidden: "high", browser_translate_detected: "high",
+  copy_attempt: "med", cut_attempt: "med", paste_attempt: "med", keyboard_copy_paste: "med", print_screen_key: "med",
+  right_click: "low"
+};
+const TIER_COLOR = { high: "var(--sev-high)", med: "var(--sev-med)", low: "var(--sev-low)" };
+const TIER_LABEL = { high: "Alto", med: "Medio", low: "Bajo" };
 
 function skillPctCell(pct, skill) {
   if (pct === undefined) return "—";
   return `
-    <div class="skill-cell">
-      <span class="pct-label" style="color:${SKILL_COLOR_HEX[skill]};">${pct}%</span>
-      <div class="mini-bar"><div style="width:${pct}%; background:${SKILL_COLOR_HEX[skill]};"></div></div>
+    <div class="skill-bar-wrap">
+      <div class="skill-bar-fill" style="width:${pct}%; background:${SKILL_COLOR_HEX[skill]};"></div>
+      <div class="skill-bar-chip">${SKILL_SHORT[skill]} · ${pct}%</div>
     </div>`;
 }
 
-function eventStatusIcon(events) {
-  if (!events || events.length === 0) return `<span class="status-icon" title="Sin eventos registrados">✅</span>`;
-  const highCount = events.filter(e => e.type === "browser_translate_detected" || e.type === "tab_hidden").length;
-  const color = highCount > 0 ? "var(--bad)" : "var(--gold)";
-  return `<span class="status-icon warn toggle-detail" data-session-events style="color:${color};">⚠ ${events.length}</span>`;
+function eventTierCounts(events) {
+  const counts = { high: 0, med: 0, low: 0 };
+  for (const e of (events || [])) {
+    const tier = EVENT_TIER[e.type] || "low";
+    counts[tier]++;
+  }
+  return counts;
 }
 
-function alertDots(alerts) {
-  if (!alerts || alerts.length === 0) return `<span class="empty-note">✓ ok</span>`;
-  return alerts.map(skill => `<span class="skill-dot" style="background:${SKILL_COLOR_HEX[skill]};"></span>${skill}`).join(" · ");
+function overallSeverity(r, events) {
+  const counts = eventTierCounts(events);
+  const skillAlert = r && r.alerts.length > 0;
+  const patternAlert = r && r.patternAlerts.length > 0;
+  if (skillAlert || counts.high > 0) return "high";
+  if (patternAlert || counts.med > 0) return "med";
+  if (counts.low > 0) return "low";
+  return null;
 }
 
-function patternDot(patternAlerts) {
-  if (!patternAlerts || patternAlerts.length === 0) return `<span class="empty-note">✓ ok</span>`;
-  return `<span class="toggle-detail" data-session-pattern style="color:var(--gold); font-weight:700;">⚠ ${patternAlerts.length}</span>`;
+function alertsCell(r, events) {
+  const sev = overallSeverity(r, events);
+  if (!sev) return `<span class="alert-icon-dash">–</span>`;
+  return `<span class="alert-icon" style="color:${TIER_COLOR[sev]};" title="Severidad ${TIER_LABEL[sev]}">⚠</span>`;
 }
 
-// ---------------- ENTREGA DE RESULTADOS (EmailJS) ----------------
+function eventsCell(events) {
+  const counts = eventTierCounts(events);
+  const parts = [];
+  if (counts.high > 0) parts.push(`<span class="sev-badge" style="background:${TIER_COLOR.high};">🔴 ${counts.high}</span>`);
+  if (counts.med > 0) parts.push(`<span class="sev-badge" style="background:${TIER_COLOR.med};">🟠 ${counts.med}</span>`);
+  if (counts.low > 0) parts.push(`<span class="sev-badge" style="background:${TIER_COLOR.low};">🟡 ${counts.low}</span>`);
+  if (parts.length === 0) return `<span class="alert-icon-dash">–</span>`;
+  return `<div class="sev-badges">${parts.join("")}</div>`;
+}
+
+// ---------------- ENTREGA DE RESULTADOS (EmailJS) — sigue corriendo en segundo plano,
+// pero ya no se muestra columna en la tabla mientras no se active EmailJS ----------------
 async function processOneSessionDelivery(session) {
   if (!answerKey) return;
   const currentStatus = session.resultDelivery?.status || "pending";
@@ -457,23 +500,6 @@ async function manualRelease(sessionId) {
 }
 window.manualRelease = manualRelease;
 
-function deliveryStatusCell(session) {
-  const status = session.resultDelivery?.status || "pending";
-  const labels = {
-    pending: "⏳ Procesando...",
-    sent: "✅ Enviado",
-    sent_after_review: "✅ Enviado (revisado)",
-    ready_no_email: "⚠ Falta EmailJS/correo",
-    error: "❌ Error al enviar",
-    held_for_review: `⏸ Retenido`
-  };
-  let html = labels[status] || status;
-  if (status === "held_for_review" || status === "ready_no_email" || status === "error") {
-    html += `<br><button class="btn-secondary" style="margin-top:6px; padding:5px 8px; font-size:11px;" onclick="manualRelease('${session.id}')">Liberar y enviar</button>`;
-  }
-  return html;
-}
-
 // ---------------- RESULTADOS ----------------
 const EVENT_LABELS = {
   tab_hidden: "Cambió de pestaña / minimizó", copy_attempt: "Intentó copiar", cut_attempt: "Intentó cortar",
@@ -484,21 +510,19 @@ const EVENT_LABELS = {
 function buildDetailPanel(s, r) {
   let html = `<div class="detail-panel">`;
 
-  // desglose por nivel
+  // desglose por nivel — tabla compacta, sin barras (solo el resumen principal lleva barras)
   html += `<h4>Desglose por nivel dentro de cada destreza</h4>`;
   if (r) {
+    html += `<table class="level-compact-table"><thead><tr><th>Destreza</th><th>A1</th><th>A2</th><th>B1</th><th>B2</th></tr></thead><tbody>`;
     for (const skill of ["UoL", "Reading", "Listening"]) {
-      html += `<div style="margin-bottom:10px;"><strong style="color:${SKILL_COLOR_HEX[skill]}; font-size:12.5px;">${skill}</strong></div>`;
+      html += `<tr><td style="color:${SKILL_COLOR_HEX[skill]};">${skill}</td>`;
       for (const lvl of ["A1", "A2", "B1", "B2"]) {
         const val = r.levelBreakdown[skill][lvl];
-        const pct = val === null ? 0 : val;
-        html += `<div class="detail-bar-row">
-          <div class="lbl">${lvl}</div>
-          <div class="bar"><div style="width:${pct}%; background:${SKILL_COLOR_HEX[skill]};"></div></div>
-          <div class="val">${val === null ? "sin datos" : val + "%"}</div>
-        </div>`;
+        html += `<td>${val === null ? "—" : val + "%"}</td>`;
       }
+      html += `</tr>`;
     }
+    html += `</tbody></table>`;
   }
 
   // tiempos por sección
@@ -520,13 +544,13 @@ function buildDetailPanel(s, r) {
   html += `<h4>Patrón inconsistente</h4>`;
   if (r && r.patternAlerts.length > 0) {
     for (const a of r.patternAlerts) {
-      html += `<div class="event-line"><span>${a.skill}: ${a.higherLevel} muy por encima de ${a.lowerLevel}</span><span class="mono" style="color:var(--gold);">${a.higherPct}% vs ${a.lowerPct}%</span></div>`;
+      html += `<div class="event-line"><span><span class="event-dot" style="background:${TIER_COLOR.med};"></span>${a.skill}: ${a.higherLevel} muy por encima de ${a.lowerLevel}</span><span class="mono" style="color:${TIER_COLOR.med};">${a.higherPct}% vs ${a.lowerPct}%</span></div>`;
     }
   } else {
     html += `<div class="empty-note">✓ Sin inversiones detectadas</div>`;
   }
 
-  // eventos sospechosos
+  // eventos sospechosos, coloreados por severidad
   html += `<h4>Eventos sospechosos registrados</h4>`;
   const events = s.suspiciousEvents || [];
   if (events.length === 0) {
@@ -534,9 +558,12 @@ function buildDetailPanel(s, r) {
   } else {
     const counts = {};
     for (const e of events) counts[e.type] = (counts[e.type] || 0) + 1;
-    for (const [type, count] of Object.entries(counts)) {
-      const high = type === "browser_translate_detected" || type === "tab_hidden";
-      html += `<div class="event-line"><span>${EVENT_LABELS[type] || type}</span><span class="mono" style="color:${high ? 'var(--bad)' : 'var(--ink-soft)'};">× ${count}</span></div>`;
+    // ordenar por severidad: alto primero
+    const order = { high: 0, med: 1, low: 2 };
+    const sorted = Object.entries(counts).sort((a, b) => order[EVENT_TIER[a[0]] || "low"] - order[EVENT_TIER[b[0]] || "low"]);
+    for (const [type, count] of sorted) {
+      const tier = EVENT_TIER[type] || "low";
+      html += `<div class="event-line"><span><span class="event-dot" style="background:${TIER_COLOR[tier]};"></span>${EVENT_LABELS[type] || type}</span><span class="mono" style="color:${TIER_COLOR[tier]};">× ${count}</span></div>`;
     }
   }
 
@@ -549,6 +576,7 @@ function renderSessionsTable() {
   tbody.innerHTML = "";
   for (const s of allSessions) {
     const r = computedById[s.id];
+    const events = s.suspiciousEvents || [];
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><span class="toggle-detail" data-session="${s.id}">ver</span></td>
@@ -559,9 +587,8 @@ function renderSessionsTable() {
       <td>${r ? skillPctCell(r.pct.Listening, "Listening") : "—"}</td>
       <td><strong>${r ? r.finalScore + "%" : "—"}</strong></td>
       <td>${r ? r.level : "—"}</td>
-      <td>${deliveryStatusCell(s)}</td>
-      <td>${r ? alertDots(r.alerts) : "—"}</td>
-      <td>${eventStatusIcon(s.suspiciousEvents)}</td>
+      <td>${alertsCell(r, events)}</td>
+      <td>${eventsCell(events)}</td>
     `;
     tbody.appendChild(tr);
 
@@ -569,24 +596,14 @@ function renderSessionsTable() {
     detailTr.className = "item-detail-row";
     detailTr.style.display = "none";
     detailTr.id = `session-detail-${s.id}`;
-    detailTr.innerHTML = `<td colspan="11" style="padding:0 !important;">${buildDetailPanel(s, r)}</td>`;
+    detailTr.innerHTML = `<td colspan="10" style="padding:0 !important;">${buildDetailPanel(s, r)}</td>`;
     tbody.appendChild(detailTr);
   }
 
-  function toggleDetail(sessionId) {
-    const row = document.getElementById(`session-detail-${sessionId}`);
-    row.style.display = row.style.display === "none" ? "table-row" : "none";
-  }
-
   document.querySelectorAll("[data-session]").forEach(el => {
-    el.addEventListener("click", () => toggleDetail(el.dataset.session));
-  });
-  // el icono de eventos y el de patron tambien abren el mismo panel de detalle
-  tbody.querySelectorAll("tr").forEach(tr => {
-    const verLink = tr.querySelector("[data-session]");
-    if (!verLink) return;
-    tr.querySelectorAll("[data-session-events], [data-session-pattern]").forEach(el => {
-      el.addEventListener("click", () => toggleDetail(verLink.dataset.session));
+    el.addEventListener("click", () => {
+      const row = document.getElementById(`session-detail-${el.dataset.session}`);
+      row.style.display = row.style.display === "none" ? "table-row" : "none";
     });
   });
 }
