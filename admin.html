@@ -32,6 +32,34 @@
     padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
   }
   .key-banner.ok { background: #EAF4EF; border-color: var(--good); }
+
+  /* ---------- Colores fijos por destreza ---------- */
+  :root {
+    --c-uol: #2F6F6B;
+    --c-reading: #B8912B;
+    --c-listening: #6B5B95;
+  }
+  .skill-cell { display: flex; align-items: center; gap: 8px; min-width: 110px; }
+  .skill-cell .pct-label { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; font-weight: 700; min-width: 34px; }
+  .mini-bar { flex: 1; height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; min-width: 60px; }
+  .mini-bar > div { height: 100%; border-radius: 4px; }
+  .skill-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+
+  .status-icon { font-size: 16px; cursor: default; }
+  .status-icon.warn { cursor: pointer; }
+
+  .detail-panel { background: var(--bg); padding: 20px 24px; }
+  .detail-panel h4 { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin: 18px 0 10px 0; }
+  .detail-panel h4:first-child { margin-top: 0; }
+  .detail-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .detail-bar-row .lbl { min-width: 130px; font-size: 12.5px; color: var(--ink); }
+  .detail-bar-row .bar { flex: 1; height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; max-width: 320px; }
+  .detail-bar-row .bar > div { height: 100%; }
+  .detail-bar-row .val { font-family: "IBM Plex Mono", monospace; font-size: 12px; min-width: 70px; }
+  .timeout-tag { color: var(--bad); font-weight: 700; font-size: 11px; margin-left: 6px; }
+  .event-line { padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; display: flex; justify-content: space-between; }
+  .event-line:last-child { border-bottom: none; }
+  .empty-note { color: var(--good); font-size: 13px; }
 </style>
 </head>
 <body>
@@ -85,7 +113,7 @@
   <div class="section" id="sessionsSection">
     <button class="btn-secondary" id="exportCsvBtn">⬇ Exportar respuestas (CSV, para Python/Excel)</button>
     <table class="admin-table">
-      <thead><tr><th></th><th>Nombre</th><th>Usuario</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Tiempo UoL</th><th>Tiempo Reading</th><th>Tiempo Listening</th><th>Entrega del resultado</th><th>Alertas (destreza &lt;30%)</th><th>Patrón inconsistente</th><th>Eventos sospechosos</th></tr></thead>
+      <thead><tr><th></th><th>Nombre</th><th>Usuario</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Entrega</th><th>Alertas</th><th>Eventos</th></tr></thead>
       <tbody id="sessionsBody"></tbody>
     </table>
   </div>
@@ -345,11 +373,33 @@ function fmtMinSec(seconds) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-function sectionTimeCell(sectionTimings, name) {
-  if (!sectionTimings || !sectionTimings[name]) return "—";
-  const t = sectionTimings[name];
-  const timeoutMark = t.timedOut ? ` <span class="flag-bad">⏱ agotado</span>` : "";
-  return `${fmtMinSec(t.elapsedSeconds)}${timeoutMark}`;
+const SKILL_COLOR = { UoL: "var(--c-uol)", Reading: "var(--c-reading)", Listening: "var(--c-listening)" };
+const SKILL_COLOR_HEX = { UoL: "#2F6F6B", Reading: "#B8912B", Listening: "#6B5B95" };
+
+function skillPctCell(pct, skill) {
+  if (pct === undefined) return "—";
+  return `
+    <div class="skill-cell">
+      <span class="pct-label" style="color:${SKILL_COLOR_HEX[skill]};">${pct}%</span>
+      <div class="mini-bar"><div style="width:${pct}%; background:${SKILL_COLOR_HEX[skill]};"></div></div>
+    </div>`;
+}
+
+function eventStatusIcon(events) {
+  if (!events || events.length === 0) return `<span class="status-icon" title="Sin eventos registrados">✅</span>`;
+  const highCount = events.filter(e => e.type === "browser_translate_detected" || e.type === "tab_hidden").length;
+  const color = highCount > 0 ? "var(--bad)" : "var(--gold)";
+  return `<span class="status-icon warn toggle-detail" data-session-events style="color:${color};">⚠ ${events.length}</span>`;
+}
+
+function alertDots(alerts) {
+  if (!alerts || alerts.length === 0) return `<span class="empty-note">✓ ok</span>`;
+  return alerts.map(skill => `<span class="skill-dot" style="background:${SKILL_COLOR_HEX[skill]};"></span>${skill}`).join(" · ");
+}
+
+function patternDot(patternAlerts) {
+  if (!patternAlerts || patternAlerts.length === 0) return `<span class="empty-note">✓ ok</span>`;
+  return `<span class="toggle-detail" data-session-pattern style="color:var(--gold); font-weight:700;">⚠ ${patternAlerts.length}</span>`;
 }
 
 // ---------------- ENTREGA DE RESULTADOS (EmailJS) ----------------
@@ -411,38 +461,86 @@ function deliveryStatusCell(session) {
   const status = session.resultDelivery?.status || "pending";
   const labels = {
     pending: "⏳ Procesando...",
-    sent: "✅ Enviado automáticamente",
-    sent_after_review: "✅ Enviado (tras tu revisión)",
-    ready_no_email: "⚠ Sin alertas, pero falta configurar EmailJS o el correo",
-    error: "❌ Error al enviar — revisa EmailJS",
-    held_for_review: `⏸ Retenido por alerta`
+    sent: "✅ Enviado",
+    sent_after_review: "✅ Enviado (revisado)",
+    ready_no_email: "⚠ Falta EmailJS/correo",
+    error: "❌ Error al enviar",
+    held_for_review: `⏸ Retenido`
   };
   let html = labels[status] || status;
   if (status === "held_for_review" || status === "ready_no_email" || status === "error") {
-    html += `<br><button class="btn-secondary" style="margin-top:6px; padding:6px 10px; font-size:12px;" onclick="manualRelease('${session.id}')">Liberar y enviar</button>`;
+    html += `<br><button class="btn-secondary" style="margin-top:6px; padding:5px 8px; font-size:11px;" onclick="manualRelease('${session.id}')">Liberar y enviar</button>`;
   }
   return html;
 }
 
 // ---------------- RESULTADOS ----------------
-function patternAlertBadges(patternAlerts) {
-  if (!patternAlerts || patternAlerts.length === 0) return "—";
-  return patternAlerts.map(a =>
-    `<span class="badge-event high">${a.skill}: ${a.higherLevel} (${a.higherPct}%) > ${a.lowerLevel} (${a.lowerPct}%)</span>`
-  ).join(" ");
-}
+const EVENT_LABELS = {
+  tab_hidden: "Cambió de pestaña / minimizó", copy_attempt: "Intentó copiar", cut_attempt: "Intentó cortar",
+  paste_attempt: "Intentó pegar", right_click: "Click derecho", keyboard_copy_paste: "Atajo de teclado copiar/pegar",
+  print_screen_key: "Tecla Print Screen", browser_translate_detected: "Usó el traductor del navegador"
+};
 
-function levelBreakdownTable(levelBreakdown) {
-  if (!levelBreakdown) return "";
-  const skills = ["UoL", "Reading", "Listening"];
-  let html = `<table class="admin-table" style="margin:0;"><thead><tr><th>Destreza</th><th>A1</th><th>A2</th><th>B1</th><th>B2</th></tr></thead><tbody>`;
-  for (const skill of skills) {
-    const row = levelBreakdown[skill] || {};
-    html += `<tr><td>${skill}</td>` +
-      ["A1", "A2", "B1", "B2"].map(l => `<td>${row[l] === null || row[l] === undefined ? "—" : row[l] + "%"}</td>`).join("") +
-      `</tr>`;
+function buildDetailPanel(s, r) {
+  let html = `<div class="detail-panel">`;
+
+  // desglose por nivel
+  html += `<h4>Desglose por nivel dentro de cada destreza</h4>`;
+  if (r) {
+    for (const skill of ["UoL", "Reading", "Listening"]) {
+      html += `<div style="margin-bottom:10px;"><strong style="color:${SKILL_COLOR_HEX[skill]}; font-size:12.5px;">${skill}</strong></div>`;
+      for (const lvl of ["A1", "A2", "B1", "B2"]) {
+        const val = r.levelBreakdown[skill][lvl];
+        const pct = val === null ? 0 : val;
+        html += `<div class="detail-bar-row">
+          <div class="lbl">${lvl}</div>
+          <div class="bar"><div style="width:${pct}%; background:${SKILL_COLOR_HEX[skill]};"></div></div>
+          <div class="val">${val === null ? "sin datos" : val + "%"}</div>
+        </div>`;
+      }
+    }
   }
-  html += `</tbody></table>`;
+
+  // tiempos por sección
+  html += `<h4>Tiempo usado por sección</h4>`;
+  const budgets = { UoL: 15, Reading: 30, Listening: 20 };
+  for (const skill of ["UoL", "Reading", "Listening"]) {
+    const t = s.sectionTimings?.[skill];
+    const budgetSec = budgets[skill] * 60;
+    const usedSec = t ? t.elapsedSeconds : 0;
+    const pct = t ? Math.min(100, Math.round((usedSec / budgetSec) * 100)) : 0;
+    html += `<div class="detail-bar-row">
+      <div class="lbl" style="color:${SKILL_COLOR_HEX[skill]}; font-weight:700;">${skill}</div>
+      <div class="bar"><div style="width:${pct}%; background:${SKILL_COLOR_HEX[skill]};"></div></div>
+      <div class="val">${t ? fmtMinSec(t.elapsedSeconds) : "—"} / ${budgets[skill]}:00${t?.timedOut ? `<span class="timeout-tag">⏱ agotado</span>` : ""}</div>
+    </div>`;
+  }
+
+  // patron inconsistente
+  html += `<h4>Patrón inconsistente</h4>`;
+  if (r && r.patternAlerts.length > 0) {
+    for (const a of r.patternAlerts) {
+      html += `<div class="event-line"><span>${a.skill}: ${a.higherLevel} muy por encima de ${a.lowerLevel}</span><span class="mono" style="color:var(--gold);">${a.higherPct}% vs ${a.lowerPct}%</span></div>`;
+    }
+  } else {
+    html += `<div class="empty-note">✓ Sin inversiones detectadas</div>`;
+  }
+
+  // eventos sospechosos
+  html += `<h4>Eventos sospechosos registrados</h4>`;
+  const events = s.suspiciousEvents || [];
+  if (events.length === 0) {
+    html += `<div class="empty-note">✓ Ningún evento registrado durante el examen</div>`;
+  } else {
+    const counts = {};
+    for (const e of events) counts[e.type] = (counts[e.type] || 0) + 1;
+    for (const [type, count] of Object.entries(counts)) {
+      const high = type === "browser_translate_detected" || type === "tab_hidden";
+      html += `<div class="event-line"><span>${EVENT_LABELS[type] || type}</span><span class="mono" style="color:${high ? 'var(--bad)' : 'var(--ink-soft)'};">× ${count}</span></div>`;
+    }
+  }
+
+  html += `</div>`;
   return html;
 }
 
@@ -456,18 +554,14 @@ function renderSessionsTable() {
       <td><span class="toggle-detail" data-session="${s.id}">ver</span></td>
       <td>${s.name || "—"}</td>
       <td class="mono">${s.username || "—"}</td>
-      <td>${r ? r.pct.UoL + "%" : "—"}</td>
-      <td>${r ? r.pct.Reading + "%" : "—"}</td>
-      <td>${r ? r.pct.Listening + "%" : "—"}</td>
+      <td>${r ? skillPctCell(r.pct.UoL, "UoL") : "—"}</td>
+      <td>${r ? skillPctCell(r.pct.Reading, "Reading") : "—"}</td>
+      <td>${r ? skillPctCell(r.pct.Listening, "Listening") : "—"}</td>
       <td><strong>${r ? r.finalScore + "%" : "—"}</strong></td>
       <td>${r ? r.level : "—"}</td>
-      <td class="mono">${sectionTimeCell(s.sectionTimings, "UoL")}</td>
-      <td class="mono">${sectionTimeCell(s.sectionTimings, "Reading")}</td>
-      <td class="mono">${sectionTimeCell(s.sectionTimings, "Listening")}</td>
       <td>${deliveryStatusCell(s)}</td>
-      <td>${r ? (r.alerts.join(", ") || "—") : "—"}</td>
-      <td>${r ? patternAlertBadges(r.patternAlerts) : "—"}</td>
-      <td>${eventBadges(s.suspiciousEvents)}</td>
+      <td>${r ? alertDots(r.alerts) : "—"}</td>
+      <td>${eventStatusIcon(s.suspiciousEvents)}</td>
     `;
     tbody.appendChild(tr);
 
@@ -475,17 +569,24 @@ function renderSessionsTable() {
     detailTr.className = "item-detail-row";
     detailTr.style.display = "none";
     detailTr.id = `session-detail-${s.id}`;
-    detailTr.innerHTML = `<td colspan="15">
-      <strong>Desglose por nivel dentro de cada destreza:</strong><br><br>
-      ${r ? levelBreakdownTable(r.levelBreakdown) : "Sin datos"}
-    </td>`;
+    detailTr.innerHTML = `<td colspan="11" style="padding:0 !important;">${buildDetailPanel(s, r)}</td>`;
     tbody.appendChild(detailTr);
   }
 
+  function toggleDetail(sessionId) {
+    const row = document.getElementById(`session-detail-${sessionId}`);
+    row.style.display = row.style.display === "none" ? "table-row" : "none";
+  }
+
   document.querySelectorAll("[data-session]").forEach(el => {
-    el.addEventListener("click", () => {
-      const row = document.getElementById(`session-detail-${el.dataset.session}`);
-      row.style.display = row.style.display === "none" ? "table-row" : "none";
+    el.addEventListener("click", () => toggleDetail(el.dataset.session));
+  });
+  // el icono de eventos y el de patron tambien abren el mismo panel de detalle
+  tbody.querySelectorAll("tr").forEach(tr => {
+    const verLink = tr.querySelector("[data-session]");
+    if (!verLink) return;
+    tr.querySelectorAll("[data-session-events], [data-session-pattern]").forEach(el => {
+      el.addEventListener("click", () => toggleDetail(verLink.dataset.session));
     });
   });
 }
