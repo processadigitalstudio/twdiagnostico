@@ -47,13 +47,15 @@
 </div>
 
 <div class="exam-shell">
-  <div class="segments" id="segments"></div>
-  <div class="topbar">
-    <div class="brand">Tweetalig · Piloto de ubicación</div>
-    <div class="timer mono" id="timer">60:00</div>
+  <div class="exam-header-sticky">
+    <div class="segments" id="segments"></div>
+    <div class="topbar">
+      <div class="brand">Tweetalig · Piloto de ubicación</div>
+      <div class="timer mono" id="timer">60:00</div>
+    </div>
   </div>
 
-  <div class="exam-body">
+  <div class="exam-body" id="examBody">
     <div class="item-counter mono" id="itemCounter"></div>
 
     <div id="pageContent"></div>
@@ -276,6 +278,7 @@ function renderOptions(container, question) {
 }
 
 function renderUolPage(item) {
+  document.getElementById("examBody").classList.remove("wide");
   const content = document.getElementById("pageContent");
   content.innerHTML = "";
 
@@ -295,14 +298,25 @@ function renderUolPage(item) {
 }
 
 function renderGroupPage(group, sectionName) {
+  document.getElementById("examBody").classList.add("wide");
   const content = document.getElementById("pageContent");
   content.innerHTML = "";
 
+  const layout = document.createElement("div");
+  layout.className = "split-layout";
+
+  const questionsCol = document.createElement("div");
+  questionsCol.className = "split-questions";
+
+  const mediaCol = document.createElement("div");
+  mediaCol.className = "split-media";
+
+  // ---- columna derecha: texto o audio, se queda fijo mientras se responde ----
   if (group.type === "reading") {
     const ctx = document.createElement("div");
     ctx.className = "context-box";
     ctx.textContent = group.context;
-    content.appendChild(ctx);
+    mediaCol.appendChild(ctx);
   } else {
     const wrap = document.createElement("div");
     wrap.className = "audio-box";
@@ -336,20 +350,25 @@ function renderGroupPage(group, sectionName) {
 
     wrap.appendChild(audioEl);
     wrap.appendChild(label);
-    content.appendChild(wrap);
+    mediaCol.appendChild(wrap);
   }
 
+  // ---- columna izquierda: todas las preguntas de este texto/audio ----
   group.questions.forEach((q, i) => {
     const block = document.createElement("div");
-    block.style.marginTop = "26px";
+    block.style.marginTop = i === 0 ? "0" : "26px";
     const stem = document.createElement("div");
     stem.className = "stem";
     stem.style.fontSize = "17px";
     stem.textContent = `${i + 1}. ${q.stem}`;
     block.appendChild(stem);
     renderOptions(block, q);
-    content.appendChild(block);
+    questionsCol.appendChild(block);
   });
+
+  layout.appendChild(mediaCol);
+  layout.appendChild(questionsCol);
+  content.appendChild(layout);
 
   state.pageShownAt = Date.now();
 }
@@ -360,6 +379,16 @@ async function goNext() {
   const currentQuestions = section.kind === "items"
     ? [section.items[state.pageIndex]]
     : section.groups[state.pageIndex].questions;
+
+  const unanswered = currentQuestions.filter(q => !state.responses[q.id]);
+  if (unanswered.length > 0) {
+    alert(
+      currentQuestions.length === 1
+        ? "Please select an answer before continuing."
+        : `Please answer all ${currentQuestions.length} questions on this page before continuing. You still have ${unanswered.length} unanswered.`
+    );
+    return;
+  }
 
   for (const q of currentQuestions) {
     const r = state.responses[q.id];
@@ -425,7 +454,7 @@ function startSectionTimerInterval() {
     const min = Math.floor(remainingMs / 60000);
     const sec = Math.floor((remainingMs % 60000) / 1000);
     timerEl.textContent = `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
-    timerEl.classList.toggle("low", remainingMs < 2 * 60 * 1000);
+    timerEl.classList.toggle("low", remainingMs < 5 * 60 * 1000);
     if (remainingMs <= 0) {
       clearInterval(sectionTimerInterval);
       forceAdvanceSection();
