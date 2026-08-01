@@ -374,6 +374,20 @@ function renderGroupPage(group, sectionName) {
 }
 
 // ---------- avanzar ----------
+function showNotice(message) {
+  const overlay = document.createElement("div");
+  overlay.className = "integrity-overlay";
+  overlay.style.zIndex = "1200";
+  overlay.innerHTML = `
+    <div class="integrity-card" style="max-width:420px; text-align:center;">
+      <p style="font-size:15px; color:var(--ink); margin-bottom:20px; line-height:1.5;">${message}</p>
+      <button class="btn-primary" id="noticeOkBtn" style="margin-top:0;">Got it</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById("noticeOkBtn").addEventListener("click", () => overlay.remove());
+}
+
 async function goNext() {
   const section = currentSection();
   const currentQuestions = section.kind === "items"
@@ -382,7 +396,7 @@ async function goNext() {
 
   const unanswered = currentQuestions.filter(q => !state.responses[q.id]);
   if (unanswered.length > 0) {
-    alert(
+    showNotice(
       currentQuestions.length === 1
         ? "Please select an answer before continuing."
         : `Please answer all ${currentQuestions.length} questions on this page before continuing. You still have ${unanswered.length} unanswered.`
