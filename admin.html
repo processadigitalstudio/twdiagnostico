@@ -157,9 +157,9 @@
     </div>
 
     <h3 style="margin-top:36px;">Todos los accesos existentes</h3>
-    <p class="muted">Por seguridad, las contraseñas ya generadas no se vuelven a mostrar aquí — si alguien perdió la suya, bórrala (🗑) y créala de nuevo.</p>
+    <p class="muted">Solo tú puedes ver estas contraseñas (esta pantalla está detrás de tu login) — click en "ver" para revelarla.</p>
     <table class="admin-table">
-      <thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Estado</th><th></th></tr></thead>
+      <thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Contraseña</th><th>Estado</th><th></th></tr></thead>
       <tbody id="allAccessBody"></tbody>
     </table>
   </div>
@@ -309,11 +309,23 @@ async function loadAllAccessCodes() {
       <td>${r.name || "—"}</td>
       <td class="mono">${r.username}</td>
       <td class="mono">${r.email || "—"}</td>
+      <td>
+        <span class="mono" id="pw-${r.username}" data-real="${r.password || ""}">••••••••</span>
+        <span class="toggle-detail" data-reveal="${r.username}" style="margin-left:6px;">👁 ver</span>
+      </td>
       <td>${statusLabels[r.status] || r.status || "—"}</td>
       <td><span class="toggle-detail" data-del="${r.username}" style="color:var(--bad);">🗑 borrar</span></td>
     `;
     tbody.appendChild(tr);
   }
+  document.querySelectorAll("[data-reveal]").forEach(el => {
+    el.addEventListener("click", () => {
+      const span = document.getElementById(`pw-${el.dataset.reveal}`);
+      const showing = span.textContent !== "••••••••";
+      span.textContent = showing ? "••••••••" : span.dataset.real;
+      el.textContent = showing ? "👁 ver" : "🙈 ocultar";
+    });
+  });
   document.querySelectorAll("[data-del]").forEach(el => {
     el.addEventListener("click", async () => {
       if (!confirm(`¿Borrar el acceso de "${el.dataset.del}"? Esto no se puede deshacer.`)) return;
