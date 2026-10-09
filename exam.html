@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google" content="notranslate">
-<title>Examen en curso — Tweetalig</title>
+<title>English Diagnostic Test — Tweetalig</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
@@ -16,7 +16,7 @@
   <div class="integrity-card">
     <div class="eyebrow">Antes de empezar</div>
     <h2>Compromiso de integridad</h2>
-    <p class="muted">Este piloto ayuda a calibrar el examen real que van a presentar miles de estudiantes. Para que los datos sean útiles, es esencial que respondas por tu cuenta.</p>
+    <p class="muted">Este examen diagnóstico determina tu punto de partida en el programa de inglés. Para que el resultado refleje tu nivel real, es esencial que respondas por tu cuenta.</p>
     <ul>
       <li>No uses traductores, diccionarios externos, ni asistentes de IA durante el examen.</li>
       <li>No copies, fotografíes, ni compartas las preguntas.</li>
@@ -50,7 +50,7 @@
   <div class="exam-header-sticky">
     <div class="segments" id="segments"></div>
     <div class="topbar">
-      <div class="brand">Tweetalig · Piloto de ubicación</div>
+      <div class="brand">Tweetalig · English Diagnostic Test</div>
       <div class="timer mono" id="timer">60:00</div>
     </div>
   </div>
@@ -183,7 +183,7 @@ const SECTION_INSTRUCTIONS = {
     body: `
       <p>This section tests your knowledge of English grammar, vocabulary, collocations, and prepositions.</p>
       <ul>
-        <li>You will answer <strong>${n} short items</strong>, each with a sentence and four options.</li>
+        <li>You will answer <strong>${n} short items</strong>, each with a sentence and four options. Some items include a picture; click it to enlarge.</li>
         <li>You have <strong>${SECTION_DURATIONS_MIN.UoL} minutes</strong> for this section. If time runs out, you'll automatically move to the next section with whatever you've answered so far.</li>
         <li>Choose the option that best completes the sentence.</li>
         <li>You cannot go back to a previous item once you continue.</li>
@@ -192,9 +192,9 @@ const SECTION_INSTRUCTIONS = {
   Reading: (n) => ({
     title: "Section 2 of 3 — Reading",
     body: `
-      <p>In this section, you will read <strong>${n} short passages</strong> in English.</p>
+      <p>In this section, you will read <strong>${n} short texts and documents</strong> in English (articles, messages, schedules, notices).</p>
       <ul>
-        <li>Each passage has several questions below it, all on the same page.</li>
+        <li>Each text has several questions next to it, all on the same page. Click an image to enlarge it.</li>
         <li>You have <strong>${SECTION_DURATIONS_MIN.Reading} minutes</strong> for this section. If time runs out, you'll automatically move to the next section with whatever you've answered so far.</li>
         <li>You can reread the passage as many times as you like while answering its questions.</li>
         <li>Once you continue to the next passage, you cannot go back.</li>
@@ -207,7 +207,7 @@ const SECTION_INSTRUCTIONS = {
       <ul>
         <li>Each recording has a few questions below it, all on the same page.</li>
         <li>You have <strong>${SECTION_DURATIONS_MIN.Listening} minutes</strong> for this section. If time runs out, the exam will submit automatically with whatever you've answered so far.</li>
-        <li>You may play each recording <strong>up to ${MAX_AUDIO_PLAYS} times</strong>.</li>
+        <li>You may play each recording <strong>up to ${MAX_AUDIO_PLAYS} times</strong>. You can pause, but you cannot skip forward or back.</li>
         <li>Make sure your volume is on before starting. Headphones are recommended.</li>
         <li>Once you continue to the next recording, you cannot go back.</li>
       </ul>`
@@ -277,6 +277,38 @@ function renderOptions(container, question) {
   container.appendChild(wrap);
 }
 
+function escapeHtml(t) {
+  return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// Imagen con zoom dentro de la misma página (no abre otra pestaña: eso se registraría como salida del examen)
+function imageBlock(src, alt) {
+  const box = document.createElement("div");
+  box.className = "image-box";
+  const img = document.createElement("img");
+  img.src = src;
+  img.alt = alt || "";
+  img.title = "Click to enlarge";
+  img.addEventListener("click", () => openLightbox(src, alt));
+  box.appendChild(img);
+  return box;
+}
+
+function openLightbox(src, alt) {
+  const overlay = document.createElement("div");
+  overlay.className = "lightbox";
+  overlay.innerHTML = `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt || "")}"><div class="lightbox-hint">Click anywhere to close</div>`;
+  overlay.addEventListener("click", () => overlay.remove());
+  document.body.appendChild(overlay);
+}
+
+function numberBadge(n) {
+  const b = document.createElement("span");
+  b.className = "q-badge";
+  b.textContent = n;
+  return b;
+}
+
 function renderUolPage(item) {
   document.getElementById("examBody").classList.remove("wide");
   const content = document.getElementById("pageContent");
@@ -285,9 +317,16 @@ function renderUolPage(item) {
   if (item.context) {
     const ctx = document.createElement("div");
     ctx.className = "context-box";
-    ctx.textContent = item.context;
+    const label = document.createElement("div");
+    label.className = "context-label";
+    label.textContent = "Context";
+    const text = document.createElement("p");
+    text.textContent = item.context;
+    ctx.appendChild(label);
+    ctx.appendChild(text);
     content.appendChild(ctx);
   }
+  if (item.image) content.appendChild(imageBlock(item.image, item.id));
   const stem = document.createElement("div");
   stem.className = "stem";
   stem.textContent = item.stem;
@@ -297,71 +336,126 @@ function renderUolPage(item) {
   state.pageShownAt = Date.now();
 }
 
+// Reproductor propio: sin barra para saltar, pausa permitida, y cada reproducción
+// que EMPIEZA desde el inicio descuenta una de las MAX_AUDIO_PLAYS.
+function buildAudioPlayer(group) {
+  const box = document.createElement("div");
+  box.className = "audio-card";
+  box.innerHTML = `<div class="audio-label">🎧 Listening Audio</div>`;
+
+  const audio = new Audio();
+  audio.preload = "auto";
+  audio.src = `audio/${group.audioId}.mp3`;
+
+  const controls = document.createElement("div");
+  controls.className = "audio-controls";
+  const playBtn = document.createElement("button");
+  playBtn.type = "button";
+  playBtn.className = "audio-play";
+  playBtn.textContent = "▶";
+  playBtn.setAttribute("aria-label", "Play");
+  const bar = document.createElement("div");
+  bar.className = "audio-bar";
+  const fill = document.createElement("div");
+  fill.className = "audio-bar-fill";
+  bar.appendChild(fill);
+  const time = document.createElement("span");
+  time.className = "audio-time mono";
+  time.textContent = "0:00";
+  const vol = document.createElement("input");
+  vol.type = "range"; vol.min = 0; vol.max = 1; vol.step = 0.05; vol.value = 1;
+  vol.className = "audio-volume";
+  vol.setAttribute("aria-label", "Volume");
+  vol.addEventListener("input", () => { audio.volume = Number(vol.value); });
+  controls.append(playBtn, bar, time, vol);
+
+  const label = document.createElement("div");
+  label.className = "plays-left mono";
+
+  function used() { return state.audioPlayCounts[group.audioId] || 0; }
+  function refresh() {
+    const left = Math.max(0, MAX_AUDIO_PLAYS - used());
+    label.textContent = `Plays remaining: ${left} / ${MAX_AUDIO_PLAYS}`;
+    const playing = !audio.paused;
+    playBtn.textContent = playing ? "❚❚" : "▶";
+    playBtn.disabled = !playing && audio.currentTime === 0 && left === 0;
+    playBtn.setAttribute("aria-label", playing ? "Pause" : "Play");
+  }
+  function fmt(t) { const m = Math.floor(t / 60), s = Math.floor(t % 60); return `${m}:${String(s).padStart(2, "0")}`; }
+
+  playBtn.addEventListener("click", () => {
+    if (!audio.paused) { audio.pause(); return; }
+    if (audio.currentTime === 0) {            // empieza una reproducción nueva
+      if (used() >= MAX_AUDIO_PLAYS) return;
+      state.audioPlayCounts[group.audioId] = used() + 1;
+      persist();
+      tryLog("audio_play", { audioId: group.audioId, n: used() });
+    }
+    audio.play().catch(() => {});
+  });
+  audio.addEventListener("play", refresh);
+  audio.addEventListener("pause", refresh);
+  audio.addEventListener("ended", () => { audio.currentTime = 0; fill.style.width = "0%"; time.textContent = "0:00"; refresh(); });
+  audio.addEventListener("timeupdate", () => {
+    if (audio.duration) fill.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
+    time.textContent = fmt(audio.currentTime);
+  });
+  audio.addEventListener("error", () => {
+    box.innerHTML = `<span class="audio-pending">🎧 Audio "${escapeHtml(group.audioId)}" could not be loaded — please tell your proctor.</span>`;
+    tryLog("audio_error", { audioId: group.audioId });
+  });
+
+  box.append(controls, label);
+  refresh();
+  return { el: box, stop: () => audio.pause() };
+}
+
+let activeAudio = null;
+
 function renderGroupPage(group, sectionName) {
   document.getElementById("examBody").classList.add("wide");
   const content = document.getElementById("pageContent");
   content.innerHTML = "";
+  if (activeAudio) { activeAudio.stop(); activeAudio = null; }
 
   const layout = document.createElement("div");
   layout.className = "split-layout";
-
   const questionsCol = document.createElement("div");
   questionsCol.className = "split-questions";
-
   const mediaCol = document.createElement("div");
   mediaCol.className = "split-media";
 
-  // ---- columna derecha: texto o audio, se queda fijo mientras se responde ----
+  // ---- columna izquierda: texto / imagen / audio, fija mientras se responde ----
   if (group.type === "reading") {
-    const ctx = document.createElement("div");
-    ctx.className = "context-box";
-    ctx.textContent = group.context;
-    mediaCol.appendChild(ctx);
-  } else {
-    const wrap = document.createElement("div");
-    wrap.className = "audio-box";
-    const used = state.audioPlayCounts[group.audioId] || 0;
-    const remaining = Math.max(0, MAX_AUDIO_PLAYS - used);
-    const audioEl = document.createElement("audio");
-    audioEl.controls = true;
-    audioEl.controlsList = "nodownload noplaybackrate";
-    audioEl.src = `audio/${group.audioId}.mp3`;
-    audioEl.onerror = () => {
-      wrap.innerHTML = `<span class="audio-pending">🎧 Audio "${group.audioId}" pendiente de cargar — avísale a Rox.</span>`;
-    };
-    const label = document.createElement("div");
-    label.className = "mono";
-    label.style.marginTop = "8px";
-    label.textContent = `Plays remaining: ${remaining} / ${MAX_AUDIO_PLAYS}`;
-
-    audioEl.addEventListener("play", () => {
-      if (audioEl.currentTime < 1) {
-        const usedNow = state.audioPlayCounts[group.audioId] || 0;
-        if (usedNow >= MAX_AUDIO_PLAYS) {
-          audioEl.pause();
-          audioEl.currentTime = 0;
-          return;
-        }
-        state.audioPlayCounts[group.audioId] = usedNow + 1;
-        persist();
-        label.textContent = `Plays remaining: ${Math.max(0, MAX_AUDIO_PLAYS - state.audioPlayCounts[group.audioId])} / ${MAX_AUDIO_PLAYS}`;
+    if (group.image) {
+      mediaCol.appendChild(imageBlock(group.image, group.title));
+    } else {
+      const ctx = document.createElement("div");
+      ctx.className = "context-box passage";
+      for (const para of group.paragraphs) {
+        const p = document.createElement("p");
+        p.textContent = para;
+        ctx.appendChild(p);
       }
-    });
-
-    wrap.appendChild(audioEl);
-    wrap.appendChild(label);
-    mediaCol.appendChild(wrap);
+      mediaCol.appendChild(ctx);
+    }
+  } else {
+    activeAudio = buildAudioPlayer(group);
+    mediaCol.appendChild(activeAudio.el);
   }
 
-  // ---- columna izquierda: todas las preguntas de este texto/audio ----
+  // ---- columna derecha: todas las preguntas de este texto / audio ----
   group.questions.forEach((q, i) => {
     const block = document.createElement("div");
-    block.style.marginTop = i === 0 ? "0" : "26px";
+    block.className = "q-block";
+    const head = document.createElement("div");
+    head.className = "q-head";
+    head.appendChild(numberBadge(i + 1));
     const stem = document.createElement("div");
-    stem.className = "stem";
-    stem.style.fontSize = "17px";
-    stem.textContent = `${i + 1}. ${q.stem}`;
-    block.appendChild(stem);
+    stem.className = "stem small";
+    stem.textContent = q.stem;
+    head.appendChild(stem);
+    block.appendChild(head);
     renderOptions(block, q);
     questionsCol.appendChild(block);
   });

@@ -94,9 +94,10 @@
 </div>
 
 <div class="wrap" id="dashboard" style="display:none;">
-  <div class="eyebrow">Tweetalig · Piloto</div>
-  <h1>Dashboard del piloto</h1>
+  <div class="eyebrow">Tweetalig · Diagnóstico</div>
+  <h1>Dashboard del examen</h1>
 
+  <div class="muted" id="oldSessionsNote" style="display:none; margin-bottom:12px; padding:10px 14px; background:var(--gold-soft); border-radius:8px;"></div>
   <div class="key-banner" id="keyBanner" style="display:none;">
     <div>
       <strong id="keyBannerText">Cargando estado de la clave de respuestas...</strong>
@@ -202,7 +203,8 @@
 
 <script type="module">
 import { db, auth } from "./js/firebase-config.js";
-import { generateRandomPassword, loadAllBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery } from "./js/exam-engine.js";
+import { BANK_VERSION } from "./js/exam-config.js";
+import { generateRandomPassword, loadAllBanks, flattenBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery } from "./js/exam-engine.js";
 import { buildBookmarkOrder, saveBookmarkOrder, loadAllJudgments, loadAllJudgeCodes } from "./js/bookmark-engine.js";
 import { EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY, EMAILJS_ENABLED } from "./js/emailjs-config.js";
 import {
@@ -282,7 +284,15 @@ async function loadDashboard() {
   await checkAnswerKey();
   const q = query(collection(db, "sessions"), where("status", "==", "completed"));
   const snap = await getDocs(q);
-  allSessions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const everySession = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  // Solo se califican sesiones del banco actual; las del piloto viejo usan otras preguntas y otra clave.
+  allSessions = everySession.filter(s => s.bankVersion === BANK_VERSION);
+  const hiddenOld = everySession.length - allSessions.length;
+  const oldNote = document.getElementById("oldSessionsNote");
+  if (oldNote) {
+    oldNote.style.display = hiddenOld > 0 ? "block" : "none";
+    oldNote.textContent = `${hiddenOld} sesión(es) del piloto anterior no se muestran (banco distinto). Siguen guardadas en Firestore.`;
+  }
 
   computedById = {};
   if (answerKey) {
@@ -624,7 +634,7 @@ function renderSessionsTable() {
 // ---------------- ANALISIS POR ITEM ----------------
 async function renderItemAnalysis() {
   if (!answerKey) { document.getElementById("itemsBody").innerHTML = "<tr><td colspan='9'>Carga la clave de respuestas primero.</td></tr>"; return; }
-  if (!banksCache) banksCache = await loadAllBanks();
+  if (!banksCache) banksCache = flattenBanks(await loadAllBanks());
   const allItemsById = {};
   for (const skill of Object.keys(banksCache)) for (const it of banksCache[skill]) allItemsById[it.id] = it;
 
@@ -770,7 +780,7 @@ document.getElementById("generateOrderBtn").addEventListener("click", async () =
   const statusEl = document.getElementById("orderStatus");
   if (!answerKey) { statusEl.textContent = "⚠ Carga primero la clave de respuestas (arriba)."; return; }
   statusEl.textContent = "Generando...";
-  if (!banksCache) banksCache = await loadAllBanks();
+  if (!banksCache) banksCache = flattenBanks(await loadAllBanks());
   const order = buildBookmarkOrder(allSessions, answerKey, banksCache);
   await saveBookmarkOrder(order);
   const conDatos = order.filter(it => it.p !== null).length;

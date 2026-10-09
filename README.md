@@ -1,37 +1,32 @@
-# Piloto — Examen de Ubicación Tweetalig
+# Examen de diagnóstico Tweetalig (versión espejo de Moodle/Splavia)
 
-Piloto interno (30 funcionarios) para validar el examen antes de subirlo a Moodle.
-Bancos: UoL (200), Reading (200), Listening (160/59 audios) = 560 ítems totales.
-Cada persona ve ~80 preguntas (18 UoL + ~38 Reading + ~24 Listening), en 65 minutos (un solo reloj global, no hay tiempo separado por sección).
+Mismos bancos, misma estructura y mismo puntaje que el examen de Moodle: 12 bancos
+(UoL, Reading y Listening × A1–B2), **68 preguntas por estudiante en 55 minutos**.
 
-**Novedades de esta versión:** login con usuario/contraseña que tú generas desde el
-dashboard, aviso de integridad académica antes de empezar, detección de cambio de
-pestaña (con blur), detección de traductor del navegador, bloqueo de copiar/pegar/
-click derecho, dashboard en vivo, análisis por ítem con el contenido completo de
-cada pregunta, **y las respuestas correctas ya no viajan al navegador** (se
-calculan solo en el dashboard, con la clave protegida).
+| Sección | Qué ve el estudiante | Preguntas | Tiempo | Puntos |
+|---|---|---|---|---|
+| Use of Language | 1 ítem por página (A1:5, A2:5, B1:4, B2:4), caja *Context*, a veces imagen | 18 | 15 min | 40 (2 pts; B2 3 pts) |
+| Reading | 2 textos o documentos por nivel; texto/imagen a la izquierda, preguntas a la derecha | 28 (3 en A1/A2, 4 en B1/B2) | 20 min | 20 (2.5 por texto) |
+| Listening | 2 audios por nivel; reproductor propio, máx. 3 reproducciones, sin saltar | 22 (2 en A1, 3 en A2/B1/B2) | 20 min | 40 (5 por audio) |
 
-**Estructura del examen (actualizada):** 3 secciones, cada una con su propia
-pantalla de instrucciones en inglés antes de empezar, **y su propio timer
-independiente**:
-- **Use of Language** — 15 min, 18 ítems individuales (5-5-4-4 por nivel)
-- **Reading** — 30 min, 2 textos por nivel (8 en total, ~38 preguntas). Se lee
-  el texto una vez y se responden todas sus preguntas juntas, en la misma página.
-- **Listening** — 20 min, 2 audios por nivel (8 en total, ~24 preguntas). Cada
-  audio se puede reproducir hasta 3 veces; el reproductor muestra cuántas
-  repeticiones quedan.
+Nota final = suma de puntos (0–100). Cortes provisionales: 0–25 A1 · 25–50 A2 · 50–75 B1 · 75–100 B2.
+Todo se ajusta en `js/exam-config.js`.
 
-**Cuando se acaba el tiempo de una sección, avanza sola a la siguiente**
-(guardando lo que ya se alcanzó a responder) — esto además queda registrado
-como dato: si alguien "se pasó del tiempo" en una destreza específica, eso en
-sí mismo es una señal de nivel (ej. alguien que no termina Reading a tiempo
-probablemente no lee con la fluidez que ese nivel requiere). Esto se ve en la
-pestaña "Resultados" del dashboard (columna "Tiempos por sección", con ⏱ si
-se agotó el tiempo) y en el CSV exportable.
+## Actualizar los bancos desde Moodle
 
-**No hay botón "Anterior"** — una vez que se avanza a un texto/audio/ítem nuevo,
-no se puede regresar. Total: ~80 ítems, 65 minutos repartidos en 3 tiempos
-independientes (15+30+20).
+Los bancos (`data/*.json`, `img/`) se generan desde los mismos XML que se importan a Moodle:
+
+```
+python3 scripts/build_banks_from_moodle.py "<carpeta con los XML>"
+```
+
+Esto crea `data/uol_bank.json`, `data/reading_bank.json`, `data/listening_bank.json` (públicos,
+**sin respuestas ni guiones de audio**), copia las imágenes a `img/` y genera
+`answer_key_PRIVADO_NO_SUBIR.json` (en `.gitignore`). Esa clave se carga desde el botón del
+dashboard (`admin.html`) y queda solo en Firestore. Si cambias preguntas, sube también la clave nueva
+y cambia `BANK_VERSION` en `exam-config.js`: el dashboard solo califica sesiones del banco vigente.
+
+Los 59 audios van en `audio/` (`A1L01.mp3` … `B2L13.mp3`).
 
 ---
 
