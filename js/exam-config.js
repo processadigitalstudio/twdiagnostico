@@ -90,3 +90,8 @@ export const VOLUME_BLUR_TOLERANCE_SEC = 10;
 
 // Nombres que ve el estudiante y la administradora para cada prueba (los códigos internos no cambian)
 export const SKILL_LABELS = { UoL: "Language Use", Reading: "Reading Comprehension", Listening: "Listening Comprehension" };
+
+
+// Envío del resultado al correo del estudiante. Pega aquí la URL de la aplicación web de Apps Script
+// (ver scripts/enviar-resultado.gs). Si está vacío, el botón abre el correo del estudiante con el resultado escrito.
+export const RESULTS_EMAIL_ENDPOINT = "";

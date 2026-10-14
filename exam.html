@@ -538,6 +538,7 @@ function renderConfirm() {
     if (!document.getElementById("cfOk").checked) { err.textContent = t.eOk; return; }
     ctx.profile = { nombres, apellidos, email, nivel: confirmDraft.nivel };
     ctx.name = `${nombres} ${apellidos}`;
+    try { sessionStorage.setItem("profile", JSON.stringify(ctx.profile)); } catch (e) {}
     participantName = ctx.name;
     renderOverview();
   };
@@ -742,8 +743,7 @@ function renderSectionIntro() {
   document.getElementById("sectionBody").innerHTML = `
     <div class="intro-block"><h4>${t.what}</h4><p>${info.what}</p></div>
     <div class="intro-block"><h4>${t.how}</h4><ul>${info.how.map(h => `<li>${h}</li>`).join("")}</ul></div>
-    <div class="intro-block"><h4>${t.time}</h4><p><b>${f.minutes} ${t.min}</b> — ${uiLang === "es" ? "el reloj de esta prueba empieza al pulsar el botón y no se detiene." : "this section's clock starts when you press the button and never stops."} ${sectionTimeoutNote(isLast)}</p></div>
-    <div class="intro-block"><h4>${t.score}</h4><p>${info.score}</p></div>`;
+    <div class="intro-block"><h4>${t.time}</h4><p><b>${f.minutes} ${t.min}</b> — ${uiLang === "es" ? "el reloj de esta prueba empieza al pulsar el botón y no se detiene." : "this section's clock starts when you press the button and never stops."} ${sectionTimeoutNote(isLast)}</p></div>`;
   document.getElementById("sectionLang").textContent = t.toggle;
   document.getElementById("sectionBtn").textContent = t.secStart;
 }
@@ -786,7 +786,18 @@ function renderCurrentPage() {
       renderGroupPage(section.groups[state.pageIndex], section.name);
     }
     buildSegments();
+    scrollExamToTop();
   });
+}
+
+// Cada página nueva empieza arriba (si no, queda donde estaba la barra de desplazamiento de la página anterior).
+function scrollExamToTop() {
+  const go = () => {
+    try { window.scrollTo({ top: 0, left: 0, behavior: "instant" }); } catch (e) { window.scrollTo(0, 0); }
+    document.documentElement.scrollTop = 0; document.body.scrollTop = 0;
+    document.querySelectorAll(".exam-shell, .exam-body, .split-media, #pageContent").forEach(el => { el.scrollTop = 0; });
+  };
+  go(); requestAnimationFrame(go);
 }
 
 function optionLetters() { return ["a", "b", "c", "d"]; }
@@ -960,7 +971,7 @@ function renderGroupPage(group, sectionName) {
   if (activeAudio) { activeAudio.stop(); activeAudio = null; }
 
   const layout = document.createElement("div");
-  layout.className = "split-layout";
+  layout.className = "split-layout" + (group.type === "reading" ? " reading-layout" : "");
   const questionsCol = document.createElement("div");
   questionsCol.className = "split-questions";
   const mediaCol = document.createElement("div");
