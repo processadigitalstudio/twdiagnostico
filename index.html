@@ -16,34 +16,16 @@
   <div class="card landing">
     <div class="brand-bar" id="brandBar"></div>
 
-    <div style="text-align:center;">
-      <div class="eyebrow">Examen diagnóstico de inglés · MCER (A1 – B2)</div>
-      <h1>Descubre tu nivel de inglés</h1>
-      <p class="muted" style="max-width:560px; margin:0 auto;">Una prueba aplicada por Tweetalig Centro de Idiomas que ubica tu nivel según el Marco Común Europeo de Referencia. Al terminar verás tu resultado de inmediato.</p>
-    </div>
+    <div class="login-box" style="max-width:420px; margin:8px auto 0;">
+      <label for="cedulaInput" style="margin-top:0;">Número de cédula</label>
+      <input type="text" id="cedulaInput" inputmode="numeric" placeholder="Solo números" autocomplete="off">
 
-    <div class="landing-grid">
-      <div>
-        <div class="eyebrow">Qué vas a presentar</div>
-        <ul class="info-list">
-          <li><span class="dot-skill dot-uol"></span><div><b>Language Use · 18 preguntas · 15 min.</b><br>Gramática, vocabulario, colocaciones y preposiciones.</div></li>
-          <li><span class="dot-skill dot-reading"></span><div><b>Reading Comprehension · 28 preguntas · 20 min.</b><br>8 textos y documentos cortos con sus preguntas.</div></li>
-          <li><span class="dot-skill dot-listening"></span><div><b>Listening Comprehension · 22 preguntas · 20 min.</b><br>8 audios; puedes escuchar cada uno hasta 4 veces.</div></li>
-        </ul>
-        <p class="muted" style="margin-top:14px;">Cada prueba tiene su propio reloj, que no se detiene. Las instrucciones del examen están en inglés, con un botón para leerlas en español. Antes de empezar cada prueba verás cómo funciona y cómo se califica. Necesitas <b>audífonos</b> y una conexión estable. Duración total: unos 55 minutos.</p>
-      </div>
+      <label for="passInput">Contraseña de la sesión</label>
+      <input type="text" id="passInput" placeholder="La indica el supervisor" autocomplete="off" autocapitalize="off" spellcheck="false">
 
-      <div class="login-box">
-        <label for="cedulaInput" style="margin-top:0;">Número de cédula</label>
-        <input type="text" id="cedulaInput" inputmode="numeric" placeholder="Solo números" autocomplete="off">
-
-        <label for="passInput">Contraseña de la sesión</label>
-        <input type="text" id="passInput" placeholder="La indica el supervisor" autocomplete="off" autocapitalize="off" spellcheck="false">
-
-        <div class="error-msg" id="errorMsg"></div>
-        <button class="btn-primary" id="startBtn">Ingresar</button>
-        <p class="muted" style="font-size:12.5px; margin-top:12px;">Tu sesión sale de la lista que cargó el supervisor y, al entrar, confirmarás tus datos. La contraseña solo funciona en el horario de tu sesión; distingue mayúsculas y minúsculas.</p>
-      </div>
+      <div class="error-msg" id="errorMsg"></div>
+      <button class="btn-primary" id="startBtn">Ingresar</button>
+      <p class="muted" style="font-size:12.5px; margin-top:12px;">La contraseña distingue mayúsculas y minúsculas.</p>
     </div>
 
     <div class="legit-foot">
