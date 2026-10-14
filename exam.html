@@ -760,6 +760,7 @@ function maybeShowSectionInstructions(callback) {
     callback();
     return;
   }
+  if (sectionTimerInterval) { clearInterval(sectionTimerInterval); sectionTimerInterval = null; }   // el reloj de la prueba anterior ya no cuenta
   document.getElementById("timer").textContent = "--:--";
   document.getElementById("timerLabel").textContent = "";
   renderSectionIntro();
@@ -1068,6 +1069,7 @@ async function goNext() {
   }
 
   if (isLastPageOfSection) {
+    if (sectionTimerInterval) { clearInterval(sectionTimerInterval); sectionTimerInterval = null; }
     state.sectionIndex += 1;
     state.pageIndex = 0;
   } else {
@@ -1129,8 +1131,10 @@ function startSectionTimerInterval() {
   document.getElementById("timerLabel").textContent = `${SKILL_LABELS[section.name]} · time left`;
   const durationMin = SECTION_DURATIONS_MIN[section.name];
   const startMs = state.sectionStartTimes[state.sectionIndex];
+  const ownIdx = state.sectionIndex;
 
   function tick() {
+    if (!state || state.sectionIndex !== ownIdx) { clearInterval(sectionTimerInterval); return; }     // este reloj es de otra prueba: no hace nada
     const elapsedMs = Date.now() - startMs;
     const totalMs = durationMin * 60 * 1000;
     const remainingMs = Math.max(0, totalMs - elapsedMs);
@@ -1140,7 +1144,7 @@ function startSectionTimerInterval() {
     timerEl.classList.toggle("low", remainingMs < 5 * 60 * 1000);
     if (remainingMs <= 0) {
       clearInterval(sectionTimerInterval);
-      forceAdvanceSection();
+      forceAdvanceSection(ownIdx);
     }
   }
   tick();
@@ -1150,7 +1154,8 @@ function startSectionTimerInterval() {
 // Las respuestas se guardan al hacer clic; al cambiar de página solo se actualiza el avance.
 function saveAnswersOf() { saveProgress(state.sessionId, progressSnapshot()).catch(() => {}); }
 
-async function forceAdvanceSection() {
+async function forceAdvanceSection(expectedIdx) {
+  if (!state || (expectedIdx !== undefined && state.sectionIndex !== expectedIdx)) return;          // ya cambió de prueba: no avanzar otra vez
   const sIdx = state.sectionIndex, pIdx = state.pageIndex;
   const section = currentSection();
   const startMs = state.sectionStartTimes[state.sectionIndex];
