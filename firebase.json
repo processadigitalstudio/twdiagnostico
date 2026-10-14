@@ -64,7 +64,47 @@
         ]
       }
     ],
-    "site": "tweetaligtest"
+    "site": "tweetaligtest",
+    "redirects": [
+      {
+        "source": "/eam/",
+        "destination": "/eam",
+        "type": 301
+      },
+      {
+        "source": "/tweetalig/",
+        "destination": "/tweetalig",
+        "type": 301
+      },
+      {
+        "source": "/unitecnar/",
+        "destination": "/unitecnar",
+        "type": 301
+      },
+      {
+        "source": "/uniajs/",
+        "destination": "/uniajs",
+        "type": 301
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/eam",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/tweetalig",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/unitecnar",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/uniajs",
+        "destination": "/index.html"
+      }
+    ]
   },
   "firestore": {
     "rules": "firestore.rules"
