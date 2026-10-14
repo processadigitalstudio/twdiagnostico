@@ -56,8 +56,8 @@
 <div class="hard-block hidden" id="closedBlock">
   <div class="msg">
     <h2>Your exam was closed / Tu examen se cerró</h2>
-    <p>Your session was interrupted (power or connection loss, or the window was closed), so the exam was closed with the answers you had saved. <b>Tell your proctor</b>: they can reopen it for you.</p>
-    <p style="opacity:.85;">Tu sesión se interrumpió (se fue la luz o el internet, o se cerró la ventana), así que el examen se cerró con las respuestas que tenías guardadas. <b>Avisa al supervisor</b>: él puede reabrirlo.</p>
+    <p>Your session was interrupted (power or connection loss, or the window was closed), so the exam was closed. <b>Tell your proctor</b>: they will let you repeat the section in progress with new questions (earlier sections are kept).</p>
+    <p style="opacity:.85;">Tu sesión se interrumpió (se fue la luz o el internet, o se cerró la ventana), así que el examen se cerró. <b>Avisa al supervisor</b>: él te deja repetir la prueba en curso con preguntas nuevas (las anteriores se conservan).</p>
     <p class="muted" id="closedStatus" style="color:#fff;opacity:.8;"></p>
     <button class="btn-primary" id="closedRetry" style="width:auto;">Try again / Intentar de nuevo</button>
   </div>
@@ -372,14 +372,14 @@ function applyResumeIfAny() {
   const rs = ctx.resume;
   if (!rs || !rs.token) return false;
   if (state && state.appliedResume === rs.token) return false;
-  if (!state || state.sessionId !== rs.sessionId) {
+  if (!state || state.sessionId !== rs.sessionId || rs.mode === "restart-section") {
     const pr = rs.progress || {};
     state = {
       sessionId: rs.sessionId, plan: JSON.parse(rs.planJson),
       sectionIndex: pr.sectionIndex || 0, pageIndex: pr.pageIndex || 0,
       sectionInstructionShown: pr.sectionInstructionShown || [false, false, false],
       sectionStartTimes: pr.sectionStartTimes || {}, responses: rs.responses || {},
-      audioPlayCounts: pr.audioPlayCounts || {}, startTimeMs: Date.now()
+      audioPlayCounts: pr.audioPlayCounts || {}, startTimeMs: state ? state.startTimeMs : Date.now()
     };
   }
   const idx = state.sectionIndex;
@@ -415,7 +415,7 @@ const T = {
       "No copies, fotografíes ni compartas las preguntas. El texto no se puede seleccionar y las capturas de pantalla quedan ocultas.",
       "El examen se presenta en <b>pantalla completa</b>. Si sales de la ventana, el contenido se oculta y queda registrado.",
       "No puedes volver a una pregunta anterior. Si se acaba el tiempo de una prueba, pasas automáticamente a la siguiente.",
-      "El tiempo de cada prueba corre en hora real y no se detiene. Si se va la luz o el internet y estás fuera más de 25 segundos, <b>tu examen se cierra</b> y el supervisor debe reabrirlo. Si solo se cae el internet y la ventana sigue abierta, puedes seguir respondiendo: tus respuestas se envían cuando vuelva.",
+      "El tiempo de cada prueba corre en hora real y no se detiene. Cada respuesta se guarda al hacer clic. Si se va la luz o te desconectas más de 25 segundos, <b>tu examen se cierra</b>: avisa al supervisor, que te dejará <b>repetir la prueba en curso con preguntas nuevas</b> (las pruebas anteriores se conservan). Si solo se cae el internet y la ventana sigue abierta, puedes seguir respondiendo: tus respuestas se envían cuando vuelva.",
       "Cada pantalla lleva tu nombre como marca de agua. Cualquier uso indebido se revisa junto con tu resultado."
     ],
     check: "Entiendo las reglas y acepto presentar el examen por mi cuenta, sin ayuda externa.",
@@ -441,7 +441,7 @@ const T = {
       "Do not copy, photograph or share the questions. Text cannot be selected and screenshots are hidden.",
       "The exam runs in <b>full screen</b>. If you leave the window, the content is hidden and the event is recorded.",
       "You cannot go back to a previous question. When a section's time runs out, you move on automatically.",
-      "Each section's clock runs in real time and never stops. If the power or internet fails and you are away for more than 25 seconds, <b>your exam is closed</b> and your proctor must reopen it. If only the internet drops and the window stays open, you can keep answering: your answers are sent when it returns.",
+      "Each section's clock runs in real time and never stops. Each answer is saved when you click it. If the power fails or you are disconnected for more than 25 seconds, <b>your exam is closed</b>: tell your proctor, who will let you <b>repeat the section in progress with new questions</b> (earlier sections are kept). If only the internet drops and the window stays open, you can keep answering: your answers are sent when it returns.",
       "Every screen carries your name as a watermark. Any misuse is reviewed together with your result."
     ],
     check: "I understand the rules and agree to take the exam on my own, without outside help.",
@@ -617,7 +617,6 @@ async function init() {
   startHeartbeat();
   installBackTrap();
   updateNet();
-  prefetchAssets(state.plan);
   applyWatermark();
   buildSegments();
   if (resumedNow) { tryLog("reopened_by_admin"); resumedNow = false; }
@@ -803,6 +802,8 @@ function renderOptions(container, question) {
       wrap.querySelectorAll(".option").forEach((el, ii) => el.classList.toggle("selected", ii === i));
       state.responses[question.id] = { selected: i, timeMs: Date.now() - (state.pageShownAt || Date.now()) };
       persist();
+      // se guarda en el servidor en el momento del clic (si falla por internet, se reenvía todo al terminar)
+      recordAnswers(state.sessionId, [{ item: question, selected: i, timeMs: state.responses[question.id].timeMs }], progressSnapshot()).catch(() => {});
     });
     wrap.appendChild(label);
   });
@@ -1130,14 +1131,8 @@ function startSectionTimerInterval() {
   sectionTimerInterval = setInterval(tick, 1000);
 }
 
-function saveAnswersOf(sIdx, pIdx) {
-  const section = state.plan.sections[sIdx];
-  const currentQuestions = section.kind === "items" ? [section.items[pIdx]] : section.groups[pIdx].questions;
-  const entries = currentQuestions.filter(q => state.responses[q.id])
-    .map(q => ({ item: q, selected: state.responses[q.id].selected, timeMs: state.responses[q.id].timeMs }));
-  if (entries.length) recordAnswers(state.sessionId, entries, progressSnapshot()).catch(console.error);
-  else saveProgress(state.sessionId, progressSnapshot()).catch(console.error);
-}
+// Las respuestas se guardan al hacer clic; al cambiar de página solo se actualiza el avance.
+function saveAnswersOf() { saveProgress(state.sessionId, progressSnapshot()).catch(() => {}); }
 
 async function forceAdvanceSection() {
   const sIdx = state.sectionIndex, pIdx = state.pageIndex;

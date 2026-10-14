@@ -392,8 +392,13 @@ dan más contexto a quien toma la decisión final:
 
 ## Interrupciones (luz, internet, cierre de ventana)
 
-- El reloj de cada prueba es hora real y no se detiene ni se devuelve tiempo.
-- Si solo se cae el internet y la ventana sigue abierta, el examen sigue; las respuestas se envían al volver.
-- Si el estudiante desaparece más de `INTERRUPTION_GRACE_SEC` (25 s) y vuelve, el examen se **cierra** con lo guardado (queda "⛔ Cerrado por interrupción" en el tablero).
-- Solo la administradora reabre, **por estudiante**: «▶ reabrir» (continúa donde iba, en el mismo u otro equipo, con los minutos que tú fijes para la prueba en curso) o «↺ reiniciar» (examen nuevo).
+- Cada respuesta se guarda en el servidor al hacer clic. El reloj de cada prueba es hora real y no se detiene.
+- Si solo se cae el internet y la ventana sigue abierta, el examen sigue; lo pendiente se envía al volver.
+- Si el estudiante desaparece más de `INTERRUPTION_GRACE_SEC` (25 s) y vuelve, el examen se **cierra** (tablero: "⛔ Cerrado por interrupción").
+- La administradora decide, **por estudiante**: «↻ repetir esta prueba» (lo normal: solo la prueba en curso, preguntas nuevas al azar y reloj completo; las anteriores se conservan), «▶ continuar» (sigue donde iba con los minutos que fije) o «↺ examen nuevo». Sirve en el mismo u otro equipo.
 - Volumen: durante Listening, o justo después de una tecla de volumen, una salida de foco menor a `VOLUME_BLUR_TOLERANCE_SEC` (10 s) no se registra como falta.
+
+## Hosting y costos
+
+- Plan gratis (Spark): `twtest.web.app` sirve la app y los audios/imágenes salen de GitHub Pages (`ASSETS_FROM_GITHUB = true`).
+- Plan Blaze: usar la rama `blaze` (`git checkout blaze && firebase deploy --only hosting`): todo sale de `twtest.web.app`.

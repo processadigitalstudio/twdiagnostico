@@ -224,7 +224,7 @@
 <script type="module">
 import { db, auth } from "./js/firebase-config.js";
 import { BANK_VERSION, SECTION_DURATIONS_MIN, SKILL_LABELS } from "./js/exam-config.js";
-import { generateRandomPassword, groupIdFromPassword, participantIdOf, normalizeCedula, tsMs, loadAllBanks, flattenBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery, publishResult } from "./js/exam-engine.js";
+import { generateRandomPassword, buildExamPlan, allItemIdsFromPlan, groupIdFromPassword, participantIdOf, normalizeCedula, tsMs, loadAllBanks, flattenBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery, publishResult } from "./js/exam-engine.js";
 import { buildBookmarkOrder, saveBookmarkOrder, loadAllJudgments, loadAllJudgeCodes } from "./js/bookmark-engine.js";
 import { INSTITUTIONS } from "./js/institutions.js";
 import {
@@ -447,11 +447,11 @@ function renderDetail() {
     <br><button class="btn-secondary" id="dAdd" style="margin-top:8px;">Agregar a la lista</button>
 
     <h4 style="margin-top:24px;">Estudiantes (${mine.length})</h4>
-    <p class="muted"><strong>▶ Reabrir</strong>: el estudiante continúa donde iba, <u>en el mismo u otro equipo</u>, y tú le fijas cuántos minutos le quedan en la prueba en curso. <strong>↺ Reiniciar</strong>: descarta su intento y le da un examen nuevo (otras preguntas). <strong>quitar</strong>: lo saca de la lista.</p>
+    <p class="muted">Si a alguien se le va la luz o el internet y su examen se cierra: <strong>↻ repetir prueba</strong> (lo normal): vuelve a empezar solo la prueba en curso, con preguntas nuevas al azar y reloj completo; las pruebas anteriores se conservan. <strong>▶ continuar</strong>: sigue donde iba con los minutos que tú le fijes (para cortes que no fueron su culpa). <strong>↺ examen nuevo</strong>: descarta todo y empieza un examen nuevo. Todo sirve en el mismo u otro equipo. <strong>quitar</strong>: lo saca de la lista.</p>
     <table class="admin-table">
       <thead><tr><th>Nombre</th><th>Cédula</th><th>Correo</th><th>Nivel</th><th>Estado</th><th></th></tr></thead>
       <tbody>${mine.map(p => `<tr><td>${esc(p.name)}</td><td class="mono">${esc(p.cedula)}</td><td style="font-size:.85rem;">${esc(p.email || "—")}</td><td>${esc(p.nivel || "—")}</td><td>${labels[p.status] || p.status}</td>
-        <td>${["in_progress", "closed"].includes(p.status) ? `<span class="toggle-detail" data-resume="${p.id}" style="margin-right:10px;">▶ reabrir</span>` : ""}${p.status !== "not_started" ? `<span class="toggle-detail" data-restart="${p.id}" style="margin-right:10px;">↺ reiniciar</span>` : ""}<span class="toggle-detail" data-delpart="${p.id}" style="color:var(--bad);">quitar</span></td></tr>`).join("")}</tbody>
+        <td>${["in_progress", "closed"].includes(p.status) ? `<span class="toggle-detail" data-sect="${p.id}" style="margin-right:10px;">↻ repetir prueba</span><span class="toggle-detail" data-resume="${p.id}" style="margin-right:10px;">▶ continuar</span>` : ""}${p.status !== "not_started" ? `<span class="toggle-detail" data-restart="${p.id}" style="margin-right:10px;">↺ examen nuevo</span>` : ""}<span class="toggle-detail" data-delpart="${p.id}" style="color:var(--bad);">quitar</span></td></tr>`).join("")}</tbody>
     </table>`;
 
   const msg = (t) => { document.getElementById("dMsg").textContent = t; };
@@ -490,6 +490,7 @@ function renderDetail() {
     await loadGroups();
   };
   box.querySelectorAll("[data-resume]").forEach(el => el.addEventListener("click", () => resumeParticipant(el.dataset.resume)));
+  box.querySelectorAll("[data-sect]").forEach(el => el.addEventListener("click", () => restartSectionOf(el.dataset.sect)));
   box.querySelectorAll("[data-restart]").forEach(el => el.addEventListener("click", () => restartParticipant(el.dataset.restart)));
   box.querySelectorAll("[data-delpart]").forEach(el => el.addEventListener("click", async () => {
     if (!confirm("¿Quitar a esta persona de la lista?")) return;
@@ -528,7 +529,7 @@ async function resumeParticipant(pid) {
     const mins = Number(String(ans).replace(",", "."));
     if (!(mins > 0)) { alert("Escribe un número de minutos mayor que 0."); return; }
     remainingMs = Math.round(Math.min(mins, SECTION_DURATIONS_MIN[sec.name]) * 60000);
-  } else if (!confirm(`${p?.name || ""}: la prueba en curso todavía no había empezado su reloj. ¿Reabrir tal cual?`)) return;
+  } else if (!confirm(`${p?.name || ""}: la prueba en curso todavía no había empezado su reloj. ¿Continuar tal cual?`)) return;
   const responses = {};
   for (const [id, r] of Object.entries(s.responses || {})) responses[id] = { selected: r.selected, timeMs: r.timeMs || 0 };
   const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -541,6 +542,42 @@ async function resumeParticipant(pid) {
   await loadGroups();
 }
 
+// ↻ Repetir la prueba en curso: se descartan las respuestas de ESA prueba, recibe preguntas nuevas al azar y el reloj completo.
+// Las pruebas anteriores se conservan. Sirve en el mismo u otro equipo.
+async function restartSectionOf(pid) {
+  const p = partsCache.find(x => x.id === pid);
+  const s = await latestAttempt(pid);
+  if (!s || s.status === "completed") { alert("No hay un intento en curso. Si quieres darle un examen nuevo usa «↺ examen nuevo»."); return; }
+  if (!s.planJson) { alert("Este intento es de una versión anterior y no guardó el examen completo. Usa «↺ examen nuevo»."); return; }
+  const pr = s.progress || {};
+  const idx = pr.sectionIndex || 0;
+  const plan = JSON.parse(s.planJson);
+  const oldSec = plan.sections[idx];
+  const mins = SECTION_DURATIONS_MIN[oldSec.name];
+  if (!confirm(`¿Repetir ${SKILL_LABELS[oldSec.name]} para ${p?.name || "este estudiante"}?\n\nSe descartan sus respuestas de esa prueba, recibe preguntas NUEVAS al azar y un reloj completo de ${mins} min. Las pruebas anteriores se conservan.`)) return;
+  const banks = await loadAllBanks();
+  const fresh = buildExamPlan(banks, p?.cedula || "x");
+  const oldIds = new Set(oldSec.kind === "items" ? oldSec.items.map(q => q.id) : oldSec.groups.flatMap(g => g.questions.map(q => q.id)));
+  plan.sections[idx] = fresh.sections[idx];
+  const planJson = JSON.stringify(plan);
+  const responses = {};
+  for (const [id, r] of Object.entries(s.responses || {})) if (!oldIds.has(id)) responses[id] = { ...r };
+  const shown = [...(pr.sectionInstructionShown || [false, false, false])]; shown[idx] = false;
+  const starts = { ...(pr.sectionStartTimes || {}) }; delete starts[idx];
+  const progress = { sectionIndex: idx, pageIndex: 0, sectionStartTimes: starts, sectionInstructionShown: shown, audioPlayCounts: pr.audioPlayCounts || {} };
+  const itemIds = allItemIdsFromPlan(plan);
+  const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  const payloadResponses = {};
+  for (const [id, r] of Object.entries(responses)) payloadResponses[id] = { selected: r.selected, timeMs: r.timeMs || 0 };
+  await updateDoc(doc(db, "sessions", s.id), { status: "in_progress", planJson, itemIds, responses, progress, reopenedAt: serverTimestamp(), reopenCount: (s.reopenCount || 0) + 1, sectionRestarts: (s.sectionRestarts || 0) + 1 });
+  await updateDoc(doc(db, "participants", pid), {
+    status: "in_progress", resumeConsumed: null,
+    resume: { token, mode: "restart-section", sessionId: s.id, planJson, progress, responses: payloadResponses, remainingMs: null, grantedAtMs: Date.now() }
+  });
+  alert(`Listo. ${p?.name || "El estudiante"} entra otra vez con su cédula y la contraseña de la sesión (en este u otro equipo) y repite ${SKILL_LABELS[oldSec.name]} con preguntas nuevas.`);
+  await loadGroups();
+}
+
 // ↺ Reiniciar: se descarta el intento y empieza un examen nuevo
 async function restartParticipant(pid) {
   const p = partsCache.find(x => x.id === pid);
@@ -550,7 +587,7 @@ async function restartParticipant(pid) {
   await updateDoc(doc(db, "participants", pid), { status: "not_started", resume: null, resumeConsumed: null });
   await loadGroups();
 }
-window.resumeParticipant = resumeParticipant; window.restartParticipant = restartParticipant;
+window.resumeParticipant = resumeParticipant; window.restartParticipant = restartParticipant; window.restartSectionOf = restartSectionOf;
 
 const newParticipant = (g, r) => ({ cedula: r.cedula, name: r.name, nombres: r.nombres || "", apellidos: r.apellidos || "", email: r.email || "", nivel: r.nivel || "", groupId: g.id, groupName: g.name, institution: g.institution, status: "not_started", createdAt: serverTimestamp() });
 
@@ -671,7 +708,7 @@ function renderBoard() {
       : (idle !== null && idle >= 6 ? `<div class="sub" style="color:var(--sev-med); font-weight:800;">⚠ sin guardar hace ${idle} min</div>` : "");
     return `<div class="board-card" style="${closed ? "border-color:var(--bad);" : ""}"><b>${esc(p.name)}</b>${sev(s?.suspiciousEvents)}<div class="sub mono">${esc(p.cedula)}${lvl(p)}${mins !== null ? " · " + mins + " min" : ""}</div>${warn}
       <div class="progress-mini" style="width:100%; margin-top:6px;"><div style="width:${Math.round(answered / total * 100)}%;"></div></div><div class="sub">${answered}/${total} respuestas guardadas</div>
-      <div style="margin-top:6px;"><span class="toggle-detail" onclick="resumeParticipant('${p.id}')">▶ reabrir</span> &nbsp; <span class="toggle-detail" onclick="restartParticipant('${p.id}')" style="color:var(--ink-soft);">↺ reiniciar</span></div></div>`;
+      <div style="margin-top:6px;"><span class="toggle-detail" onclick="restartSectionOf('${p.id}')">↻ repetir esta prueba</span> &nbsp; <span class="toggle-detail" onclick="resumeParticipant('${p.id}')">▶ continuar</span> &nbsp; <span class="toggle-detail" onclick="restartParticipant('${p.id}')" style="color:var(--ink-soft);">↺ examen nuevo</span></div></div>`;
   }).join("") || `<div class="muted">—</div>`;
   document.getElementById("colDone").innerHTML = cols.completed.map(p => {
     const s = byPart[p.id];
