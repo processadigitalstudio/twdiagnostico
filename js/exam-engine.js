@@ -197,7 +197,7 @@ export async function loginToGroup({ cedula, password }) {
   const rs = part.resume && part.resume.token && part.resumeConsumed !== part.resume.token ? part.resume : null;
 
   if (part.status === "completed") return { ok: false, reason: "Esta cédula ya presentó el examen." };
-  if (part.status === "closed") return { ok: false, reason: "Tu examen se cerró por una interrupción (se acabó el tiempo, se fue la luz o se cerró la ventana). Avisa al supervisor: él puede reabrirlo." };
+  if (part.status === "closed") return { ok: false, reason: "Tu examen se cerró por una interrupción (se acabó el tiempo, se fue la luz o se cerró la ventana). Avisa al supervisor: él te deja repetir la prueba en curso." };
   if (part.status === "in_progress") {
     if (!hasLocal && !rs) return { ok: false, reason: "Este examen ya está en curso en otro equipo o navegador. Avisa al supervisor." };
   } else {
