@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Examen Diagnóstico de Inglés — Tweetalig</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="notranslate">
@@ -37,15 +37,12 @@
         <label for="cedulaInput" style="margin-top:0;">Número de cédula</label>
         <input type="text" id="cedulaInput" inputmode="numeric" placeholder="Solo números" autocomplete="off">
 
-        <label for="nameInput">Nombre completo</label>
-        <input type="text" id="nameInput" placeholder="Nombres y apellidos" autocomplete="off">
-
         <label for="passInput">Contraseña de la sesión</label>
         <input type="text" id="passInput" placeholder="La indica el supervisor" autocomplete="off" autocapitalize="off" spellcheck="false">
 
         <div class="error-msg" id="errorMsg"></div>
         <button class="btn-primary" id="startBtn">Ingresar</button>
-        <p class="muted" style="font-size:12.5px; margin-top:12px;">La contraseña solo funciona mientras el supervisor tiene abierta la sesión de examen.</p>
+        <p class="muted" style="font-size:12.5px; margin-top:12px;">Tu nombre y tu sesión salen de la lista que cargó el supervisor. La contraseña solo funciona en el horario de tu sesión; distingue mayúsculas y minúsculas.</p>
       </div>
     </div>
 
@@ -65,8 +62,7 @@
 
   const btn = document.getElementById("startBtn");
   const cedulaInput = document.getElementById("cedulaInput");
-  const nameInput = document.getElementById("nameInput");
-  const passInput = document.getElementById("passInput");
+    const passInput = document.getElementById("passInput");
   const errorMsg = document.getElementById("errorMsg");
 
   async function attemptLogin() {
@@ -74,7 +70,7 @@
     btn.textContent = "Verificando...";
     errorMsg.textContent = "";
     try {
-      const r = await loginToGroup({ cedula: cedulaInput.value, name: nameInput.value, password: passInput.value });
+      const r = await loginToGroup({ cedula: cedulaInput.value, password: passInput.value });
       if (!r.ok) {
         errorMsg.textContent = r.reason;
         btn.disabled = false;
@@ -98,8 +94,7 @@
 
   btn.addEventListener("click", attemptLogin);
   passInput.addEventListener("keydown", (e) => { if (e.key === "Enter") attemptLogin(); });
-  cedulaInput.addEventListener("keydown", (e) => { if (e.key === "Enter") nameInput.focus(); });
-  nameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") passInput.focus(); });
+  cedulaInput.addEventListener("keydown", (e) => { if (e.key === "Enter") passInput.focus(); });
 </script>
 
 </body>

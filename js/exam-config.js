@@ -73,3 +73,8 @@ export const MAX_EVENTS_PER_SESSION = 150;  // tope de eventos sospechosos guard
 const ON_FIREBASE_HOSTING = /\.(web\.app|firebaseapp\.com)$/.test(location.hostname);
 export const ASSET_BASE = ON_FIREBASE_HOSTING ? "https://processadigitalstudio.github.io/twtest/" : "";
 export const assetUrl = (path) => ASSET_BASE + path;
+
+// ---------- Cortes de luz / internet ----------
+// Si el examen se cierra o el equipo se apaga a mitad de una prueba, al volver se le devuelve el tiempo que
+// estuvo fuera, hasta este máximo en TOTAL por examen (para no penalizar un corte, pero sin permitir pausas largas).
+export const MAX_DOWNTIME_CREDIT_MIN = 10;

@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>English Diagnostic Test — Tweetalig</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="notranslate proctored">
@@ -50,6 +50,14 @@
 </div>
 
 <div class="watermark" id="watermark"></div>
+<div class="net-banner hidden" id="netBanner">Sin conexión a internet. Sigue respondiendo con calma: tus respuestas se guardan en este equipo y se enviarán cuando vuelva la conexión. No cierres esta ventana.</div>
+<div class="integrity-overlay hidden-flex" id="submitOverlay" style="display:none; z-index:2500;">
+  <div class="integrity-card" style="max-width:460px; text-align:center;">
+    <div class="spinner"></div>
+    <h2 id="submitTitle">Enviando tus respuestas…</h2>
+    <p class="muted" id="submitMsg">No cierres esta ventana.</p>
+  </div>
+</div>
 
 <div class="exam-shell">
   <div class="exam-header-sticky">
@@ -72,8 +80,8 @@
 </div>
 
 <script type="module">
-import { loadAllBanks, buildExamPlan, createSession, recordAnswers, finishSession, logSuspiciousEvent, logSectionTiming } from "./js/exam-engine.js";
-import { assetUrl, SECTION_DURATIONS_MIN, MAX_AUDIO_PLAYS, WEIGHTS, LEVEL_CUTS, REQUIRE_FULLSCREEN, ENABLE_WATERMARK, UOL_TOTAL_POINTS, READING_POINTS_PER_TEXT, LISTENING_POINTS_PER_AUDIO } from "./js/exam-config.js";
+import { loadAllBanks, buildExamPlan, createSession, recordAnswers, finishSession, logSuspiciousEvent, logSectionTiming, retryUntilDone } from "./js/exam-engine.js";
+import { assetUrl, MAX_DOWNTIME_CREDIT_MIN, SECTION_DURATIONS_MIN, MAX_AUDIO_PLAYS, WEIGHTS, LEVEL_CUTS, REQUIRE_FULLSCREEN, ENABLE_WATERMARK, UOL_TOTAL_POINTS, READING_POINTS_PER_TEXT, LISTENING_POINTS_PER_AUDIO } from "./js/exam-config.js";
 import { resolveInstitution, renderBrand } from "./js/institutions.js";
 
 const ctx = {
@@ -234,6 +242,80 @@ function applyWatermark() {
 }
 
 // ============================================================
+// RESISTENCIA: sin internet, botón "atrás", cortes de luz
+// ============================================================
+// Las respuestas se guardan en este equipo al instante; a Firestore se envían por página y TODAS juntas al terminar.
+// El reloj de cada prueba es hora real (no se detiene por falta de internet).
+const netBanner = document.getElementById("netBanner");
+let offlineSince = null;
+function updateNet() {
+  const off = !navigator.onLine;
+  netBanner.classList.toggle("hidden", !off);
+  if (off && !offlineSince) offlineSince = Date.now();
+  if (!off && offlineSince) { tryLog("was_offline", { seconds: Math.round((Date.now() - offlineSince) / 1000) }); offlineSince = null; }
+}
+window.addEventListener("offline", updateNet);
+window.addEventListener("online", updateNet);
+
+// Botón "atrás" del navegador / gesto: se ignora (no hay forma de volver a preguntas anteriores).
+function installBackTrap() {
+  try { history.pushState({ exam: 1 }, "", location.href); history.pushState({ exam: 2 }, "", location.href); } catch (e) {}
+  window.addEventListener("popstate", () => {
+    try { history.pushState({ exam: 3 }, "", location.href); } catch (e) {}
+    tryLog("back_attempt");
+    showToast(uiLang === "es" ? "No puedes volver atrás durante el examen." : "You cannot go back during the exam.");
+  });
+  window.addEventListener("beforeunload", (e) => { if (examRunning) { e.preventDefault(); e.returnValue = ""; } });
+}
+function showToast(msg) {
+  const t = document.createElement("div");
+  t.className = "toast"; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// Se descargan los audios e imágenes del examen apenas empieza: así sirven aunque el internet se caiga después.
+const assetBlobs = new Map();
+function assetSrc(path) { return assetBlobs.get(path) || assetUrl(path); }
+async function prefetchAssets(plan) {
+  const paths = [];
+  for (const sec of plan.sections) {
+    if (sec.kind === "items") { for (const it of sec.items) if (it.image) paths.push(it.image); }
+    else for (const g of sec.groups) { if (g.image) paths.push(g.image); if (g.audioId) paths.push(`audio/${g.audioId}.mp3`); }
+  }
+  let i = 0;
+  const worker = async () => {
+    while (i < paths.length) {
+      const path = paths[i++];
+      try {
+        const r = await fetch(assetUrl(path));
+        if (r.ok) assetBlobs.set(path, URL.createObjectURL(await r.blob()));
+      } catch (e) { /* se usará la URL normal */ }
+    }
+  };
+  await Promise.all([worker(), worker()]);
+}
+
+// Latido: cada 3 s se guarda "visto por última vez". Si el examen se cierra (corte de luz, cierre accidental),
+// al volver se le devuelve el tiempo ausente a la prueba en curso (máximo MAX_DOWNTIME_CREDIT_MIN en total).
+function startHeartbeat() { setInterval(() => { if (state) { state.lastSeen = Date.now(); persist(); } }, 3000); }
+function applyDowntimeCredit() {
+  if (!state || !state.lastSeen) return;
+  const gap = Date.now() - state.lastSeen;
+  if (gap < 15000) return;
+  const maxCredit = MAX_DOWNTIME_CREDIT_MIN * 60000;
+  const used = state.creditMs || 0;
+  const credit = Math.max(0, Math.min(gap, maxCredit - used));
+  const idx = state.sectionIndex;
+  if (credit > 0 && state.sectionStartTimes[idx] !== undefined) {
+    state.sectionStartTimes[idx] += credit;
+    state.creditMs = used + credit;
+  }
+  persist();
+  tryLog("resumed_after_gap", { gapSec: Math.round(gap / 1000), creditSec: Math.round(credit / 1000) });
+}
+
+// ============================================================
 // IDIOMA DE LAS PANTALLAS INFORMATIVAS (el examen siempre va en inglés)
 // ============================================================
 let uiLang = "es";
@@ -347,7 +429,7 @@ function renderOverview() {
     } catch (e) {
       console.error(e);
       btn.disabled = false; btn.textContent = t.start;
-      alert("No se pudo iniciar el examen (conexión). Intenta de nuevo. / Could not start the exam. Please try again.");
+      alert(navigator.onLine ? "No se pudo iniciar el examen. Si la sesión ya cerró o hay un problema, avisa al supervisor. / Could not start the exam; tell your proctor." : "Sin conexión a internet. Verifica la red e intenta de nuevo. / No internet connection; check the network and try again.");
     }
   });
 }
@@ -357,7 +439,10 @@ function renderOverview() {
 // ============================================================
 async function init() {
   if (!state) {
-    const sessionId = await createSession(ctx, pendingPlan);
+    const sessionId = await Promise.race([
+      createSession(ctx, pendingPlan),
+      new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 20000))
+    ]);
     state = {
       sessionId,
       plan: pendingPlan,
@@ -373,6 +458,11 @@ async function init() {
   }
   sessionIdRef = state.sessionId;
   examRunning = true;
+  applyDowntimeCredit();
+  startHeartbeat();
+  installBackTrap();
+  updateNet();
+  prefetchAssets(state.plan);
   applyWatermark();
   buildSegments();
   renderCurrentPage();
@@ -561,7 +651,7 @@ function escapeHtml(t) {
 
 // Imagen con zoom dentro de la misma página (no abre otra pestaña: eso se registraría como salida del examen)
 function imageBlock(rawSrc, alt) {
-  const src = assetUrl(rawSrc);
+  const src = assetSrc(rawSrc);
   const box = document.createElement("div");
   box.className = "image-box";
   const img = document.createElement("img");
@@ -624,7 +714,7 @@ function buildAudioPlayer(group) {
 
   const audio = new Audio();
   audio.preload = "auto";
-  audio.src = assetUrl(`audio/${group.audioId}.mp3`);
+  audio.src = assetSrc(`audio/${group.audioId}.mp3`);
 
   const controls = document.createElement("div");
   controls.className = "audio-controls";
@@ -804,13 +894,30 @@ async function goNext() {
   renderCurrentPage();
 }
 
+function allEntries() {
+  const entries = [];
+  for (const sec of state.plan.sections) {
+    const qs = sec.kind === "items" ? sec.items : sec.groups.flatMap(g => g.questions);
+    for (const q of qs) { const r = state.responses[q.id]; if (r) entries.push({ item: q, selected: r.selected, timeMs: r.timeMs }); }
+  }
+  return entries;
+}
+
 async function submitExam() {
   document.getElementById("nextBtn").disabled = true;
-  document.getElementById("nextBtn").textContent = "Submitting...";
-  examRunning = false;
   if (sectionTimerInterval) clearInterval(sectionTimerInterval);
-  try { await finishSession(state.sessionId, ctx.participantId); }
-  catch (e) { console.error(e); examRunning = true; document.getElementById("nextBtn").disabled = false; document.getElementById("nextBtn").textContent = "Retry submit"; return; }
+  const ov = document.getElementById("submitOverlay");
+  ov.style.display = "flex";
+  const entries = allEntries();
+  await retryUntilDone(() => finishSession(state.sessionId, ctx.participantId, entries), {
+    onWait: (i) => {
+      document.getElementById("submitTitle").textContent = navigator.onLine ? "Enviando tus respuestas…" : "Sin conexión a internet";
+      document.getElementById("submitMsg").textContent = navigator.onLine
+        ? "Reintentando… No cierres esta ventana."
+        : "Tus respuestas están guardadas en este equipo. No cierres esta ventana: se enviarán solas cuando vuelva la conexión.";
+    }
+  });
+  examRunning = false;
   try { localStorage.setItem("lastSessionId", state.sessionId); localStorage.removeItem(STORAGE_KEY); } catch (e) {}
   try { if (document.exitFullscreen && inFs()) await document.exitFullscreen(); } catch (e) {}
   window.location.href = "results.html?s=" + encodeURIComponent(state.sessionId);

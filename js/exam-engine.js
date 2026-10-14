@@ -159,51 +159,51 @@ export function allItemIdsFromPlan(plan) {
 }
 
 // ---------- sesiones de examen (grupos) ----------
-// La administradora crea una sesión con una contraseña COMPARTIDA y la abre/cierra a mano. El estudiante
-// entra con su cédula, su nombre y esa contraseña; si la sesión está cerrada, no hay acceso.
-// El id del grupo es el hash de la contraseña: así se encuentra la sesión sin listar ni exponer las demás.
+// La administradora crea una sesión (con horario de apertura y cierre, una contraseña compartida y la lista de
+// estudiantes: cédula + nombre). El estudiante entra con su cédula y la contraseña; fuera del horario no hay acceso.
+// El id del grupo es el hash de la contraseña (distingue mayúsculas/minúsculas y símbolos): así se encuentra
+// la sesión sin listar ni exponer las demás.
 async function sha256hex(text) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
 export const normalizeCedula = (c) => String(c || "").replace(/\D/g, "");
 export function groupIdFromPassword(password) {
-  return sha256hex("twtest:" + String(password || "").trim().toLowerCase());
+  return sha256hex("twtest:" + String(password || "").trim());     // sin pasar a minúsculas: distingue mayúsculas
 }
 export const participantIdOf = (groupId, cedula) => `${groupId}_${cedula}`;
+export const tsMs = (v) => (v && typeof v.toMillis === "function") ? v.toMillis() : (v && v.seconds !== undefined ? v.seconds * 1000 : Number(v) || 0);
 
-export async function loginToGroup({ cedula, name, password }) {
+const fmtDate = (ms) => new Date(ms).toLocaleString("es-CO", { weekday: "long", day: "numeric", month: "long", hour: "numeric", minute: "2-digit" });
+
+export async function loginToGroup({ cedula, password }) {
   const ced = normalizeCedula(cedula);
-  const fullName = String(name || "").trim().replace(/\s+/g, " ");
   if (ced.length < 5) return { ok: false, reason: "Escribe tu número de cédula (solo números)." };
-  if (fullName.length < 5 || !fullName.includes(" ")) return { ok: false, reason: "Escribe tu nombre completo (nombre y apellido)." };
   if (!String(password || "").trim()) return { ok: false, reason: "Escribe la contraseña de la sesión." };
 
   const groupId = await groupIdFromPassword(password);
   const gSnap = await getDoc(doc(db, "exam_groups", groupId));
-  if (!gSnap.exists()) return { ok: false, reason: "Contraseña incorrecta." };
+  if (!gSnap.exists()) return { ok: false, reason: "Contraseña incorrecta. Revisa mayúsculas, minúsculas y símbolos." };
   const group = gSnap.data();
   const pid = participantIdOf(groupId, ced);
   const pSnap = await getDoc(doc(db, "participants", pid));
-  const part = pSnap.exists() ? pSnap.data() : null;
+  if (!pSnap.exists()) return { ok: false, reason: "Tu cédula no está registrada en esta sesión. Avisa al supervisor." };
+  const part = pSnap.data();
 
   let hasLocal = false;
   try { hasLocal = !!localStorage.getItem(`examState_${pid}`); } catch (e) {}
 
-  if (part && part.status === "completed") return { ok: false, reason: "Esta cédula ya presentó el examen en esta sesión." };
-  if (part && part.status === "in_progress") {
+  if (part.status === "completed") return { ok: false, reason: "Esta cédula ya presentó el examen." };
+  if (part.status === "in_progress") {
     if (!hasLocal) return { ok: false, reason: "Este examen ya está en curso en otro equipo o navegador. Avisa al supervisor." };
-  } else if (group.status !== "open") {
-    return { ok: false, reason: "La sesión de examen todavía no está abierta. Espera la indicación del supervisor." };
-  }
-  if (!part) {
-    await setDoc(doc(db, "participants", pid), {
-      cedula: ced, name: fullName, groupId, groupName: group.name || "", institution: group.institution || "",
-      status: "registered", createdAt: serverTimestamp()
-    });
+  } else {
+    const now = Date.now(), opens = tsMs(group.opensAt), closes = tsMs(group.closesAt);
+    if (group.enabled === false) return { ok: false, reason: "Esta sesión está pausada. Espera la indicación del supervisor." };
+    if (now < opens - 60000) return { ok: false, reason: `La sesión abre el ${fmtDate(opens)}.` };
+    if (closes && now >= closes) return { ok: false, reason: "La sesión de examen ya cerró. Avisa al supervisor." };
   }
   return {
-    ok: true, participantId: pid, cedula: ced, name: part ? part.name : fullName,
+    ok: true, participantId: pid, cedula: ced, name: part.name || "",
     groupId, groupName: group.name || "", institution: group.institution || ""
   };
 }
@@ -273,9 +273,27 @@ export async function logSectionTiming(sessionId, sectionName, elapsedSeconds, t
 }
 
 // ---------- cerrar la sesión (sin calcular resultado) ----------
-export async function finishSession(sessionId, participantId) {
-  await updateDoc(doc(db, "sessions", sessionId), { status: "completed", completedAt: serverTimestamp() });
+// Cierra el intento y reenvía TODAS las respuestas en una sola escritura (así, aunque alguna escritura de página
+// se hubiera perdido por falta de internet, el intento queda completo).
+export async function finishSession(sessionId, participantId, entries = []) {
+  const patch = { status: "completed", completedAt: serverTimestamp() };
+  for (const { item, selected, timeMs } of entries) {
+    patch[`responses.${item.id}`] = { skill: item.skill, level: item.level, category: item.category, selected, timeMs };
+  }
+  await updateDoc(doc(db, "sessions", sessionId), patch);
   try { await updateDoc(doc(db, "participants", participantId), { status: "completed" }); } catch (e) { console.warn(e); }
+}
+
+// Reintenta una operación de Firestore hasta que se confirme (las escrituras sin internet quedan pendientes y no fallan).
+export async function retryUntilDone(fn, { attemptMs = 15000, onWait = () => {} } = {}) {
+  for (let i = 0; ; i++) {
+    try {
+      return await Promise.race([fn(), new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), attemptMs))]);
+    } catch (e) {
+      onWait(i, e);
+      await new Promise(r => setTimeout(r, Math.min(2000 * (i + 1), 10000)));
+    }
+  }
 }
 
 // ---------- resultado publicado por el panel de administración ----------

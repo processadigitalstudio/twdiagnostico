@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Tu resultado — Tweetalig</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="notranslate">
@@ -64,7 +64,7 @@ function render(r) {
   // la institución guardada en el resultado manda sobre la del navegador
   if (r.institution) { inst = resolveInstitution(r.institution); renderBrand(document.getElementById("brandBar"), inst); }
   const c = CANDO[r.level] || CANDO.A1;
-  const colors = { UoL: "var(--teal)", Reading: "var(--gold)", Listening: "#6B5B95" };
+  const colors = { UoL: "var(--teal)", Reading: "var(--gold)", Listening: "var(--lvl-b1)" };
   const rows = ["UoL", "Reading", "Listening"].map(sk => {
     const p = r.points[sk];
     const pct = p.max > 0 ? Math.round((p.earned / p.max) * 100) : 0;
@@ -82,10 +82,10 @@ function render(r) {
     : (inst.contact ? `<div class="cta-box"><h3>¿Quieres inscribirte?</h3><p>Escríbenos a ${esc(inst.contact)}</p></div>` : "");
 
   view.innerHTML = `
-    <div class="result-hero">
+    <div class="result-hero lvl-${esc(r.level)}">
       <div class="eyebrow">${r.name ? esc(r.name) + " · " : ""}Tu resultado</div>
       <div class="result-level">${esc(r.level)}</div>
-      <div style="font-family:'Newsreader',serif; font-size:22px;">Nivel ${esc(r.level)} · ${esc(c.name)}</div>
+      <div><span class="lvl-pill ${esc(r.level)}">Nivel ${esc(r.level)} · ${esc(c.name)}</span></div>
       <div class="result-score">Puntaje total: <b>${r.finalScore.toFixed(1)}</b> / 100</div>
     </div>
 

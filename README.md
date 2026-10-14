@@ -7,7 +7,7 @@
 3. **Logos**: Tweetalig y EAM ya están en `img/brand/`. Otra universidad: sube su logo ahí y regístralo en `js/institutions.js`.
 4. **Instituciones**: `js/institutions.js` (nombre, logo, link de inscripción). El link se elige por institución del acceso o por `?u=slug`.
 5. **Clave**: en `admin.html` → "Cargar answer_key_PRIVADO_NO_SUBIR.json" (una sola vez).
-6. **Sesiones de examen**: `admin.html` → Sesiones de examen → crea una sesión (nombre, institución, contraseña compartida) y ábrela/ciérrala a mano. Los estudiantes entran con cédula + nombre + esa contraseña, solo con la sesión abierta.
+6. **Sesiones de examen**: `admin.html` → Sesiones y estudiantes → crea una sesión (nombre, institución, contraseña compartida que distingue mayúsculas/minúsculas, fecha y hora de apertura y cierre, y la lista "cédula, nombre"). Los estudiantes entran con cédula + esa contraseña, solo dentro del horario. El tablero "Estado de la sesión" muestra Sin iniciar / En proceso / Finalizado.
 7. **Día del examen**: deja `admin.html` abierto con la clave cargada. Cada examen que termina se califica ahí y el resultado aparece en pantalla al estudiante.
 
 ## Publicar como "Twtest"

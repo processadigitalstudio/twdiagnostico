@@ -600,3 +600,165 @@ body.exam-locked .exam-shell, body.exam-locked .watermark { filter: blur(26px); 
 .hard-block button { margin-top: 18px; }
 .watermark { position: fixed; inset: 0; z-index: 800; pointer-events: none; opacity: .09; background-repeat: repeat; }
 @media print { body { display: none !important; } }
+
+
+/* ============================================================
+   REDISEÑO — paleta Tweetalig / Tweetaform + lectura cómoda
+   (este bloque va al final y manda sobre lo anterior)
+   Colores por nivel (igual que Tweetaform):
+   A1 verde · A2 naranja · B1 morado · B2 cian
+   ============================================================ */
+:root {
+  --lvl-a1: #8BC34A;  --lvl-a1-soft: #EEF6E0;  --lvl-a1-ink: #4E7A12;
+  --lvl-a2: #FFB74D;  --lvl-a2-soft: #FFF1DC;  --lvl-a2-ink: #A25E00;
+  --lvl-b1: #9575CD;  --lvl-b1-soft: #EFE9F8;  --lvl-b1-ink: #5E3FA0;
+  --lvl-b2: #4DD0E1;  --lvl-b2-soft: #DFF5F9;  --lvl-b2-ink: #11707F;
+  --cream: #F4EDDE;
+  --bg: #FAF7EF;
+  --ink-soft: #46586A;           /* más oscuro = más contraste */
+  --line: #D9D3C4;
+  --radius: 14px;
+  --shadow: 0 2px 4px rgba(44,61,77,.06), 0 10px 28px rgba(44,61,77,.08);
+}
+
+html { font-size: 17px; -webkit-text-size-adjust: 100%; }
+html, body {
+  font-family: "Nunito Sans", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  line-height: 1.55;
+  background:
+    radial-gradient(900px 380px at 100% -80px, rgba(93,182,156,.16), transparent 70%),
+    radial-gradient(700px 320px at -10% 0, rgba(230,193,79,.14), transparent 70%),
+    var(--bg);
+  background-attachment: fixed;
+}
+h1, h2, h3, .brand-wordmark, .result-level, .level-badge, .topbar .brand {
+  font-family: "Nunito", "Nunito Sans", system-ui, sans-serif;
+  font-weight: 800; letter-spacing: -0.005em;
+}
+h1 { font-size: 2.1rem; line-height: 1.15; }
+h2 { font-size: 1.55rem; line-height: 1.2; }
+h3 { font-size: 1.2rem; }
+.muted { font-size: 1rem; }
+.eyebrow { font-family: "Nunito", sans-serif; font-weight: 800; font-size: .8rem; letter-spacing: .1em; color: var(--teal-dark); }
+label { font-size: .95rem; color: var(--ink); }
+
+/* Campos y botones grandes, fáciles de tocar */
+input[type="text"], input[type="password"], input[type="datetime-local"], input[type="number"], select, textarea {
+  font-size: 1.1rem; padding: 14px 16px; border-radius: 12px; border: 2px solid var(--line); background: #fff;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(93,182,156,.25); outline: none; }
+button { font-family: "Nunito", sans-serif; font-weight: 800; font-size: 1.05rem; border-radius: 12px; padding: 14px 24px; }
+.btn-primary { background: var(--teal-dark); box-shadow: 0 3px 0 #1d5e4d; }
+.btn-primary:hover { background: #2f8f76; }
+.btn-primary:active { box-shadow: none; transform: translateY(3px); }
+.btn-secondary { border-width: 2px; background: #fff; }
+.error-msg { font-size: 1rem; font-weight: 700; min-height: 22px; }
+
+/* Tarjetas */
+.card { border-radius: 18px; border-color: #E4DECF; }
+.card.landing { border-top: 6px solid var(--teal); }
+.login-box { border-radius: 16px; border: 2px solid var(--cream); background: #fff; }
+.info-list li { font-size: 1.02rem; color: var(--ink-soft); }
+.dot-uol { background: var(--lvl-a1); } .dot-reading { background: var(--lvl-a2); } .dot-listening { background: var(--lvl-b1); }
+.legit-foot { font-size: .85rem; }
+
+/* Franja de los 4 niveles (decorativa, como Tweetaform) */
+.level-ribbon { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin: 6px 0 20px; }
+.level-ribbon i { flex: 1; }
+.level-ribbon i:nth-child(1) { background: var(--lvl-a1); } .level-ribbon i:nth-child(2) { background: var(--lvl-a2); }
+.level-ribbon i:nth-child(3) { background: var(--lvl-b1); } .level-ribbon i:nth-child(4) { background: var(--lvl-b2); }
+.brand-bar::after { content: ""; flex-basis: 100%; height: 8px; border-radius: 4px; margin-top: 4px;
+  background: linear-gradient(90deg, var(--lvl-a1) 0 25%, var(--lvl-a2) 25% 50%, var(--lvl-b1) 50% 75%, var(--lvl-b2) 75% 100%); }
+
+/* Barra superior del examen */
+.topbar { background: var(--ink); padding: 12px 28px; border-bottom: 4px solid var(--teal); }
+.topbar .timer { font-size: 1.35rem; font-weight: 600; background: rgba(255,255,255,.14); padding: 6px 16px; border-radius: 10px; }
+.topbar .timer.low { background: var(--bad); animation: tpulse 1s infinite; }
+@keyframes tpulse { 50% { opacity: .7; } }
+.segments { height: 8px; }
+.segments .seg.done { background: var(--lvl-a1); }
+.segments .seg.active { background: var(--teal); }
+
+/* Examen: texto más grande y opciones cómodas */
+.exam-body { max-width: 820px; font-size: 1.06rem; }
+.exam-body .stem, .stem { font-size: 1.28rem; line-height: 1.4; }
+.stem.small { font-size: 1.12rem; }
+.option { padding: 16px 18px; border-width: 2px; border-radius: 14px; gap: 14px; }
+.option .opt-text { font-size: 1.08rem; line-height: 1.4; }
+.option .letter { font-family: "Nunito", sans-serif; font-size: 1.05rem; color: var(--teal-dark); width: 26px; }
+.option input[type="radio"] { width: 22px; height: 22px; }
+.option:hover { border-color: var(--teal); background: #F5FBF8; }
+.option.selected { border-color: var(--teal-dark); background: #E8F5F0; box-shadow: 0 0 0 3px rgba(93,182,156,.25); }
+.context-box.passage { font-size: 1.06rem; line-height: 1.75; }
+.context-box > p:only-of-type, .context-label + p { font-size: 1.04rem; }
+.q-badge { background: var(--gold); color: var(--ink); width: 28px; height: 28px; line-height: 28px; font-size: .85rem; }
+.skill-tag { color: var(--gold-text); border-color: rgba(154,118,21,.4); font-size: .75rem; }
+.audio-pending { color: var(--gold-text); }
+.audio-card .audio-pending { color: var(--cream); }
+.badge-event { color: var(--gold-text); border-color: rgba(154,118,21,.4); }
+.nav-row button { min-width: 150px; }
+
+/* Resultado: color del nivel como en Tweetaform */
+.result-level { font-size: 6rem; }
+.result-hero.lvl-A1 .result-level { color: var(--lvl-a1-ink); } .result-hero.lvl-A2 .result-level { color: var(--lvl-a2-ink); }
+.result-hero.lvl-B1 .result-level { color: var(--lvl-b1-ink); } .result-hero.lvl-B2 .result-level { color: var(--lvl-b2-ink); }
+.lvl-pill { display: inline-block; padding: 6px 18px; border-radius: 999px; font-family: "Nunito", sans-serif; font-weight: 800; font-size: 1.05rem; }
+.lvl-pill.A1 { background: var(--lvl-a1-soft); color: var(--lvl-a1-ink); border: 2px solid var(--lvl-a1); }
+.lvl-pill.A2 { background: var(--lvl-a2-soft); color: var(--lvl-a2-ink); border: 2px solid var(--lvl-a2); }
+.lvl-pill.B1 { background: var(--lvl-b1-soft); color: var(--lvl-b1-ink); border: 2px solid var(--lvl-b1); }
+.lvl-pill.B2 { background: var(--lvl-b2-soft); color: var(--lvl-b2-ink); border: 2px solid var(--lvl-b2); }
+.skill-row { grid-template-columns: 150px 1fr 100px; font-size: 1rem; font-weight: 700; }
+.skill-row .bar { height: 16px; border-radius: 8px; }
+.skill-row .bar > div { border-radius: 8px; }
+.cando-box { border-radius: 14px; }
+.cando-box li { font-size: 1.04rem; }
+.cta-box { background: var(--ink); border-radius: 16px; border-bottom: 6px solid var(--teal); }
+.cta-btn { font-family: "Nunito", sans-serif; font-weight: 800; font-size: 1.1rem; padding: 15px 32px; border-radius: 12px; }
+
+/* Pantallas informativas */
+.intro-block p, .intro-block li, .intro-table { font-size: 1.03rem; }
+.intro-block h4 { font-family: "Nunito", sans-serif; font-size: .85rem; }
+.level-strip div:nth-child(1) { background: var(--lvl-a1-soft); } .level-strip div:nth-child(2) { background: var(--lvl-a2-soft); }
+.level-strip div:nth-child(3) { background: var(--lvl-b1-soft); } .level-strip div:nth-child(4) { background: var(--lvl-b2-soft); }
+
+/* ---------- Utilidades que faltaban ---------- */
+.hidden { display: none !important; }
+.net-banner {
+  position: fixed; left: 0; right: 0; top: 0; z-index: 2500; padding: 12px 20px; text-align: center;
+  background: var(--gold); color: var(--ink); font-weight: 800; font-size: 1rem; line-height: 1.4;
+  box-shadow: 0 4px 14px rgba(0,0,0,.18);
+}
+.toast {
+  position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 2600; max-width: min(92vw, 520px);
+  background: var(--ink); color: #fff; padding: 14px 22px; border-radius: 12px; font-weight: 700; font-size: 1rem;
+  box-shadow: 0 8px 30px rgba(0,0,0,.28); animation: toastin .2s ease-out;
+}
+@keyframes toastin { from { opacity: 0; transform: translate(-50%, 10px); } }
+
+/* ---------- Admin: tablero de 3 columnas y colores ---------- */
+.tab { font-family: "Nunito", sans-serif; font-weight: 800; font-size: 1rem; padding: 10px 18px; border-radius: 10px; }
+.tab.active { background: var(--ink); border-color: var(--ink); box-shadow: 0 3px 0 var(--teal); }
+table.admin-table { font-size: .95rem; }
+table.admin-table th { font-family: "Nunito", sans-serif; font-size: .75rem; }
+.board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+@media (max-width: 900px) { .board { grid-template-columns: 1fr; } }
+.board-col { background: #fff; border: 2px solid var(--line); border-radius: 16px; padding: 14px 14px 10px; min-height: 160px; }
+.board-col h3 { display: flex; justify-content: space-between; align-items: center; margin: 0 0 10px; font-size: 1.1rem; }
+.board-col .count { font-family: "IBM Plex Mono", monospace; font-size: 1rem; padding: 2px 12px; border-radius: 999px; color: #fff; }
+.board-col.col-wait  { border-top: 6px solid var(--lvl-a2); }  .col-wait .count  { background: var(--lvl-a2-ink); }
+.board-col.col-prog  { border-top: 6px solid var(--lvl-b2); }  .col-prog .count  { background: var(--lvl-b2-ink); }
+.board-col.col-done  { border-top: 6px solid var(--lvl-a1); }  .col-done .count  { background: var(--lvl-a1-ink); }
+.board-card { border: 1.5px solid var(--line); border-radius: 12px; padding: 9px 12px; margin-bottom: 8px; background: var(--bg); font-size: .95rem; }
+.board-card b { display: block; }
+.board-card .sub { color: var(--ink-soft); font-size: .85rem; }
+
+@media (max-width: 640px) {
+  html { font-size: 16px; }
+  h1 { font-size: 1.7rem; }
+  .topbar { padding: 10px 14px; }
+  .skill-row { grid-template-columns: 1fr; gap: 4px; }
+  .result-level { font-size: 4.5rem; }
+}
+.skill-row > span:first-child { text-align: left; }
+.topbar .brand-bar::after { display: none; }
+.board-card .sub b { display: inline; }

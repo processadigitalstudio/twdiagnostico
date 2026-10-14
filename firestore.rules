@@ -7,37 +7,44 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == 'UIsTtqPwumUidDNfbvCQqbCUpbx1';
     }
 
+    // La sesión está abierta si no está pausada y la hora del SERVIDOR está dentro de su horario.
     function groupOpen(gid) {
-      return get(/databases/$(database)/documents/exam_groups/$(gid)).data.status == 'open';
+      let g = get(/databases/$(database)/documents/exam_groups/$(gid)).data;
+      return g.enabled == true && request.time >= g.opensAt && request.time < g.closesAt;
     }
 
-    // Sesión de examen (grupo con contraseña compartida). Su id es el hash de la contraseña: solo se
-    // encuentra sabiendo la contraseña (no se puede listar). La admin la abre y la cierra.
+    // Sesión de examen (horario + contraseña compartida). Su id es el hash de la contraseña: solo se encuentra
+    // sabiendo la contraseña (no se puede listar). La contraseña en claro vive en group_secrets (solo admin).
     match /exam_groups/{gid} {
       allow get: if true;
       allow list, write: if isAdmin();
     }
+    match /group_secrets/{gid} {
+      allow read, write: if isAdmin();
+    }
 
-    // Participante = cédula dentro de una sesión. Solo se puede registrar mientras la sesión está abierta.
+    // Participante = cédula + nombre cargados por la admin en una sesión. El estudiante solo puede pasar
+    // su propio estado de not_started -> in_progress (con la sesión abierta) -> completed.
     match /participants/{pid} {
       allow get: if true;
-      allow list, delete: if isAdmin();
-      allow create: if request.resource.data.status == 'registered'
-                    && pid == request.resource.data.groupId + '_' + request.resource.data.cedula
-                    && groupOpen(request.resource.data.groupId);
+      allow list, create, delete: if isAdmin();
       allow update: if isAdmin() || (
         resource.data.status != 'completed' &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'usedAt']) &&
-        request.resource.data.status in ['in_progress', 'completed']
+        (
+          (request.resource.data.status == 'completed') ||
+          (request.resource.data.status == 'in_progress' && groupOpen(resource.data.groupId))
+        )
       );
     }
 
-    // Intentos. Solo la admin los lee. El estudiante crea el suyo (con la sesión abierta) y lo actualiza mientras esté en curso.
+    // Intentos. Solo la admin los lee. El estudiante crea el suyo (sesión abierta, participante sin iniciar)
+    // y lo actualiza mientras esté en curso.
     match /sessions/{id} {
       allow read, delete: if isAdmin();
       allow create: if request.resource.data.status == 'in_progress'
                     && groupOpen(request.resource.data.groupId)
-                    && exists(/databases/$(database)/documents/participants/$(request.resource.data.participantId));
+                    && get(/databases/$(database)/documents/participants/$(request.resource.data.participantId)).data.status == 'not_started';
       allow update: if isAdmin() || (
         resource.data.status == 'in_progress' &&
         !request.resource.data.diff(resource.data).affectedKeys()

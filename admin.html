@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard del examen — Tweetalig</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <style>
   .wrap { max-width: 1200px; margin: 0 auto; padding: 32px 20px 80px 20px; }
@@ -76,6 +76,9 @@
   .event-line:last-child { border-bottom: none; }
   .event-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 8px; }
   .empty-note { color: var(--good); font-size: 13px; }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px 16px; margin: 14px 0; }
+  .form-grid input, .form-grid select { width: 100%; padding: 11px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--bg); font-size: 14px; }
+  .detail-card { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; }
 </style>
 </head>
 <body>
@@ -112,10 +115,10 @@
   <div class="stat-row" id="summaryRow"></div>
 
   <div class="tabs">
-    <div class="tab active" data-tab="live">🔴 En vivo</div>
+    <div class="tab active" data-tab="live">Estado de la sesión</div>
+    <div class="tab" data-tab="access">Sesiones y estudiantes</div>
     <div class="tab" data-tab="sessions">Resultados</div>
     <div class="tab" data-tab="items">Análisis por ítem</div>
-    <div class="tab" data-tab="access">Sesiones de examen</div>
     <div class="tab" data-tab="bookmark">📊 Panel Bookmark</div>
   </div>
 
@@ -123,15 +126,20 @@
     <div class="key-banner" style="margin-bottom:14px;">
       <div>
         <strong>Los estudiantes ven su resultado cuando este panel lo publica.</strong>
-        <div class="muted" style="margin-top:4px;">Deja esta página abierta durante el examen (con la clave cargada). <span id="liveCounters" class="mono"></span></div>
+        <div class="muted" style="margin-top:4px;">Deja esta página abierta durante el examen, con la sesión iniciada y la clave cargada.</div>
       </div>
       <label style="display:flex; gap:8px; align-items:center; margin:0;"><input type="checkbox" id="autoPublishChk" checked> Publicar resultados automáticamente</label>
     </div>
-    <p class="muted"><span class="live-dot"></span>Actualiza en tiempo real mientras las personas responden.</p>
-    <table class="admin-table">
-      <thead><tr><th>Nombre</th><th>Cédula</th><th>Sesión</th><th>Estado</th><th>Progreso</th><th>Tiempo transcurrido</th><th>Eventos</th></tr></thead>
-      <tbody id="liveBody"></tbody>
-    </table>
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
+      <label style="margin:0;">Sesión:</label>
+      <select id="boardGroup" style="padding:9px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--bg);"></select>
+      <span class="mono muted" id="boardCounters"></span>
+    </div>
+    <div class="board">
+      <div class="board-col col-wait"><h3>⚪ Sin iniciar <span id="cntNot" class="count">0</span></h3><div id="colNot"></div></div>
+      <div class="board-col col-prog"><h3>🟡 En proceso <span id="cntProg" class="count">0</span></h3><div id="colProg"></div></div>
+      <div class="board-col col-done"><h3>✅ Finalizado <span id="cntDone" class="count">0</span></h3><div id="colDone"></div></div>
+    </div>
   </div>
 
   <div class="section" id="sessionsSection">
@@ -152,27 +160,27 @@
 
   <div class="section" id="accessSection">
     <h3>Crear una sesión de examen</h3>
-    <p class="muted">Una sesión es un grupo de estudiantes que comparte <strong>una sola contraseña</strong> (la eliges tú). Entran con su cédula, su nombre y esa contraseña, y <strong>solo mientras la sesión esté abierta</strong>. Puedes crearla con anticipación y abrirla en el momento.</p>
-    <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin:14px 0;">
-      <div><label>Nombre de la sesión</label><input type="text" id="grpName" placeholder="EAM · jornada mañana" style="width:260px;"></div>
-      <div><label>Institución</label><select id="grpInstitution" style="padding:11px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--bg);"></select></div>
-      <div><label>Contraseña de la sesión</label><input type="text" id="grpPassword" placeholder="ej. EAM2026" style="width:200px;" autocomplete="off"></div>
-      <button class="btn-primary" id="createGroupBtn" style="width:auto; margin:0;">Crear sesión</button>
+    <p class="muted">Una sesión es un grupo de estudiantes con <strong>una contraseña compartida</strong> (distingue mayúsculas, minúsculas y símbolos) y un <strong>horario</strong>: solo se puede entrar entre la hora de apertura y la de cierre. Cargas aquí la lista (cédula y nombre) y cada estudiante entra con su cédula.</p>
+    <div class="form-grid">
+      <div><label>Nombre de la sesión</label><input type="text" id="grpName" placeholder="EAM · jornada mañana"></div>
+      <div><label>Institución</label><select id="grpInstitution"></select></div>
+      <div><label>Contraseña (mín. 6, sin espacios)</label><input type="text" id="grpPassword" placeholder="Ej. Eam#2026" autocomplete="off"></div>
+      <div><label>Abre (fecha y hora)</label><input type="datetime-local" id="grpOpens"></div>
+      <div><label>Cierra (fecha y hora)</label><input type="datetime-local" id="grpCloses"></div>
     </div>
+    <label>Estudiantes — una línea por persona: <code>cédula, nombre completo</code> (puedes pegar desde Excel)</label>
+    <textarea class="access-input" id="grpRoster" placeholder="1020304050, Ana María Pérez Gómez&#10;1098765432, Juan Carlos Rojas"></textarea>
+    <br><br>
+    <button class="btn-primary" id="createGroupBtn" style="width:auto;">Crear sesión</button>
     <div class="error-msg" id="grpMsg"></div>
 
-    <h3 style="margin-top:28px;">Sesiones</h3>
+    <h3 style="margin-top:32px;">Sesiones</h3>
     <table class="admin-table">
-      <thead><tr><th>Sesión</th><th>Institución</th><th>Contraseña</th><th>Estado</th><th>Participantes</th><th></th></tr></thead>
+      <thead><tr><th>Sesión</th><th>Institución</th><th>Contraseña</th><th>Horario</th><th>Estado</th><th>Estudiantes</th><th></th></tr></thead>
       <tbody id="groupsBody"></tbody>
     </table>
 
-    <h3 style="margin-top:36px;">Participantes</h3>
-    <p class="muted">Quien se registró con la contraseña de una sesión. <strong>Reabrir</strong> sirve cuando a alguien se le cayó el equipo y debe empezar de nuevo; <strong>quitar</strong> borra el registro.</p>
-    <table class="admin-table">
-      <thead><tr><th>Nombre</th><th>Cédula</th><th>Sesión</th><th>Estado</th><th></th></tr></thead>
-      <tbody id="participantsBody"></tbody>
-    </table>
+    <div id="groupDetail" style="display:none; margin-top:28px;" class="detail-card"></div>
   </div>
 
   <div class="section" id="bookmarkSection">
@@ -214,11 +222,11 @@
 <script type="module">
 import { db, auth } from "./js/firebase-config.js";
 import { BANK_VERSION } from "./js/exam-config.js";
-import { generateRandomPassword, groupIdFromPassword, loadAllBanks, flattenBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery, publishResult } from "./js/exam-engine.js";
+import { generateRandomPassword, groupIdFromPassword, participantIdOf, normalizeCedula, tsMs, loadAllBanks, flattenBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery, publishResult } from "./js/exam-engine.js";
 import { buildBookmarkOrder, saveBookmarkOrder, loadAllJudgments, loadAllJudgeCodes } from "./js/bookmark-engine.js";
 import { INSTITUTIONS } from "./js/institutions.js";
 import {
-  collection, getDocs, getDoc, query, where, onSnapshot, setDoc, updateDoc, doc, deleteDoc, serverTimestamp
+  collection, getDocs, getDoc, query, where, onSnapshot, setDoc, updateDoc, doc, deleteDoc, serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
@@ -316,74 +324,131 @@ async function loadDashboard() {
 }
 
 // ---------------- SESIONES DE EXAMEN ----------------
-async function loadGroups() {
-  const [gSnap, pSnap] = await Promise.all([getDocs(collection(db, "exam_groups")), getDocs(collection(db, "participants"))]);
-  const groups = gSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-  const parts = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-  const gname = Object.fromEntries(groups.map(g => [g.id, g.name]));
+const esc = (t) => String(t ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const fmtDT = (ms) => ms ? new Date(ms).toLocaleString("es-CO", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : "—";
+const toLocalInput = (ms) => { const d = new Date(ms); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };
+let groupsCache = [], partsCache = [], selectedGroupId = null;
 
+function groupState(g) {
+  const now = Date.now(), o = tsMs(g.opensAt), c = tsMs(g.closesAt);
+  if (g.enabled === false) return { label: "⏸ Pausada", open: false };
+  if (now < o) return { label: "🕒 Programada", open: false };
+  if (now < c) return { label: "🟢 <b>ABIERTA</b>", open: true };
+  return { label: "🔴 Cerrada", open: false };
+}
+
+function parseRoster(text) {
+  const rows = [], bad = [];
+  for (const raw of text.split("\n")) {
+    const line = raw.trim();
+    if (!line) continue;
+    const m = line.match(/^\s*(\d[\d.]*)\s*[\t;,]?\s*([^\d\s].*)$/);   // cédula, luego coma / punto y coma / tab / espacio, luego nombre
+    const ced = m ? normalizeCedula(m[1]) : "";
+    const name = m ? m[2].trim().replace(/\s+/g, " ") : "";
+    if (ced.length >= 5 && name.length >= 3) rows.push({ cedula: ced, name }); else bad.push(line);
+  }
+  return { rows, bad };
+}
+
+async function loadGroups() {
+  const [gSnap, pSnap, sSnap] = await Promise.all([getDocs(collection(db, "exam_groups")), getDocs(collection(db, "participants")), getDocs(collection(db, "group_secrets"))]);
+  const secrets = {}; sSnap.forEach(d => { secrets[d.id] = d.data().password; });
+  groupsCache = gSnap.docs.map(d => ({ id: d.id, password: secrets[d.id], ...d.data() })).sort((a, b) => tsMs(b.opensAt) - tsMs(a.opensAt));
+  partsCache = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  renderGroups();
+  fillBoardSelect();
+  renderBoard();
+}
+
+function renderGroups() {
   const tb = document.getElementById("groupsBody");
   tb.innerHTML = "";
-  for (const g of groups) {
-    const mine = parts.filter(p => p.groupId === g.id);
-    const c = (st) => mine.filter(p => p.status === st).length;
-    const open = g.status === "open";
+  for (const g of groupsCache) {
+    const mine = partsCache.filter(p => p.groupId === g.id);
+    const st = groupState(g);
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><b>${esc(g.name)}</b></td>
       <td>${esc((INSTITUTIONS[g.institution] || {}).name || g.institution || "—")}</td>
-      <td class="mono">${esc(g.password || "")}</td>
-      <td>${open ? "🟢 <b>ABIERTA</b>" : "🔴 Cerrada"}</td>
-      <td class="mono">${mine.length} · en curso ${c("in_progress")} · terminaron ${c("completed")}</td>
-      <td>
-        <button class="btn-secondary" data-toggle="${g.id}" style="padding:6px 14px;">${open ? "Cerrar sesión" : "Abrir sesión"}</button>
-        <span class="toggle-detail" data-delgroup="${g.id}" style="color:var(--bad); margin-left:10px;">🗑</span>
-      </td>`;
+      <td class="mono">${esc(g.password || "—")}</td>
+      <td style="font-size:12.5px;">${fmtDT(tsMs(g.opensAt))}<br>→ ${fmtDT(tsMs(g.closesAt))}</td>
+      <td>${st.label}</td>
+      <td class="mono">${mine.length}</td>
+      <td><button class="btn-secondary" data-manage="${g.id}" style="padding:6px 14px;">Gestionar</button></td>`;
     tb.appendChild(tr);
   }
-  if (!groups.length) tb.innerHTML = `<tr><td colspan="6" class="muted">Aún no hay sesiones. Crea la primera arriba.</td></tr>`;
-  tb.querySelectorAll("[data-toggle]").forEach(btn => btn.addEventListener("click", async () => {
-    const g = groups.find(x => x.id === btn.dataset.toggle);
-    const next = g.status === "open" ? "closed" : "open";
-    await updateDoc(doc(db, "exam_groups", g.id), { status: next, [next === "open" ? "openedAt" : "closedAt"]: serverTimestamp() });
-    await loadGroups();
-  }));
-  tb.querySelectorAll("[data-delgroup]").forEach(el => el.addEventListener("click", async () => {
-    if (!confirm("¿Borrar esta sesión? Los resultados ya guardados no se borran.")) return;
-    await deleteDoc(doc(db, "exam_groups", el.dataset.delgroup));
-    await loadGroups();
-  }));
+  if (!groupsCache.length) tb.innerHTML = `<tr><td colspan="7" class="muted">Aún no hay sesiones. Crea la primera arriba.</td></tr>`;
+  tb.querySelectorAll("[data-manage]").forEach(b => b.addEventListener("click", () => { selectedGroupId = b.dataset.manage; renderDetail(); document.getElementById("groupDetail").scrollIntoView({ behavior: "smooth" }); }));
+  if (selectedGroupId) renderDetail();
+}
 
-  const pb = document.getElementById("participantsBody");
-  pb.innerHTML = "";
-  const labels = { registered: "⚪ Registrado", in_progress: "🟡 En curso", completed: "✅ Terminó" };
-  for (const p of parts.sort((a, b) => (a.name || "").localeCompare(b.name || ""))) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${esc(p.name)}</td><td class="mono">${esc(p.cedula)}</td><td>${esc(gname[p.groupId] || "—")}</td>
-      <td>${labels[p.status] || p.status}</td>
-      <td>
-        ${p.status === "in_progress" ? `<span class="toggle-detail" data-reopen="${p.id}" style="margin-right:10px;">↺ reabrir</span>` : ""}
-        <span class="toggle-detail" data-delpart="${p.id}" style="color:var(--bad);">quitar</span>
-      </td>`;
-    pb.appendChild(tr);
-  }
-  pb.querySelectorAll("[data-reopen]").forEach(el => el.addEventListener("click", async () => {
+function renderDetail() {
+  const g = groupsCache.find(x => x.id === selectedGroupId);
+  const box = document.getElementById("groupDetail");
+  if (!g) { box.style.display = "none"; return; }
+  const mine = partsCache.filter(p => p.groupId === g.id).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+  const labels = { not_started: "⚪ Sin iniciar", in_progress: "🟡 En proceso", completed: "✅ Finalizado" };
+  box.style.display = "block";
+  box.innerHTML = `
+    <h3 style="margin-top:0;">${esc(g.name)} · ${groupState(g).label}</h3>
+    <p class="muted">Contraseña: <span class="mono"><b>${esc(g.password || "—")}</b></span></p>
+    <div class="form-grid">
+      <div><label>Abre</label><input type="datetime-local" id="dOpens" value="${toLocalInput(tsMs(g.opensAt))}"></div>
+      <div><label>Cierra</label><input type="datetime-local" id="dCloses" value="${toLocalInput(tsMs(g.closesAt))}"></div>
+    </div>
+    <button class="btn-primary" id="dSave" style="width:auto;">Guardar horario</button>
+    <button class="btn-secondary" id="dPause" style="margin-left:8px;">${g.enabled === false ? "▶ Reanudar sesión" : "⏸ Pausar sesión"}</button>
+    <button class="btn-secondary" id="dDelete" style="margin-left:8px; color:var(--bad);">🗑 Borrar sesión</button>
+    <div class="error-msg" id="dMsg"></div>
+
+    <h4 style="margin-top:24px;">Agregar estudiantes</h4>
+    <textarea class="access-input" id="dRoster" style="min-height:80px;" placeholder="cédula, nombre completo"></textarea>
+    <br><button class="btn-secondary" id="dAdd" style="margin-top:8px;">Agregar a la lista</button>
+
+    <h4 style="margin-top:24px;">Estudiantes (${mine.length})</h4>
+    <p class="muted"><strong>Reabrir</strong> sirve cuando a alguien se le cayó el equipo y debe empezar un examen nuevo; <strong>quitar</strong> lo borra de la lista.</p>
+    <table class="admin-table">
+      <thead><tr><th>Nombre</th><th>Cédula</th><th>Estado</th><th></th></tr></thead>
+      <tbody>${mine.map(p => `<tr><td>${esc(p.name)}</td><td class="mono">${esc(p.cedula)}</td><td>${labels[p.status] || p.status}</td>
+        <td>${p.status !== "not_started" ? `<span class="toggle-detail" data-reopen="${p.id}" style="margin-right:10px;">↺ reabrir</span>` : ""}<span class="toggle-detail" data-delpart="${p.id}" style="color:var(--bad);">quitar</span></td></tr>`).join("")}</tbody>
+    </table>`;
+
+  const msg = (t) => { document.getElementById("dMsg").textContent = t; };
+  document.getElementById("dSave").onclick = async () => {
+    const o = new Date(document.getElementById("dOpens").value).getTime(), c = new Date(document.getElementById("dCloses").value).getTime();
+    if (!(o < c)) { msg("La hora de cierre debe ser posterior a la de apertura."); return; }
+    await updateDoc(doc(db, "exam_groups", g.id), { opensAt: Timestamp.fromMillis(o), closesAt: Timestamp.fromMillis(c) });
+    msg(""); await loadGroups();
+  };
+  document.getElementById("dPause").onclick = async () => { await updateDoc(doc(db, "exam_groups", g.id), { enabled: g.enabled === false }); await loadGroups(); };
+  document.getElementById("dDelete").onclick = async () => {
+    if (!confirm("¿Borrar esta sesión y su lista de estudiantes? Los resultados ya guardados no se borran.")) return;
+    for (const p of mine) await deleteDoc(doc(db, "participants", p.id));
+    await deleteDoc(doc(db, "exam_groups", g.id)); try { await deleteDoc(doc(db, "group_secrets", g.id)); } catch (e) {}
+    selectedGroupId = null; await loadGroups();
+  };
+  document.getElementById("dAdd").onclick = async () => {
+    const { rows, bad } = parseRoster(document.getElementById("dRoster").value);
+    for (const r of rows) await setDoc(doc(db, "participants", participantIdOf(g.id, r.cedula)), newParticipant(g, r));
+    msg(bad.length ? `Se agregaron ${rows.length}. No se entendieron ${bad.length} líneas: ${bad.slice(0, 3).join(" | ")}` : `Se agregaron ${rows.length}.`);
+    await loadGroups();
+  };
+  box.querySelectorAll("[data-reopen]").forEach(el => el.addEventListener("click", async () => {
     const pid = el.dataset.reopen;
     if (!confirm("¿Reabrir? Su intento actual queda descartado y empezará un examen nuevo (con otras preguntas).")) return;
     const ss = await getDocs(query(collection(db, "sessions"), where("participantId", "==", pid), where("status", "==", "in_progress")));
     for (const d of ss.docs) await updateDoc(doc(db, "sessions", d.id), { status: "abandoned" });
-    await updateDoc(doc(db, "participants", pid), { status: "registered" });
+    await updateDoc(doc(db, "participants", pid), { status: "not_started" });
     await loadGroups();
   }));
-  pb.querySelectorAll("[data-delpart]").forEach(el => el.addEventListener("click", async () => {
-    if (!confirm("¿Quitar este participante? Podrá registrarse de nuevo.")) return;
+  box.querySelectorAll("[data-delpart]").forEach(el => el.addEventListener("click", async () => {
+    if (!confirm("¿Quitar a esta persona de la lista?")) return;
     await deleteDoc(doc(db, "participants", el.dataset.delpart));
     await loadGroups();
   }));
 }
 
-const esc = (t) => String(t ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const newParticipant = (g, r) => ({ cedula: r.cedula, name: r.name, groupId: g.id, groupName: g.name, institution: g.institution, status: "not_started", createdAt: serverTimestamp() });
 
 const grpInst = document.getElementById("grpInstitution");
 for (const slug of Object.keys(INSTITUTIONS)) { const o = document.createElement("option"); o.value = slug; o.textContent = INSTITUTIONS[slug].name; grpInst.appendChild(o); }
@@ -394,13 +459,25 @@ document.getElementById("createGroupBtn").addEventListener("click", async () => 
   msg.textContent = "";
   const name = document.getElementById("grpName").value.trim();
   const password = document.getElementById("grpPassword").value.trim();
-  if (!name || password.length < 4) { msg.textContent = "Escribe un nombre y una contraseña de al menos 4 caracteres."; return; }
+  const o = new Date(document.getElementById("grpOpens").value).getTime(), c = new Date(document.getElementById("grpCloses").value).getTime();
+  const { rows, bad } = parseRoster(document.getElementById("grpRoster").value);
+  if (!name) { msg.textContent = "Escribe el nombre de la sesión."; return; }
+  if (password.length < 6 || /\s/.test(password)) { msg.textContent = "La contraseña debe tener al menos 6 caracteres y no puede tener espacios."; return; }
+  if (!(o < c)) { msg.textContent = "Indica la fecha y hora de apertura y de cierre (el cierre debe ser después de la apertura)."; return; }
+  if (!rows.length) { msg.textContent = "Pega al menos un estudiante (cédula, nombre)."; return; }
+  if (bad.length && !confirm(`No se entendieron ${bad.length} líneas (por ejemplo: "${bad[0]}"). ¿Crear la sesión sin ellas?`)) return;
   const id = await groupIdFromPassword(password);
-  const exists = await getDoc(doc(db, "exam_groups", id));
-  if (exists.exists()) { msg.textContent = "Ya existe una sesión con esa contraseña (en mayúsculas o minúsculas). Usa otra."; return; }
-  await setDoc(doc(db, "exam_groups", id), { name, institution: grpInst.value, password, status: "closed", createdAt: serverTimestamp() });
-  document.getElementById("grpName").value = ""; document.getElementById("grpPassword").value = "";
-  await loadGroups();
+  if ((await getDoc(doc(db, "exam_groups", id))).exists()) { msg.textContent = "Ya existe una sesión con exactamente esa contraseña. Usa otra."; return; }
+  const btn = document.getElementById("createGroupBtn"); btn.disabled = true;
+  const g = { id, name, institution: grpInst.value };
+  await setDoc(doc(db, "exam_groups", id), { name, institution: g.institution, enabled: true, opensAt: Timestamp.fromMillis(o), closesAt: Timestamp.fromMillis(c), createdAt: serverTimestamp() });
+  await setDoc(doc(db, "group_secrets", id), { password });
+  let n = 0;
+  for (const r of rows) { await setDoc(doc(db, "participants", participantIdOf(id, r.cedula)), newParticipant(g, r)); btn.textContent = `Cargando estudiantes… ${++n}/${rows.length}`; }
+  btn.disabled = false; btn.textContent = "Crear sesión";
+  for (const f of ["grpName", "grpPassword", "grpOpens", "grpCloses", "grpRoster"]) document.getElementById(f).value = "";
+  selectedGroupId = id;
+  msg.textContent = ""; await loadGroups();
 });
 
 function renderSummary() {
@@ -434,38 +511,60 @@ function eventBadges(events) {
 // ---------------- EN VIVO ----------------
 function startLiveListener() {
   onSnapshot(collection(db, "sessions"), (snap) => {
-    const sessions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-    latestSessions = sessions;
+    latestSessions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     publishPending();
-    const done = sessions.filter(s => s.status === "completed").length;
-    const pub = sessions.filter(s => s.resultDelivery?.status === "published").length;
-    const act = sessions.filter(s => s.status === "in_progress").length;
-    document.getElementById("liveCounters").textContent = `En curso: ${act} · Completados: ${done} · Resultados publicados: ${pub}`;
-
-    const tbody = document.getElementById("liveBody");
-    tbody.innerHTML = "";
-    sessions
-      .sort((a, b) => (b.startedAt?.seconds || 0) - (a.startedAt?.seconds || 0))
-      .forEach(s => {
-        const total = (s.itemIds || []).length || 54;
-        const answered = Object.keys(s.responses || {}).length;
-        const pctDone = Math.round((answered / total) * 100);
-        const startedMs = s.startedAt?.seconds ? s.startedAt.seconds * 1000 : Date.now();
-        const elapsedMin = Math.floor((Date.now() - startedMs) / 60000);
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${s.name || "—"}</td>
-          <td class="mono">${s.username || "—"}</td>
-          <td>${esc(s.groupName || "—")}</td>
-          <td>${s.status === "completed" ? "✅ Completado" : s.status === "abandoned" ? "⚫ Descartado" : "🟡 En curso"}</td>
-          <td><div class="progress-mini"><div style="width:${pctDone}%;"></div></div>${answered}/${total}</td>
-          <td class="mono">${elapsedMin} min</td>
-          <td>${eventBadges(s.suspiciousEvents)}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+    renderBoard();
   });
+  onSnapshot(collection(db, "participants"), (snap) => {
+    partsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderBoard();
+    if (document.getElementById("groupDetail").style.display !== "none") renderDetail();
+    renderGroups();
+  });
+}
+
+function fillBoardSelect() {
+  const sel = document.getElementById("boardGroup");
+  const cur = sel.value;
+  sel.innerHTML = `<option value="">Todas las sesiones</option>` + groupsCache.map(g => `<option value="${g.id}">${esc(g.name)}</option>`).join("");
+  if ([...sel.options].some(o => o.value === cur)) sel.value = cur;
+}
+document.getElementById("boardGroup").addEventListener("change", renderBoard);
+
+const tierOf = (events) => eventTierCounts(events);
+function renderBoard() {
+  const gid = document.getElementById("boardGroup").value;
+  const parts = partsCache.filter(p => !gid || p.groupId === gid).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+  const byPart = {};
+  for (const s of latestSessions) {
+    if (!s.participantId || s.status === "abandoned") continue;
+    const prev = byPart[s.participantId];
+    if (!prev || (s.startedAt?.seconds || 0) >= (prev.startedAt?.seconds || 0)) byPart[s.participantId] = s;
+  }
+  const cols = { not_started: [], in_progress: [], completed: [] };
+  for (const p of parts) (cols[p.status] || cols.not_started).push(p);
+
+  const sev = (events) => { const c = tierOf(events); return (c.high ? ` <span class="sev-badge" style="background:var(--sev-high);">🔴 ${c.high}</span>` : "") + (c.med ? ` <span class="sev-badge" style="background:var(--sev-med);">🟠 ${c.med}</span>` : ""); };
+  document.getElementById("colNot").innerHTML = cols.not_started.map(p => `<div class="board-card"><b>${esc(p.name)}</b><div class="sub mono">${esc(p.cedula)}</div></div>`).join("") || `<div class="muted">—</div>`;
+  document.getElementById("colProg").innerHTML = cols.in_progress.map(p => {
+    const s = byPart[p.id];
+    const total = (s?.itemIds || []).length || 68, answered = Object.keys(s?.responses || {}).length;
+    const startedMs = s?.startedAt?.seconds ? s.startedAt.seconds * 1000 : 0;
+    const mins = startedMs ? Math.floor((Date.now() - startedMs) / 60000) : null;
+    return `<div class="board-card"><b>${esc(p.name)}</b>${sev(s?.suspiciousEvents)}<div class="sub mono">${esc(p.cedula)}${mins !== null ? " · " + mins + " min" : ""}</div>
+      <div class="progress-mini" style="width:100%; margin-top:6px;"><div style="width:${Math.round(answered / total * 100)}%;"></div></div><div class="sub">${answered}/${total} respuestas guardadas</div></div>`;
+  }).join("") || `<div class="muted">—</div>`;
+  document.getElementById("colDone").innerHTML = cols.completed.map(p => {
+    const s = byPart[p.id];
+    let res = "";
+    if (s && answerKey) { try { const r = computeSessionResults(s, answerKey); res = ` · <b>${r.level}</b> · ${r.finalScore}`; } catch (e) {} }
+    const pub = s?.resultDelivery?.status === "published" ? "" : (s ? " · ⏳ sin publicar" : "");
+    return `<div class="board-card"><b>${esc(p.name)}</b>${sev(s?.suspiciousEvents)}<div class="sub mono">${esc(p.cedula)}${res}${pub}</div></div>`;
+  }).join("") || `<div class="muted">—</div>`;
+  document.getElementById("cntNot").textContent = cols.not_started.length;
+  document.getElementById("cntProg").textContent = cols.in_progress.length;
+  document.getElementById("cntDone").textContent = cols.completed.length;
+  document.getElementById("boardCounters").textContent = `${parts.length} estudiantes`;
 }
 
 function fmtMinSec(seconds) {
