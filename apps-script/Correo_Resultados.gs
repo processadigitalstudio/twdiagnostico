@@ -13,7 +13,8 @@
  *
  * Si cambias este código, usa Implementar → Administrar implementaciones → editar → "Nueva versión".
  */
-var FROM_NAME = 'Tweetalig Centro de Idiomas';
+var FROM_NAME = 'Centro de Idiomas Tweetalig';
+var LOGO_URL = 'https://tweetaligtest.web.app/img/brand/tweetalig-logo.png';
 var REPLY_TO = 'info.eam@tweetalig.edu.co';
 var ALLOWED_LINK_PREFIX = 'https://tweetaligtest.web.app/';
 var MAX_PER_CALL = 40;
@@ -78,10 +79,14 @@ function sendOne_(m) {
   var first = String(m.name || '').split(' ')[0];
   var html =
     '<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#2C3D4D;">' +
-    '<div style="background:#2C3D4D;padding:18px 22px;border-radius:12px 12px 0 0;border-bottom:4px solid #5DB69C;color:#fff;font-size:18px;font-weight:bold;">Tweetalig Centro de Idiomas</div>' +
+    '<div style="background:#2C3D4D;padding:16px 22px;border-radius:12px 12px 0 0;border-bottom:4px solid #5DB69C;">' +
+    '<table role="presentation" style="border-collapse:collapse;"><tr>' +
+    '<td style="padding:0 14px 0 0;"><span style="display:inline-block;background:#fff;border-radius:8px;padding:5px 10px;line-height:0;"><img src="' + LOGO_URL + '" alt="Tweetalig" width="110" style="display:block;border:0;height:auto;width:110px;"></span></td>' +
+    '<td style="color:#fff;font-size:17px;font-weight:bold;font-family:Arial,Helvetica,sans-serif;">Centro de Idiomas Tweetalig</td>' +
+    '</tr></table></div>' +
     '<div style="border:1px solid #DAD6CC;border-top:0;border-radius:0 0 12px 12px;padding:24px 22px;background:#fff;">' +
     '<p style="font-size:16px;margin:0 0 14px;">Hola, <b>' + esc_(first) + '</b>:</p>' +
-    '<p style="font-size:15px;line-height:1.5;margin:0 0 18px;">Ya está listo el resultado de tu examen de ubicación de inglés.</p>' +
+    '<p style="font-size:15px;line-height:1.5;margin:0 0 18px;">Ya está listo el resultado de tu examen de ubicación (diagnóstico) de inglés.</p>' +
     '<div style="background:#F7F4EC;border-left:6px solid ' + c + ';border-radius:8px;padding:16px 18px;margin:0 0 18px;">' +
     '<div style="font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#52616F;">Tu nivel</div>' +
     '<div style="font-size:40px;font-weight:bold;color:' + c + ';line-height:1.1;">' + esc_(m.level) + '</div>' +
@@ -90,10 +95,10 @@ function sendOne_(m) {
     '<table style="width:100%;border-collapse:collapse;border-top:1px solid #DAD6CC;margin:0 0 20px;">' + skills + '</table>' +
     '<p style="font-size:15px;line-height:1.5;margin:0 0 16px;">En el siguiente enlace puedes ver tu resultado completo y <b>tu ruta recomendada</b> (cursos, fechas e inscripción):</p>' +
     '<p style="margin:0 0 20px;"><a href="' + esc_(m.link) + '" style="background:#2C3D4D;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:bold;display:inline-block;">Ver mi resultado y mi ruta</a></p>' +
-    '<p style="font-size:12.5px;color:#52616F;line-height:1.5;margin:0;">Resultado válido para el periodo académico 2026-2. ¿Dudas o facilidades de pago? Escríbenos a ' + REPLY_TO + '.</p>' +
+    '<p style="font-size:12.5px;color:#52616F;line-height:1.5;margin:0;">Resultado válido para el periodo académico 2026-2. ¿Dudas? Escríbenos a ' + REPLY_TO + '.</p>' +
     '</div></div>';
   var text = 'Hola, ' + first + ':\n\nTu nivel de inglés es ' + m.level + ' (puntaje final ' + Math.round(Number(m.score) || 0) + '/100).\n' +
-    'Mira tu resultado completo y tu ruta recomendada aquí: ' + m.link + '\n\nResultado válido para el periodo académico 2026-2.\nTweetalig Centro de Idiomas — ' + REPLY_TO;
+    'Mira tu resultado completo y tu ruta recomendada aquí: ' + m.link + '\n\nResultado válido para el periodo académico 2026-2.\nCentro de Idiomas Tweetalig — ' + REPLY_TO;
   MailApp.sendEmail({
     to: m.to,
     subject: 'Tu resultado del examen de ubicación de inglés — Tweetalig',
