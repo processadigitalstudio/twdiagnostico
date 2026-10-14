@@ -72,7 +72,7 @@ export const MAX_EVENTS_PER_SESSION = 150;  // tope de eventos sospechosos guard
 // así que en twtest.web.app solo se sirve la aplicación (~0.5 MB por estudiante) y los audios/imágenes grandes salen
 // de GitHub Pages (sin tope diario). Cuando el proyecto pase al plan Blaze (de pago), poner ASSETS_FROM_GITHUB = false
 // y quitar "audio/**" e "img/*.webp" de "ignore" en firebase.json: todo saldrá de twtest.web.app.
-const ASSETS_FROM_GITHUB = true;
+const ASSETS_FROM_GITHUB = false;
 const ON_FIREBASE_HOSTING = /\.(web\.app|firebaseapp\.com)$/.test(location.hostname);
 export const ASSET_BASE = (ASSETS_FROM_GITHUB && ON_FIREBASE_HOSTING) ? "https://processadigitalstudio.github.io/twtest/" : "";
 export const assetUrl = (path) => ASSET_BASE + path;
