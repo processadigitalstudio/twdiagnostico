@@ -56,8 +56,16 @@ export function resolveInstitution(slug) {
 }
 
 // Institución actual del navegador: la guarda index.html al entrar.
+// El slug sale de ?u=eam o de la ruta limpia (https://sitio/eam).
+export function slugFromLocation() {
+  const q = new URLSearchParams(location.search).get("u");
+  if (q) return q;
+  const seg = (location.pathname.split("/").filter(Boolean)[0] || "").toLowerCase();
+  return INSTITUTIONS[seg] ? seg : "";
+}
+
 export function currentInstitutionSlug() {
-  const fromUrl = new URLSearchParams(location.search).get("u");
+  const fromUrl = slugFromLocation();
   try { return sessionStorage.getItem("institution") || fromUrl || "tweetalig"; }
   catch (e) { return fromUrl || "tweetalig"; }
 }
