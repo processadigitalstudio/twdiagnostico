@@ -12,7 +12,7 @@
 
 ## Publicar como "Twtest"
 - **GitHub Pages (recomendado, sin costo):** Settings → Rename repository → `twtest`; luego Settings → Pages → rama `main`. Link: `https://processadigitalstudio.github.io/twtest/index.html?u=eam`. Añade `processadigitalstudio.github.io` a Authentication → Settings → Authorized domains.
-- **Firebase Hosting (`tweetalig-examen.web.app`):** requiere plan Blaze (el plan gratis solo permite 360 MB/día de descarga y 200 estudiantes bajan ~1 GB). `firebase hosting:sites:create twtest` y `firebase deploy --only hosting`.
+- **Firebase Hosting (`tweetaligtest.web.app`):** requiere plan Blaze (el plan gratis solo permite 360 MB/día de descarga y 200 estudiantes bajan ~1 GB). `firebase hosting:sites:create twtest` y `firebase deploy --only hosting`.
 
 Link para estudiantes: `https://<tu-sitio>/index.html?u=eam` (cambia `eam` por la institución).
 
@@ -400,5 +400,5 @@ dan más contexto a quien toma la decisión final:
 
 ## Hosting y costos
 
-- Plan gratis (Spark): `tweetalig-examen.web.app` sirve la app y los audios/imágenes salen de GitHub Pages (`ASSETS_FROM_GITHUB = true`).
-- Plan Blaze: usar la rama `blaze` (`git checkout blaze && firebase deploy --only hosting`): todo sale de `tweetalig-examen.web.app`.
+- Plan gratis (Spark): `tweetaligtest.web.app` sirve la app y los audios/imágenes salen de GitHub Pages (`ASSETS_FROM_GITHUB = true`).
+- Plan Blaze: usar la rama `blaze` (`git checkout blaze && firebase deploy --only hosting`): todo sale de `tweetaligtest.web.app`.
