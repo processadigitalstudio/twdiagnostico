@@ -62,7 +62,7 @@
         ]
       }
     ],
-    "site": "tweetalig-examen"
+    "site": "tweetaligtest"
   },
   "firestore": {
     "rules": "firestore.rules"

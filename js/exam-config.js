@@ -69,9 +69,9 @@ export const MAX_EVENTS_PER_SESSION = 150;  // tope de eventos sospechosos guard
 
 // ---------- Dónde están los audios e imágenes ----------
 // Plan gratis de Firebase Hosting (Spark): 360 MB de descarga al día. Cada estudiante baja ~7 MB (casi todo audio),
-// así que en tweetalig-examen.web.app solo se sirve la aplicación (~0.5 MB por estudiante) y los audios/imágenes grandes salen
+// así que en tweetaligtest.web.app solo se sirve la aplicación (~0.5 MB por estudiante) y los audios/imágenes grandes salen
 // de GitHub Pages (sin tope diario). Cuando el proyecto pase al plan Blaze (de pago), poner ASSETS_FROM_GITHUB = false
-// y quitar "audio/**" e "img/*.webp" de "ignore" en firebase.json: todo saldrá de tweetalig-examen.web.app.
+// y quitar "audio/**" e "img/*.webp" de "ignore" en firebase.json: todo saldrá de tweetaligtest.web.app.
 const ASSETS_FROM_GITHUB = false;
 const ON_FIREBASE_HOSTING = /\.(web\.app|firebaseapp\.com)$/.test(location.hostname);
 export const ASSET_BASE = (ASSETS_FROM_GITHUB && ON_FIREBASE_HOSTING) ? "https://processadigitalstudio.github.io/twtest/" : "";
