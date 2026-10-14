@@ -350,7 +350,8 @@ function progressSnapshot() {
   return {
     sectionIndex: state.sectionIndex, pageIndex: state.pageIndex,
     sectionStartTimes: state.sectionStartTimes, sectionInstructionShown: state.sectionInstructionShown,
-    audioPlayCounts: state.audioPlayCounts
+    audioPlayCounts: state.audioPlayCounts,
+    ...((state.onlySection !== undefined && state.onlySection !== null) ? { onlySection: state.onlySection } : {})
   };
 }
 
@@ -392,6 +393,7 @@ function applyResumeIfAny() {
       sectionStartTimes: pr.sectionStartTimes || {}, responses: rs.responses || {},
       audioPlayCounts: pr.audioPlayCounts || {}, startTimeMs: state ? state.startTimeMs : Date.now()
     };
+    if (pr.onlySection !== undefined && pr.onlySection !== null) state.onlySection = pr.onlySection;
   }
   const idx = state.sectionIndex;
   if (rs.remainingMs !== undefined && rs.remainingMs !== null && state.sectionStartTimes[idx] !== undefined) {
@@ -652,6 +654,11 @@ async function boot() {
 }
 
 function currentSection() { return state.plan.sections[state.sectionIndex]; }
+// Última prueba de ESTE intento: normalmente Listening; si la administradora le repite una sola prueba, esa misma.
+function isFinalSection() {
+  const only = state.onlySection;
+  return (only !== undefined && only !== null) ? state.sectionIndex === only : state.sectionIndex === state.plan.sections.length - 1;
+}
 function pagesInSection(section) { return section.kind === "items" ? section.items.length : section.groups.length; }
 function totalPages() { return state.plan.sections.reduce((sum, s) => sum + pagesInSection(s), 0); }
 function pagesDoneBefore() {
@@ -737,7 +744,7 @@ function renderSectionIntro() {
   const section = currentSection();
   const f = sectionFacts(section);
   const info = SECTION_TEXT[uiLang][section.name](f);
-  const isLast = state.sectionIndex === state.plan.sections.length - 1;
+  const isLast = isFinalSection();
   document.getElementById("sectionEyebrow").textContent = `${t.secEyebrow} · ${t.secOf(state.sectionIndex + 1)}`;
   document.getElementById("sectionTitle").textContent = t.names[section.name];
   document.getElementById("sectionBody").innerHTML = `
@@ -1053,7 +1060,7 @@ async function goNext() {
 
   const sIdx = state.sectionIndex, pIdx = state.pageIndex;
   const isLastPageOfSection = pIdx === pagesInSection(section) - 1;
-  const isLastSection = sIdx === state.plan.sections.length - 1;
+  const isLastSection = isFinalSection();
 
   if (isLastPageOfSection) {
     const startMs = state.sectionStartTimes[state.sectionIndex];
@@ -1163,7 +1170,7 @@ async function forceAdvanceSection(expectedIdx) {
   logSectionTiming(state.sessionId, section.name, elapsedSeconds, true);
   tryLog("section_timeout", { section: section.name });
 
-  const isLastSection = state.sectionIndex === state.plan.sections.length - 1;
+  const isLastSection = isFinalSection();
   if (isLastSection) {
     saveAnswersOf(sIdx, pIdx);
     await submitExam();

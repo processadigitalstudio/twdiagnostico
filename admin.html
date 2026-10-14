@@ -447,11 +447,11 @@ function renderDetail() {
     <br><button class="btn-secondary" id="dAdd" style="margin-top:8px;">Agregar a la lista</button>
 
     <h4 style="margin-top:24px;">Estudiantes (${mine.length})</h4>
-    <p class="muted">Si a alguien se le va la luz o el internet y su examen se cierra: <strong>↻ repetir prueba</strong> (lo normal): vuelve a empezar solo la prueba en curso, con preguntas nuevas al azar y reloj completo; las pruebas anteriores se conservan. <strong>▶ continuar</strong>: sigue donde iba con los minutos que tú le fijes (para cortes que no fueron su culpa). <strong>↺ examen nuevo</strong>: descarta todo y empieza un examen nuevo. Todo sirve en el mismo u otro equipo. <strong>quitar</strong>: lo saca de la lista.</p>
+    <p class="muted">Si a alguien se le va la luz o el internet y su examen se cierra: <strong>↻ Language Use / Reading / Listening</strong>: repite SOLO esa prueba, con preguntas nuevas al azar y reloj completo; las demás pruebas se conservan. Si el estudiante ya había terminado, solo repite esa prueba y su resultado se recalcula al terminar. <strong>▶ continuar</strong>: sigue donde iba con los minutos que tú le fijes (para cortes que no fueron su culpa). <strong>↺ examen nuevo</strong>: descarta todo y empieza un examen nuevo. Todo sirve en el mismo u otro equipo. <strong>quitar</strong>: lo saca de la lista.</p>
     <table class="admin-table">
       <thead><tr><th>Nombre</th><th>Cédula</th><th>Correo</th><th>Nivel</th><th>Estado</th><th></th></tr></thead>
       <tbody>${mine.map(p => `<tr><td>${esc(p.name)}</td><td class="mono">${esc(p.cedula)}</td><td style="font-size:.85rem;">${esc(p.email || "—")}</td><td>${esc(p.nivel || "—")}</td><td>${labels[p.status] || p.status}</td>
-        <td>${["in_progress", "closed"].includes(p.status) ? `<span class="toggle-detail" data-sect="${p.id}" style="margin-right:10px;">↻ repetir prueba</span><span class="toggle-detail" data-resume="${p.id}" style="margin-right:10px;">▶ continuar</span>` : ""}${p.status !== "not_started" ? `<span class="toggle-detail" data-restart="${p.id}" style="margin-right:10px;">↺ examen nuevo</span>` : ""}<span class="toggle-detail" data-delpart="${p.id}" style="color:var(--bad);">quitar</span></td></tr>`).join("")}</tbody>
+        <td>${p.status !== "not_started" ? `<div style="margin-bottom:3px;">${sectButtons(p.id)}</div>` : ""}${["in_progress", "closed"].includes(p.status) ? `<span class="toggle-detail" data-resume="${p.id}" style="margin-right:10px;">▶ continuar</span>` : ""}${p.status !== "not_started" ? `<span class="toggle-detail" data-restart="${p.id}" style="margin-right:10px;">↺ examen nuevo</span>` : ""}<span class="toggle-detail" data-delpart="${p.id}" style="color:var(--bad);">quitar</span></td></tr>`).join("")}</tbody>
     </table>`;
 
   const msg = (t) => { document.getElementById("dMsg").textContent = t; };
@@ -490,7 +490,6 @@ function renderDetail() {
     await loadGroups();
   };
   box.querySelectorAll("[data-resume]").forEach(el => el.addEventListener("click", () => resumeParticipant(el.dataset.resume)));
-  box.querySelectorAll("[data-sect]").forEach(el => el.addEventListener("click", () => restartSectionOf(el.dataset.sect)));
   box.querySelectorAll("[data-restart]").forEach(el => el.addEventListener("click", () => restartParticipant(el.dataset.restart)));
   box.querySelectorAll("[data-delpart]").forEach(el => el.addEventListener("click", async () => {
     if (!confirm("¿Quitar a esta persona de la lista?")) return;
@@ -542,19 +541,28 @@ async function resumeParticipant(pid) {
   await loadGroups();
 }
 
-// ↻ Repetir la prueba en curso: se descartan las respuestas de ESA prueba, recibe preguntas nuevas al azar y el reloj completo.
-// Las pruebas anteriores se conservan. Sirve en el mismo u otro equipo.
-async function restartSectionOf(pid) {
+// ↻ Repetir UNA prueba (Language Use, Reading o Listening): se descartan las respuestas de ESA prueba, recibe preguntas
+// nuevas al azar y el reloj completo. Las demás pruebas se conservan. Sirve en el mismo u otro equipo.
+//  · Si el estudiante ya había TERMINADO el examen, solo repite esa prueba y al acabarla su resultado se recalcula.
+//  · Si sigue en curso, repite esa prueba y después continúa con las siguientes (con reloj nuevo).
+const SECTION_ORDER = ["UoL", "Reading", "Listening"];
+async function restartSectionOf(pid, forcedIdx) {
   const p = partsCache.find(x => x.id === pid);
   const s = await latestAttempt(pid);
-  if (!s || s.status === "completed") { alert("No hay un intento en curso. Si quieres darle un examen nuevo usa «↺ examen nuevo»."); return; }
+  if (!s) { alert("Este estudiante no tiene un intento. Si quieres darle un examen nuevo usa «↺ examen nuevo»."); return; }
   if (!s.planJson) { alert("Este intento es de una versión anterior y no guardó el examen completo. Usa «↺ examen nuevo»."); return; }
   const pr = s.progress || {};
-  const idx = pr.sectionIndex || 0;
+  const completed = s.status === "completed";
   const plan = JSON.parse(s.planJson);
+  const idx = forcedIdx !== undefined && forcedIdx !== null ? Number(forcedIdx) : (pr.sectionIndex || 0);
   const oldSec = plan.sections[idx];
+  if (!oldSec) { alert("No se encontró esa prueba en el examen de este estudiante."); return; }
   const mins = SECTION_DURATIONS_MIN[oldSec.name];
-  if (!confirm(`¿Repetir ${SKILL_LABELS[oldSec.name]} para ${p?.name || "este estudiante"}?\n\nSe descartan sus respuestas de esa prueba, recibe preguntas NUEVAS al azar y un reloj completo de ${mins} min. Las pruebas anteriores se conservan.`)) return;
+  const who = p?.name || "este estudiante";
+  const detail = completed
+    ? `${who} ya había terminado. Repite SOLO ${SKILL_LABELS[oldSec.name]}: se descartan sus respuestas de esa prueba, recibe preguntas NUEVAS al azar y un reloj completo de ${mins} min. Las otras pruebas se conservan y su resultado se recalcula cuando termine.`
+    : `Se descartan sus respuestas de ${SKILL_LABELS[oldSec.name]}, recibe preguntas NUEVAS al azar y un reloj completo de ${mins} min. Después continúa con las pruebas siguientes (con reloj nuevo). Las pruebas anteriores se conservan.`;
+  if (!confirm(`¿Repetir ${SKILL_LABELS[oldSec.name]} para ${who}?\n\n${detail}`)) return;
   const banks = await loadAllBanks();
   const fresh = buildExamPlan(banks, p?.cedula || "x");
   const oldIds = new Set(oldSec.kind === "items" ? oldSec.items.map(q => q.id) : oldSec.groups.flatMap(g => g.questions.map(q => q.id)));
@@ -562,20 +570,60 @@ async function restartSectionOf(pid) {
   const planJson = JSON.stringify(plan);
   const responses = {};
   for (const [id, r] of Object.entries(s.responses || {})) if (!oldIds.has(id)) responses[id] = { ...r };
-  const shown = [...(pr.sectionInstructionShown || [false, false, false])]; shown[idx] = false;
-  const starts = { ...(pr.sectionStartTimes || {}) }; delete starts[idx];
-  const progress = { sectionIndex: idx, pageIndex: 0, sectionStartTimes: starts, sectionInstructionShown: shown, audioPlayCounts: pr.audioPlayCounts || {} };
+  const shown = [...(pr.sectionInstructionShown || [false, false, false])];
+  const starts = { ...(pr.sectionStartTimes || {}) };
+  shown[idx] = false; delete starts[idx];
+  for (let j = idx + 1; j < plan.sections.length; j++) { shown[j] = false; delete starts[j]; }       // las siguientes arrancan con reloj nuevo
+  const counts = { ...(pr.audioPlayCounts || {}) };
+  for (const g of [...(oldSec.groups || []), ...(fresh.sections[idx].groups || [])]) if (g.audioId) delete counts[g.audioId];   // reproducciones de audio como nuevas
+  const progress = { sectionIndex: idx, pageIndex: 0, sectionStartTimes: starts, sectionInstructionShown: shown, audioPlayCounts: counts };
+  if (completed) progress.onlySection = idx;                                                         // al terminar esta prueba, se envía el examen
   const itemIds = allItemIdsFromPlan(plan);
   const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
   const payloadResponses = {};
   for (const [id, r] of Object.entries(responses)) payloadResponses[id] = { selected: r.selected, timeMs: r.timeMs || 0 };
-  await updateDoc(doc(db, "sessions", s.id), { status: "in_progress", planJson, itemIds, responses, progress, reopenedAt: serverTimestamp(), reopenCount: (s.reopenCount || 0) + 1, sectionRestarts: (s.sectionRestarts || 0) + 1 });
+  const sessionPatch = { status: "in_progress", planJson, itemIds, responses, progress, reopenedAt: serverTimestamp(), reopenCount: (s.reopenCount || 0) + 1, sectionRestarts: (s.sectionRestarts || 0) + 1 };
+  if (completed) sessionPatch.resultDelivery = { status: "pending" };                                // se vuelve a calificar y publicar al terminar
+  await updateDoc(doc(db, "sessions", s.id), sessionPatch);
+  if (completed) { try { await deleteDoc(doc(db, "results", s.id)); } catch (e) { console.warn(e); } }   // el resultado anterior ya no es válido
   await updateDoc(doc(db, "participants", pid), {
     status: "in_progress", resumeConsumed: null,
     resume: { token, mode: "restart-section", sessionId: s.id, planJson, progress, responses: payloadResponses, remainingMs: null, grantedAtMs: Date.now() }
   });
-  alert(`Listo. ${p?.name || "El estudiante"} entra otra vez con su cédula y la contraseña de la sesión (en este u otro equipo) y repite ${SKILL_LABELS[oldSec.name]} con preguntas nuevas.`);
+  alert(`Listo. ${who} entra otra vez con su cédula y la contraseña de la sesión (en este u otro equipo) y repite ${SKILL_LABELS[oldSec.name]} con preguntas nuevas${completed ? ". Al terminarla se recalcula su resultado (con este panel abierto)." : "."}`);
   await loadGroups();
+}
+
+// Botones «↻ Language Use · Reading · Listening» para repetir una prueba en particular
+function sectButtons(pid, skillCov) {
+  return SECTION_ORDER.map((k, i) => {
+    const c = skillCov ? skillCov.find(x => x.name === k) : null;
+    const zero = c && c.answered === 0;
+    return `<span class="toggle-detail" onclick="restartSectionOf('${pid}', ${i})" style="${zero ? "color:var(--bad); font-weight:800;" : ""}" title="Repetir ${SKILL_LABELS[k]}">↻ ${SKILL_LABELS[k]}</span>`;
+  }).join(" &nbsp; ");
+}
+// Cuántas preguntas de cada prueba tiene contestadas un intento (para ver quién se saltó una)
+const _covCache = new Map();
+function skillCoverage(s) {
+  if (!s || !s.planJson) return null;
+  const key = s.id + ":" + s.planJson.length;
+  let secs = _covCache.get(key);
+  if (!secs) {
+    const plan = JSON.parse(s.planJson);
+    secs = plan.sections.map(sec => ({ name: sec.name, ids: sec.kind === "items" ? sec.items.map(q => q.id) : sec.groups.flatMap(g => g.questions.map(q => q.id)) }));
+    _covCache.set(key, secs);
+  }
+  const resp = s.responses || {};
+  return secs.map(sec => ({ name: sec.name, answered: sec.ids.filter(id => resp[id]).length, total: sec.ids.length }));
+}
+function covChips(cov) {
+  if (!cov) return "";
+  const lastWith = Math.max(-1, ...cov.map((c, i) => c.answered > 0 ? i : -1));
+  return `<div class="sub" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">${cov.map((c, i) => {
+    const bad = c.answered === 0 && i < lastWith;
+    const short = { UoL: "LU", Reading: "Reading", Listening: "Listening" }[c.name];
+    return `<span style="padding:1px 7px; border-radius:8px; border:1.5px solid ${bad ? "var(--bad)" : "var(--line)"}; ${bad ? "color:var(--bad); font-weight:800;" : ""}">${short} ${c.answered}/${c.total}</span>`;
+  }).join("")}</div>`;
 }
 
 // ↺ Reiniciar: se descarta el intento y empieza un examen nuevo
@@ -707,15 +755,19 @@ function renderBoard() {
     const warn = closed ? `<div class="sub" style="color:var(--bad); font-weight:800;">⛔ Cerrado por interrupción</div>`
       : (idle !== null && idle >= 6 ? `<div class="sub" style="color:var(--sev-med); font-weight:800;">⚠ sin guardar hace ${idle} min</div>` : "");
     return `<div class="board-card" style="${closed ? "border-color:var(--bad);" : ""}"><b>${esc(p.name)}</b>${sev(s?.suspiciousEvents)}<div class="sub mono">${esc(p.cedula)}${lvl(p)}${mins !== null ? " · " + mins + " min" : ""}</div>${warn}
-      <div class="progress-mini" style="width:100%; margin-top:6px;"><div style="width:${Math.round(answered / total * 100)}%;"></div></div><div class="sub">${answered}/${total} respuestas guardadas</div>
-      <div style="margin-top:6px;"><span class="toggle-detail" onclick="restartSectionOf('${p.id}')">↻ repetir esta prueba</span> &nbsp; <span class="toggle-detail" onclick="resumeParticipant('${p.id}')">▶ continuar</span> &nbsp; <span class="toggle-detail" onclick="restartParticipant('${p.id}')" style="color:var(--ink-soft);">↺ examen nuevo</span></div></div>`;
+      <div class="progress-mini" style="width:100%; margin-top:6px;"><div style="width:${Math.round(answered / total * 100)}%;"></div></div><div class="sub">${answered}/${total} respuestas guardadas</div>${covChips(skillCoverage(s))}
+      <div style="margin-top:6px;">${sectButtons(p.id, skillCoverage(s))}</div>
+      <div style="margin-top:4px;"><span class="toggle-detail" onclick="resumeParticipant('${p.id}')">▶ continuar</span> &nbsp; <span class="toggle-detail" onclick="restartParticipant('${p.id}')" style="color:var(--ink-soft);">↺ examen nuevo</span></div></div>`;
   }).join("") || `<div class="muted">—</div>`;
   document.getElementById("colDone").innerHTML = cols.completed.map(p => {
     const s = byPart[p.id];
     let res = "";
     if (s && answerKey) { try { const r = computeSessionResults(s, answerKey); res = ` · <b>${r.level}</b> · ${r.finalScore}`; } catch (e) {} }
     const pub = s?.resultDelivery?.status === "published" ? "" : (s ? " · ⏳ sin publicar" : "");
-    return `<div class="board-card"><b>${esc(p.name)}</b>${sev(s?.suspiciousEvents)}<div class="sub mono">${esc(p.cedula)}${res}${pub}</div></div>`;
+    const cov = skillCoverage(s);
+    let pcts = "";
+    if (s && answerKey) { try { const r = computeSessionResults(s, answerKey); pcts = `<div class="sub" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">${["UoL", "Reading", "Listening"].map(k => { const v = Math.round(r.pct[k]); const c = cov && cov.find(x => x.name === k); const zero = v === 0 || (c && c.answered === 0); return `<span style="padding:1px 7px; border-radius:8px; border:1.5px solid ${zero ? "var(--bad)" : "var(--line)"}; ${zero ? "color:var(--bad); font-weight:800;" : ""}">${{ UoL: "LU", Reading: "Reading", Listening: "Listening" }[k]} ${v}%</span>`; }).join("")}</div>`; } catch (e) {} }
+    return `<div class="board-card"><b>${esc(p.name)}</b>${sev(s?.suspiciousEvents)}<div class="sub mono">${esc(p.cedula)}${res}${pub}</div>${pcts}<div style="margin-top:6px;">${sectButtons(p.id, cov)}</div></div>`;
   }).join("") || `<div class="muted">—</div>`;
   document.getElementById("cntNot").textContent = cols.not_started.length;
   document.getElementById("cntProg").textContent = cols.in_progress.length;
