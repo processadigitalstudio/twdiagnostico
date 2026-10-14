@@ -855,3 +855,4 @@ html.zn .exam-body { padding: 24px 16px 60px 16px; }
 }
 .size-ctl button:hover:not(:disabled) { background: #E9F4F0; color: var(--teal-dark); }
 .size-ctl button:disabled { opacity: .35; cursor: default; }
+.route-start { margin: 10px 0 0; padding: 8px 12px; border-radius: 10px; background: #E8F5F0; color: var(--teal-dark); font-size: .98rem; }
