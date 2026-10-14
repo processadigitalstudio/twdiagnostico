@@ -832,3 +832,26 @@ input[readonly] { background: #EFEBDF; color: var(--ink-soft); }
 .cta-box.cta-only h3 { margin: 0 0 14px; font-size: 1.35rem; }
 .cta-box.cta-only .cta-btn { margin-top: 0; background: #fff; color: var(--ink); font-size: 1.15rem; padding: 14px 40px; border-radius: 12px; box-shadow: 0 3px 0 rgba(0,0,0,.25); }
 .cta-box.cta-only .cta-btn:hover { background: #F3F1EA; filter: none; }
+
+/* ---------- Accesibilidad: escala automática por pantalla + botones A− A A+ (js/a11y-scale.js) ---------- */
+:root { --z: 1; }
+.exam-shell { zoom: var(--z); min-height: calc(100vh / var(--z)); }
+.integrity-card { zoom: var(--z); max-height: calc(85vh / var(--z)); }
+.hard-block .msg { zoom: var(--z); }
+.split-media { max-height: calc(100vh / var(--z) - 130px); }
+html.zn .split-layout { flex-direction: column; }
+html.zn .split-media { position: static; max-height: none; order: -1; }
+html.zn .exam-body { padding: 24px 16px 60px 16px; }
+
+.size-ctl {
+  position: fixed; left: 14px; bottom: 14px; z-index: 1500;
+  display: flex; gap: 2px; padding: 3px; border-radius: 12px;
+  background: rgba(255,255,255,.96); border: 1.5px solid var(--line); box-shadow: 0 2px 10px rgba(44,61,77,.18);
+  font-family: Arial, Helvetica, sans-serif;
+}
+.size-ctl button {
+  min-width: 40px; height: 36px; padding: 0 8px; border: 0; border-radius: 9px; background: transparent;
+  color: var(--ink); font-weight: 700; font-size: 15px; cursor: pointer; line-height: 1;
+}
+.size-ctl button:hover:not(:disabled) { background: #E9F4F0; color: var(--teal-dark); }
+.size-ctl button:disabled { opacity: .35; cursor: default; }
