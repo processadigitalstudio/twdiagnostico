@@ -66,7 +66,7 @@ if (!sessionId) {
 function routeCardHtml(key, card, recommended) {
   const li = (arr) => arr.map(x => `<li>${esc(x)}</li>`).join("");
   const dl = (rows) => rows.map(([a, b]) => `<div><dt>${esc(a)}</dt><dd>${esc(b)}</dd></div>`).join("");
-  const isMe = (lv) => lv === card.highlightPrice || (card.highlightPrice === "B1" && lv === "B1.1");
+  const isMe = (lv) => lv === card.highlightPrice;
   const prices = card.highlightPrice !== undefined
     ? `<div class="route-price-grid">${card.price.map(([lv, v]) => `<span class="${isMe(lv) ? "me" : ""}"><b>${esc(lv)}</b> ${esc(v)}</span>`).join("")}</div>`
     : `<dl class="route-dl">${dl(card.price)}</dl>`;
@@ -76,6 +76,7 @@ function routeCardHtml(key, card, recommended) {
     <h4>${esc(card.title)}</h4>
     <p>${esc(card.what)}</p>
     <ul>${li(card.facts)}</ul>
+    ${card.startNote ? `<p class="route-start"><b>${esc(card.startNote)}</b></p>` : ""}
     <div class="route-sub">${esc(card.priceTitle || "Valor")}</div>${prices}
     <div class="route-sub">Fechas</div>${card.dateGroups
       ? card.dateGroups.map(g => `<div class="route-grp">${esc(g.title)}</div><dl class="route-dl">${dl(g.rows)}</dl>`).join("")
