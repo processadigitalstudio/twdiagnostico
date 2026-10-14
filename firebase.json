@@ -10,7 +10,9 @@
       "serviceAccountKey.json",
       "scripts/**",
       "README.md",
-      "firestore.rules"
+      "firestore.rules",
+      "audio/**",
+      "img/*.webp"
     ],
     "headers": [
       {

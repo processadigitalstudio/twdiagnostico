@@ -68,11 +68,11 @@ export const ENABLE_WATERMARK = true;       // marca de agua con nombre y docume
 export const MAX_EVENTS_PER_SESSION = 150;  // tope de eventos sospechosos guardados por estudiante
 
 // ---------- Dónde están los audios e imágenes ----------
-// Todo sale del MISMO sitio (twtest.web.app): así el estudiante nunca ve otra dirección (ni la del repositorio).
-// OJO: los audios pesan ~7 MB por estudiante; el plan gratis de Firebase Hosting (Spark) permite 360 MB al día (~50 estudiantes).
-// Para 200+ estudiantes el proyecto debe estar en el plan Blaze (con alerta de presupuesto, el costo es de centavos).
-// Si NO se pasa a Blaze, poner ASSETS_FROM_GITHUB = true y volver a poner "audio/**" e "img/*.webp" en "ignore" de firebase.json.
-const ASSETS_FROM_GITHUB = false;
+// Plan gratis de Firebase Hosting (Spark): 360 MB de descarga al día. Cada estudiante baja ~7 MB (casi todo audio),
+// así que en twtest.web.app solo se sirve la aplicación (~0.5 MB por estudiante) y los audios/imágenes grandes salen
+// de GitHub Pages (sin tope diario). Cuando el proyecto pase al plan Blaze (de pago), poner ASSETS_FROM_GITHUB = false
+// y quitar "audio/**" e "img/*.webp" de "ignore" en firebase.json: todo saldrá de twtest.web.app.
+const ASSETS_FROM_GITHUB = true;
 const ON_FIREBASE_HOSTING = /\.(web\.app|firebaseapp\.com)$/.test(location.hostname);
 export const ASSET_BASE = (ASSETS_FROM_GITHUB && ON_FIREBASE_HOSTING) ? "https://processadigitalstudio.github.io/twtest/" : "";
 export const assetUrl = (path) => ASSET_BASE + path;
