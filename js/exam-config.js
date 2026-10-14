@@ -66,3 +66,10 @@ export function scoreToLevel(pct) {
 export const REQUIRE_FULLSCREEN = true;     // pide pantalla completa y bloquea si la abandonan
 export const ENABLE_WATERMARK = true;       // marca de agua con nombre y documento en cada pantalla
 export const MAX_EVENTS_PER_SESSION = 150;  // tope de eventos sospechosos guardados por estudiante
+
+// ---------- Dónde están los audios e imágenes ----------
+// En Firebase Hosting gratis (twtest.web.app) el tráfico diario es limitado, así que allí los audios e
+// imágenes (los archivos pesados) se sirven desde GitHub Pages. En cualquier otro dominio salen del mismo sitio.
+const ON_FIREBASE_HOSTING = /\.(web\.app|firebaseapp\.com)$/.test(location.hostname);
+export const ASSET_BASE = ON_FIREBASE_HOSTING ? "https://processadigitalstudio.github.io/twdiagnostico/" : "";
+export const assetUrl = (path) => ASSET_BASE + path;

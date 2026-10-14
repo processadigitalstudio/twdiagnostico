@@ -73,7 +73,7 @@
 
 <script type="module">
 import { loadAllBanks, buildExamPlan, createSession, recordAnswers, finishSession, logSuspiciousEvent, logSectionTiming } from "./js/exam-engine.js";
-import { SECTION_DURATIONS_MIN, MAX_AUDIO_PLAYS, WEIGHTS, LEVEL_CUTS, REQUIRE_FULLSCREEN, ENABLE_WATERMARK, UOL_TOTAL_POINTS, READING_POINTS_PER_TEXT, LISTENING_POINTS_PER_AUDIO } from "./js/exam-config.js";
+import { assetUrl, SECTION_DURATIONS_MIN, MAX_AUDIO_PLAYS, WEIGHTS, LEVEL_CUTS, REQUIRE_FULLSCREEN, ENABLE_WATERMARK, UOL_TOTAL_POINTS, READING_POINTS_PER_TEXT, LISTENING_POINTS_PER_AUDIO } from "./js/exam-config.js";
 import { resolveInstitution, renderBrand } from "./js/institutions.js";
 
 const username = sessionStorage.getItem("username");
@@ -553,7 +553,8 @@ function escapeHtml(t) {
 }
 
 // Imagen con zoom dentro de la misma página (no abre otra pestaña: eso se registraría como salida del examen)
-function imageBlock(src, alt) {
+function imageBlock(rawSrc, alt) {
+  const src = assetUrl(rawSrc);
   const box = document.createElement("div");
   box.className = "image-box";
   const img = document.createElement("img");
@@ -616,7 +617,7 @@ function buildAudioPlayer(group) {
 
   const audio = new Audio();
   audio.preload = "auto";
-  audio.src = `audio/${group.audioId}.mp3`;
+  audio.src = assetUrl(`audio/${group.audioId}.mp3`);
 
   const controls = document.createElement("div");
   controls.className = "audio-controls";

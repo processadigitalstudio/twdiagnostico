@@ -3,21 +3,70 @@
     "public": ".",
     "cleanUrls": false,
     "ignore": [
-      "firebase.json", "**/.*", "**/node_modules/**",
-      "answer_key_PRIVADO_NO_SUBIR.json", "serviceAccountKey.json",
-      "scripts/**", "README.md", "firestore.rules"
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "answer_key_PRIVADO_NO_SUBIR.json",
+      "serviceAccountKey.json",
+      "scripts/**",
+      "README.md",
+      "firestore.rules",
+      "audio/**",
+      "img/*.webp"
     ],
     "headers": [
-      { "source": "**/*.@(html|js|json|css)", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
-      { "source": "audio/**", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }] },
-      { "source": "img/**", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }] },
-      { "source": "**", "headers": [
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "no-referrer" },
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
-      ] }
-    ]
+      {
+        "source": "**/*.@(html|js|json|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "audio/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400"
+          }
+        ]
+      },
+      {
+        "source": "img/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400"
+          }
+        ]
+      },
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "X-Frame-Options",
+            "value": "DENY"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "no-referrer"
+          },
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, nofollow"
+          }
+        ]
+      }
+    ],
+    "site": "twtest"
   },
-  "firestore": { "rules": "firestore.rules" }
+  "firestore": {
+    "rules": "firestore.rules"
+  }
 }
