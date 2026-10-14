@@ -178,7 +178,7 @@ const fmtDate = (ms) => new Date(ms).toLocaleString("es-CO", { weekday: "long", 
 
 export async function loginToGroup({ cedula, password }) {
   const ced = normalizeCedula(cedula);
-  if (ced.length < 5) return { ok: false, reason: "Escribe tu número de cédula (solo números)." };
+  if (ced.length < 5) return { ok: false, reason: "Escribe tu username." };
   if (!String(password || "").trim()) return { ok: false, reason: "Escribe la contraseña de la sesión." };
 
   const groupId = await groupIdFromPassword(password);
@@ -187,7 +187,7 @@ export async function loginToGroup({ cedula, password }) {
   const group = gSnap.data();
   const pid = participantIdOf(groupId, ced);
   const pSnap = await getDoc(doc(db, "participants", pid));
-  if (!pSnap.exists()) return { ok: false, reason: "Tu cédula no está registrada en esta sesión. Avisa al supervisor." };
+  if (!pSnap.exists()) return { ok: false, reason: "Tu username no está registrado en esta sesión. Avisa al supervisor." };
   const part = pSnap.data();
 
   let hasLocal = false;
@@ -196,7 +196,7 @@ export async function loginToGroup({ cedula, password }) {
   // Una reapertura de la administradora (con otra reanudación pendiente de usar) permite continuar desde cualquier equipo.
   const rs = part.resume && part.resume.token && part.resumeConsumed !== part.resume.token ? part.resume : null;
 
-  if (part.status === "completed") return { ok: false, reason: "Esta cédula ya presentó el examen." };
+  if (part.status === "completed") return { ok: false, reason: "Este username ya presentó el examen." };
   if (part.status === "closed") return { ok: false, reason: "Tu examen se cerró por una interrupción (se acabó el tiempo, se fue la luz o se cerró la ventana). Avisa al supervisor: él te deja repetir la prueba en curso." };
   if (part.status === "in_progress") {
     if (!hasLocal && !rs) return { ok: false, reason: "Este examen ya está en curso en otro equipo o navegador. Avisa al supervisor." };
