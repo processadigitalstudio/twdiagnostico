@@ -2,9 +2,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // SOLO la administradora. Reemplaza el valor por TU uid (Firebase Console → Authentication → Users → "User UID").
+    // SOLO la administradora (UID del usuario admin en Firebase Authentication).
     function isAdmin() {
-      return request.auth != null && request.auth.uid == 'PEGA_AQUI_TU_UID';
+      return request.auth != null && request.auth.uid == 'UIsTtqPwumUidDNfbvCQqbCUpbx1';
     }
 
     // Usuario del estudiante: se lee SOLO conociendo el usuario (no se puede listar). Contiene el hash de la
