@@ -135,17 +135,28 @@ function tryLog(type, meta) {
 
 const focusBlurOverlay = document.getElementById("focusBlurOverlay");
 let flashTimer = null;
+let flashUntil = 0;                    // hasta cuándo debe seguir oculto por una captura/impresión
 function lockView() { focusBlurOverlay.classList.remove("hidden"); document.body.classList.add("exam-locked"); }
-function unlockView() {
-  if (document.hidden || !document.hasFocus()) return;          // sigue oculto mientras la ventana no tenga el foco
+function unlockView(force) {
+  if (document.hidden) return;                                   // pestaña oculta: sigue bloqueado
+  if (Date.now() < flashUntil) return;                           // todavía dentro del tiempo de una captura
+  if (!force && !document.hasFocus()) return;                    // sigue oculto mientras la ventana no tenga el foco
   focusBlurOverlay.classList.add("hidden"); document.body.classList.remove("exam-locked");
 }
 // Oculta (blur) el contenido un momento: ante teclas de captura, impresión, etc.
 function flashBlur(ms = 2500) {
   lockView();
+  flashUntil = Math.max(flashUntil, Date.now() + ms);
   clearTimeout(flashTimer);
-  flashTimer = setTimeout(unlockView, ms);
+  flashTimer = setTimeout(() => unlockView(), ms + 50);
 }
+// Al volver a la ventana (tras una captura, por ejemplo) el navegador a veces no avisa del foco: se desbloquea solo,
+// o con cualquier clic / tecla / movimiento del mouse sobre el aviso.
+focusBlurOverlay.addEventListener("pointerdown", () => { window.focus(); unlockView(true); });
+focusBlurOverlay.addEventListener("click", () => { window.focus(); unlockView(true); });
+window.addEventListener("mousemove", () => { if (examRunning && !focusBlurOverlay.classList.contains("hidden") && document.hasFocus()) unlockView(); }, { passive: true });
+window.addEventListener("keydown", () => { if (examRunning && !focusBlurOverlay.classList.contains("hidden") && document.hasFocus()) unlockView(); }, true);
+setInterval(() => { if (examRunning && !focusBlurOverlay.classList.contains("hidden") && document.hasFocus()) unlockView(); }, 500);
 
 document.addEventListener("copy", (e) => { e.preventDefault(); try { e.clipboardData.setData("text/plain", ""); } catch (_) {} tryLog("copy_attempt"); });
 document.addEventListener("cut", (e) => { e.preventDefault(); tryLog("cut_attempt"); });
@@ -401,7 +412,7 @@ let uiLang = "en";                       // las instrucciones salen en inglés; 
 const T = {
   es: {
     toggle: "Read in English", eyebrow: "Antes de empezar", hello: "Hola", title: "Así funciona tu examen",
-    intro: "Este examen diagnóstico ubica tu nivel de inglés según el Marco Común Europeo de Referencia (MCER): A1, A2, B1 o B2. Tiene tres pruebas, cada una con su propio reloj.",
+    intro: "Este examen diagnóstico ubica tu nivel de inglés según el Marco Común Europeo de Referencia (MCER): A1, A2, B1 o B2. Tiene tres pruebas, cada una con su propio reloj. Este examen es válido para el periodo académico <b>2026-2</b>.",
     thSection: "Prueba", thItems: "Preguntas", thTime: "Tiempo", thPoints: "Puntos",
     scoringTitle: "Cómo se califica",
     scoring: (w) => `<ul><li>El examen suma <b>100 puntos</b>: Language Use ${w.u}, Reading Comprehension ${w.r} y Listening Comprehension ${w.l}.</li>
@@ -428,7 +439,7 @@ const T = {
   },
   en: {
     toggle: "Leer en español", eyebrow: "Before you start", hello: "Hello", title: "How your exam works",
-    intro: "This diagnostic exam places your English level on the Common European Framework of Reference (CEFR): A1, A2, B1 or B2. It has three sections, each with its own clock.",
+    intro: "This diagnostic exam places your English level on the Common European Framework of Reference (CEFR): A1, A2, B1 or B2. It has three sections, each with its own clock. This exam is valid for the <b>2026-2</b> academic term.",
     thSection: "Section", thItems: "Questions", thTime: "Time", thPoints: "Points",
     scoringTitle: "How it is scored",
     scoring: (w) => `<ul><li>The exam adds up to <b>100 points</b>: Language Use ${w.u}, Reading Comprehension ${w.r} and Listening Comprehension ${w.l}.</li>
