@@ -821,10 +821,13 @@ input[readonly] { background: #EFEBDF; color: var(--ink-soft); }
 .email-msg { margin-top: 8px; font-size: .92rem; min-height: 1.2em; } .email-msg.ok { color: var(--teal-dark); font-weight: 700; } .email-msg.err { color: #B3261E; font-weight: 700; }
 
 /* ---------- Reading: opciones sin caja ---------- */
-.reading-layout .option, .reading-layout .option:hover, .reading-layout .option.selected {
+.exam-body .option, .exam-body .option:hover, .exam-body .option.selected {
   border: 0; background: transparent; box-shadow: none; border-radius: 0; padding: 5px 2px; margin: 0; gap: 12px;
 }
-.reading-layout .option.selected .opt-text { font-weight: 800; color: var(--teal-dark); }
-.reading-layout .option:hover .opt-text { color: var(--teal-dark); }
-.reading-layout .options { gap: 0; }
-.reading-layout .q-block { margin-bottom: 22px; }
+.exam-body .option.selected .opt-text { font-weight: 800; color: var(--teal-dark); }
+.exam-body .option:hover .opt-text { color: var(--teal-dark); }
+.exam-body .options { gap: 0; }
+.exam-body .q-block { margin-bottom: 22px; }
+
+.route-grp { margin-top: 8px; font-weight: 800; font-size: .95rem; color: var(--ink); }
+.route-pay { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: #E8F5F0; font-size: .95rem; font-weight: 700; }

@@ -47,6 +47,9 @@ const CERT_DATES = {
   ]
 };
 
+// Correo para dudas y facilidades de pago
+export const CONTACT_EMAIL = "info.eam@tweetalig.edu.co";
+
 export const INTENSIVE_PRICES = [
   ["A1", "$958.725"], ["A2", "$958.725"], ["B1.1", "$861.600"], ["B1.2", "$1.045.125"], ["B2", "$1.045.125"]
 ];
@@ -82,12 +85,21 @@ export function routeCards(level, institutionSlug) {
       priceTitle: "Valores con 20% de descuento para estudiantes",
       price: INTENSIVE_PRICES,
       highlightPrice: level,                      // se resalta el nivel donde empieza el estudiante
-      dates: [
-        ["Inscripciones y pagos (Ciclo 4 súper intensivo)", "18 de noviembre al 9 de diciembre de 2026"],
-        ["Inducción", "11 de diciembre de 2026"],
-        ["Inicio de clases", "14 de diciembre de 2026"],
-        ["Fin de clases y exámenes finales", "hasta el 5 de febrero de 2027"]
-      ]
+      dateGroups: [
+        { title: "Ciclo 3 (el que empieza ahora)", rows: [
+          ["Inscripciones y pagos", "14 de septiembre al 31 de octubre"],
+          ["Inducción", "17 de noviembre"],
+          ["Inicio de clases", "17 de noviembre"],
+          ["Fin de clases", "12 de febrero"]
+        ] },
+        { title: "Ciclo 4 súper intensivo", rows: [
+          ["Inscripciones y pagos", "18 de noviembre al 9 de diciembre de 2026"],
+          ["Inducción", "11 de diciembre de 2026"],
+          ["Inicio de clases", "14 de diciembre de 2026"],
+          ["Fin de clases y exámenes finales", "hasta el 5 de febrero de 2027"]
+        ] }
+      ],
+      payNote: `Puedes pagar en 2 cuotas y hay facilidades de pago. Para más información escribe a ${CONTACT_EMAIL}.`
     }
   };
 }
