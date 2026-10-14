@@ -829,5 +829,6 @@ input[readonly] { background: #EFEBDF; color: var(--ink-soft); }
 .route-pay { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: #E8F5F0; font-size: .95rem; font-weight: 700; }
 
 .cta-box.cta-only { padding: 22px; }
+.cta-box.cta-only h3 { margin: 0 0 14px; font-size: 1.35rem; }
 .cta-box.cta-only .cta-btn { margin-top: 0; background: #fff; color: var(--ink); font-size: 1.15rem; padding: 14px 40px; border-radius: 12px; box-shadow: 0 3px 0 rgba(0,0,0,.25); }
 .cta-box.cta-only .cta-btn:hover { background: #F3F1EA; filter: none; }
