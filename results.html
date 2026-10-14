@@ -126,7 +126,7 @@ function render(r) {
   }).join("");
 
   const cta = inst.enrollUrl
-    ? `<div class="cta-box cta-only"><a class="cta-btn" href="${esc(inst.enrollUrl)}" target="_blank" rel="noopener">Inscríbete ya →</a></div>`
+    ? `<div class="cta-box cta-only"><h3>Ya conoces tu ruta</h3><a class="cta-btn" href="${esc(inst.enrollUrl)}" target="_blank" rel="noopener">Inscríbete ya →</a></div>`
     : (inst.contact ? `<div class="cta-box"><h3>¿Quieres inscribirte?</h3><p>Escríbenos a ${esc(inst.contact)}</p></div>` : "");
 
   view.innerHTML = `
