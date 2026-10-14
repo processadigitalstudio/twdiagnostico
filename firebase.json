@@ -64,7 +64,7 @@
         ]
       }
     ],
-    "site": "twtest"
+    "site": "tweetalig-examen"
   },
   "firestore": {
     "rules": "firestore.rules"
