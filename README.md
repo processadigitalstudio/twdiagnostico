@@ -7,7 +7,7 @@
 3. **Logos**: Tweetalig y EAM ya están en `img/brand/`. Otra universidad: sube su logo ahí y regístralo en `js/institutions.js`.
 4. **Instituciones**: `js/institutions.js` (nombre, logo, link de inscripción). El link se elige por institución del acceso o por `?u=slug`.
 5. **Clave**: en `admin.html` → "Cargar answer_key_PRIVADO_NO_SUBIR.json" (una sola vez).
-6. **Sesiones de examen**: `admin.html` → Sesiones y estudiantes → crea una sesión (nombre, institución, contraseña compartida que distingue mayúsculas/minúsculas, fecha y hora de apertura y cierre, y la lista "cédula, nombre"). Los estudiantes entran con cédula + esa contraseña, solo dentro del horario. El tablero "Estado de la sesión" muestra Sin iniciar / En proceso / Finalizado.
+6. **Sesiones de examen**: `admin.html` → Sesiones y estudiantes → crea una sesión (nombre, institución, contraseña compartida que distingue mayúsculas/minúsculas, apertura y cierre) y pega la lista `cédula, nombres, apellidos, correo, nivel (B1/B2)`. Cada estudiante entra con cédula + contraseña, **confirma sus datos** y presenta. El tablero "Estado de la sesión" muestra Sin iniciar / En proceso / Finalizado. Puedes agregar estudiantes sueltos en cualquier momento.
 7. **Día del examen**: deja `admin.html` abierto con la clave cargada. Cada examen que termina se califica ahí y el resultado aparece en pantalla al estudiante.
 
 ## Publicar como "Twtest"
@@ -388,3 +388,12 @@ dan más contexto a quien toma la decisión final:
   Esto casi siempre es señal de que un ítem está mal calibrado, no de que
   la persona sea "rara" — y es exactamente el tipo de caso que el panel
   Bookmark necesita ver para decidir qué ítems corregir.
+
+
+## Interrupciones (luz, internet, cierre de ventana)
+
+- El reloj de cada prueba es hora real y no se detiene ni se devuelve tiempo.
+- Si solo se cae el internet y la ventana sigue abierta, el examen sigue; las respuestas se envían al volver.
+- Si el estudiante desaparece más de `INTERRUPTION_GRACE_SEC` (25 s) y vuelve, el examen se **cierra** con lo guardado (queda "⛔ Cerrado por interrupción" en el tablero).
+- Solo la administradora reabre, **por estudiante**: «▶ reabrir» (continúa donde iba, en el mismo u otro equipo, con los minutos que tú fijes para la prueba en curso) o «↺ reiniciar» (examen nuevo).
+- Volumen: durante Listening, o justo después de una tecla de volumen, una salida de foco menor a `VOLUME_BLUR_TOLERANCE_SEC` (10 s) no se registra como falta.

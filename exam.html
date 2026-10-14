@@ -14,13 +14,13 @@
 
 <!-- Pantalla inicial: estructura, calificación y compromiso de integridad -->
 <div class="integrity-overlay" id="integrityOverlay">
-  <div class="integrity-card intro-card" id="introCard"><div class="spinner"></div><p class="muted" style="text-align:center;">Cargando el examen…</p></div>
+  <div class="integrity-card intro-card" id="introCard"><div class="spinner"></div><p class="muted" style="text-align:center;">Loading the exam… / Cargando el examen…</p></div>
 </div>
 
 <!-- Instrucciones por sección (en ingles) -->
 <div class="integrity-overlay" id="sectionOverlay" style="display:none;">
   <div class="integrity-card intro-card">
-    <button class="lang-toggle" id="sectionLang" type="button">English</button>
+    <button class="lang-toggle" id="sectionLang" type="button">Leer en español</button>
     <div class="eyebrow" id="sectionEyebrow">Section</div>
     <h2 id="sectionTitle">—</h2>
     <div id="sectionBody" class="muted"></div>
@@ -30,27 +30,38 @@
 
 <!-- Overlay que aparece si cambia de pestaña/ventana -->
 <div class="focus-blur-overlay hidden" id="focusBlurOverlay">
-  <div class="msg">El contenido está oculto porque saliste de esta ventana o se detectó una captura.<br><br>Vuelve a esta ventana para continuar. Esto queda registrado.</div>
+  <div class="msg">The exam is hidden while this window is not active.<br>Click here to continue. Long absences and screenshot attempts are recorded.<br><br><span style="font-size:.8em;opacity:.85;">El examen se oculta mientras esta ventana no está activa. Haz clic aquí para continuar. Las ausencias largas y los intentos de captura quedan registrados.</span></div>
 </div>
 
 <div class="hard-block hidden" id="translateBlock">
   <div class="msg">
-    <h2>Traducción detectada</h2>
-    <p>Se detectó un traductor activo en tu navegador. Desactívalo y recarga la página para continuar. El tiempo sigue corriendo y este evento queda registrado.</p>
-    <button class="btn-primary" id="translateReload" style="width:auto;">Recargar página</button>
+    <h2>Translator detected / Traducción detectada</h2>
+    <p>A browser translator is active. Turn it off and reload the page to continue. The clock keeps running and this event is recorded.</p>
+    <p style="opacity:.85;">Se detectó un traductor activo. Desactívalo y recarga la página. El tiempo sigue corriendo y este evento queda registrado.</p>
+    <button class="btn-primary" id="translateReload" style="width:auto;">Reload / Recargar</button>
   </div>
 </div>
 
 <div class="hard-block hidden" id="fsBlock">
   <div class="msg">
-    <h2>Pantalla completa requerida</h2>
-    <p>El examen debe presentarse en pantalla completa. Pulsa el botón para volver. El tiempo sigue corriendo y esta salida queda registrada.</p>
-    <button class="btn-primary" id="fsReturn" style="width:auto;">Volver a pantalla completa</button>
+    <h2>Full screen required / Pantalla completa requerida</h2>
+    <p>The exam must be taken in full screen. Press the button to return. The clock keeps running and this exit is recorded.</p>
+    <p style="opacity:.85;">El examen debe presentarse en pantalla completa. Pulsa el botón para volver. El tiempo sigue corriendo y esta salida queda registrada.</p>
+    <button class="btn-primary" id="fsReturn" style="width:auto;">Back to full screen / Volver a pantalla completa</button>
   </div>
 </div>
 
 <div class="watermark" id="watermark"></div>
-<div class="net-banner hidden" id="netBanner">Sin conexión a internet. Sigue respondiendo con calma: tus respuestas se guardan en este equipo y se enviarán cuando vuelva la conexión. No cierres esta ventana.</div>
+<div class="net-banner hidden" id="netBanner">No internet connection. Keep answering: your answers are saved on this computer and will be sent when the connection returns. The clock keeps running. Do not close this window.<br><span style="font-weight:600;">Sin conexión a internet. Sigue respondiendo: tus respuestas se guardan en este equipo y se enviarán cuando vuelva la conexión. El tiempo sigue corriendo. No cierres esta ventana.</span></div>
+<div class="hard-block hidden" id="closedBlock">
+  <div class="msg">
+    <h2>Your exam was closed / Tu examen se cerró</h2>
+    <p>Your session was interrupted (power or connection loss, or the window was closed), so the exam was closed with the answers you had saved. <b>Tell your proctor</b>: they can reopen it for you.</p>
+    <p style="opacity:.85;">Tu sesión se interrumpió (se fue la luz o el internet, o se cerró la ventana), así que el examen se cerró con las respuestas que tenías guardadas. <b>Avisa al supervisor</b>: él puede reabrirlo.</p>
+    <p class="muted" id="closedStatus" style="color:#fff;opacity:.8;"></p>
+    <button class="btn-primary" id="closedRetry" style="width:auto;">Try again / Intentar de nuevo</button>
+  </div>
+</div>
 <div class="integrity-overlay hidden-flex" id="submitOverlay" style="display:none; z-index:2500;">
   <div class="integrity-card" style="max-width:460px; text-align:center;">
     <div class="spinner"></div>
@@ -80,8 +91,8 @@
 </div>
 
 <script type="module">
-import { loadAllBanks, buildExamPlan, createSession, recordAnswers, finishSession, logSuspiciousEvent, logSectionTiming, retryUntilDone } from "./js/exam-engine.js";
-import { assetUrl, MAX_DOWNTIME_CREDIT_MIN, SECTION_DURATIONS_MIN, MAX_AUDIO_PLAYS, WEIGHTS, LEVEL_CUTS, REQUIRE_FULLSCREEN, ENABLE_WATERMARK, UOL_TOTAL_POINTS, READING_POINTS_PER_TEXT, LISTENING_POINTS_PER_AUDIO } from "./js/exam-config.js";
+import { loadAllBanks, buildExamPlan, createSession, recordAnswers, saveProgress, closeSession, markResumeConsumed, finishSession, logSuspiciousEvent, logSectionTiming, retryUntilDone } from "./js/exam-engine.js";
+import { assetUrl, INTERRUPTION_GRACE_SEC, VOLUME_BLUR_TOLERANCE_SEC, SKILL_LABELS, SECTION_DURATIONS_MIN, MAX_AUDIO_PLAYS, WEIGHTS, LEVEL_CUTS, REQUIRE_FULLSCREEN, ENABLE_WATERMARK, UOL_TOTAL_POINTS, READING_POINTS_PER_TEXT, LISTENING_POINTS_PER_AUDIO } from "./js/exam-config.js";
 import { resolveInstitution, renderBrand } from "./js/institutions.js";
 
 const ctx = {
@@ -90,10 +101,12 @@ const ctx = {
   name: sessionStorage.getItem("participantName") || "",
   groupId: sessionStorage.getItem("groupId") || "",
   groupName: sessionStorage.getItem("groupName") || "",
-  institution: sessionStorage.getItem("institution") || "tweetalig"
+  institution: sessionStorage.getItem("institution") || "tweetalig",
+  profile: (() => { try { return JSON.parse(sessionStorage.getItem("profile") || "{}"); } catch (e) { return {}; } })(),
+  resume: (() => { try { return JSON.parse(sessionStorage.getItem("resume") || "null"); } catch (e) { return null; } })()
 };
 const username = ctx.cedula;
-const participantName = ctx.name;
+let participantName = ctx.name;
 const institutionSlug = ctx.institution;
 if (!ctx.participantId) window.location.href = "index.html";
 
@@ -151,7 +164,11 @@ setInterval(() => {
   if (sel && sel.rangeCount && !sel.isCollapsed) { sel.removeAllRanges(); tryLog("selection_attempt"); }
 }, 400);
 
+// Teclas de volumen: no son sospechosas (y justo después, una salida de foco breve tampoco se registra).
+const VOLUME_KEYS = ["AudioVolumeUp", "AudioVolumeDown", "AudioVolumeMute", "VolumeUp", "VolumeDown", "VolumeMute"];
+let recentVolumeKeyAt = 0;
 document.addEventListener("keydown", (e) => {
+  if (VOLUME_KEYS.includes(e.key)) { recentVolumeKeyAt = Date.now(); return; }
   const k = (e.key || "").toLowerCase();
   const mod = e.ctrlKey || e.metaKey;
   if (mod && ["c", "v", "x", "a", "p", "s", "u", "f", "g", "o"].includes(k)) {
@@ -181,8 +198,20 @@ document.addEventListener("visibilitychange", () => {
   if (!examRunning) return;
   if (document.hidden) { lockView(); tryLog("tab_hidden"); } else { unlockView(); }
 });
-window.addEventListener("blur", () => { if (!examRunning) return; lockView(); tryLog("window_blur"); });
-window.addEventListener("focus", () => { if (examRunning) unlockView(); });
+// Salida de foco de la ventana. Siempre se oculta el contenido. Se REGISTRA como sospechosa de inmediato, salvo cuando
+// el estudiante está en Listening o acaba de pulsar una tecla de volumen: ahí solo se registra si la salida dura
+// más de VOLUME_BLUR_TOLERANCE_SEC (subir el volumen desde el sistema quita el foco unos segundos).
+let blurTimer = null;
+const inListening = () => !!(state && state.plan && state.plan.sections[state.sectionIndex] && state.plan.sections[state.sectionIndex].name === "Listening");
+window.addEventListener("blur", () => {
+  if (!examRunning) return;
+  lockView();
+  const tolerant = inListening() || Date.now() - recentVolumeKeyAt < 15000;
+  if (!tolerant) { tryLog("window_blur"); return; }
+  clearTimeout(blurTimer);
+  blurTimer = setTimeout(() => { if (!document.hasFocus()) tryLog("window_blur", { longerThanSec: VOLUME_BLUR_TOLERANCE_SEC }); }, VOLUME_BLUR_TOLERANCE_SEC * 1000);
+});
+window.addEventListener("focus", () => { clearTimeout(blurTimer); if (examRunning) unlockView(); });
 
 // ---- Traductores del navegador / extensiones ----
 const translateBlock = document.getElementById("translateBlock");
@@ -296,36 +325,86 @@ async function prefetchAssets(plan) {
   await Promise.all([worker(), worker()]);
 }
 
-// Latido: cada 3 s se guarda "visto por última vez". Si el examen se cierra (corte de luz, cierre accidental),
-// al volver se le devuelve el tiempo ausente a la prueba en curso (máximo MAX_DOWNTIME_CREDIT_MIN en total).
-function startHeartbeat() { setInterval(() => { if (state) { state.lastSeen = Date.now(); persist(); } }, 3000); }
-function applyDowntimeCredit() {
-  if (!state || !state.lastSeen) return;
-  const gap = Date.now() - state.lastSeen;
-  if (gap < 15000) return;
-  const maxCredit = MAX_DOWNTIME_CREDIT_MIN * 60000;
-  const used = state.creditMs || 0;
-  const credit = Math.max(0, Math.min(gap, maxCredit - used));
-  const idx = state.sectionIndex;
-  if (credit > 0 && state.sectionStartTimes[idx] !== undefined) {
-    state.sectionStartTimes[idx] += credit;
-    state.creditMs = used + credit;
+// Latido: cada 3 s (y al cerrar o recargar la página) se guarda "visto por última vez". Al volver, si pasaron más de
+// INTERRUPTION_GRACE_SEC segundos, el examen se CIERRA y la administradora debe reabrirlo (ver boot). No se devuelve tiempo.
+function stamp() { if (state) { state.lastSeen = Date.now(); persist(); } }
+function startHeartbeat() {
+  setInterval(stamp, 3000);
+  window.addEventListener("pagehide", stamp);
+  document.addEventListener("visibilitychange", stamp);
+}
+
+// Foto del avance, para poder continuar en otro equipo si el actual se cae.
+function progressSnapshot() {
+  return {
+    sectionIndex: state.sectionIndex, pageIndex: state.pageIndex,
+    sectionStartTimes: state.sectionStartTimes, sectionInstructionShown: state.sectionInstructionShown,
+    audioPlayCounts: state.audioPlayCounts
+  };
+}
+
+// Cierra el examen de ESTE estudiante: guarda todo lo respondido y queda esperando que la administradora lo reabra.
+async function closeAttempt(gapMs) {
+  examRunning = false;
+  if (sectionTimerInterval) clearInterval(sectionTimerInterval);
+  document.getElementById("integrityOverlay").style.display = "none";
+  document.getElementById("sectionOverlay").style.display = "none";
+  const closed = document.getElementById("closedBlock");
+  closed.classList.remove("hidden");
+  document.getElementById("closedRetry").onclick = () => { window.location.href = "index.html"; };
+  const idx = state.sectionIndex, section = state.plan.sections[idx];
+  const start = state.sectionStartTimes[idx];
+  const durMs = SECTION_DURATIONS_MIN[section.name] * 60000;
+  const lastSeen = state.lastSeen || Date.now();
+  const remainingMs = start === undefined ? durMs : Math.min(durMs, Math.max(0, durMs - (lastSeen - start)));
+  const closure = { reason: "interrupted", gapSec: Math.round(gapMs / 1000), section: section.name, sectionIndex: idx, remainingMsAtDrop: remainingMs };
+  const status = document.getElementById("closedStatus");
+  status.textContent = "Saving your answers… / Guardando tus respuestas…";
+  await retryUntilDone(() => closeSession(state.sessionId, ctx.participantId, allEntries(), closure, progressSnapshot()), {
+    onWait: () => { status.textContent = navigator.onLine ? "Retrying… / Reintentando…" : "Waiting for the internet connection… / Esperando la conexión a internet…"; }
+  });
+  status.textContent = "Your answers are saved. / Tus respuestas quedaron guardadas.";
+}
+
+// Reapertura hecha por la administradora (puede ser en otro equipo): se reconstruye el examen desde el servidor
+// y se fija cuánto tiempo le queda a la prueba en curso.
+function applyResumeIfAny() {
+  const rs = ctx.resume;
+  if (!rs || !rs.token) return false;
+  if (state && state.appliedResume === rs.token) return false;
+  if (!state || state.sessionId !== rs.sessionId) {
+    const pr = rs.progress || {};
+    state = {
+      sessionId: rs.sessionId, plan: JSON.parse(rs.planJson),
+      sectionIndex: pr.sectionIndex || 0, pageIndex: pr.pageIndex || 0,
+      sectionInstructionShown: pr.sectionInstructionShown || [false, false, false],
+      sectionStartTimes: pr.sectionStartTimes || {}, responses: rs.responses || {},
+      audioPlayCounts: pr.audioPlayCounts || {}, startTimeMs: Date.now()
+    };
   }
+  const idx = state.sectionIndex;
+  if (rs.remainingMs !== undefined && rs.remainingMs !== null && state.sectionStartTimes[idx] !== undefined) {
+    const durMs = SECTION_DURATIONS_MIN[state.plan.sections[idx].name] * 60000;
+    state.sectionStartTimes[idx] = Date.now() - (durMs - rs.remainingMs);
+  }
+  state.appliedResume = rs.token;
+  state.lastSeen = Date.now();
   persist();
-  tryLog("resumed_after_gap", { gapSec: Math.round(gap / 1000), creditSec: Math.round(credit / 1000) });
+  retryUntilDone(() => markResumeConsumed(ctx.participantId, rs.token), { attemptMs: 10000 }).catch(() => {});
+  return true;
 }
 
 // ============================================================
 // IDIOMA DE LAS PANTALLAS INFORMATIVAS (el examen siempre va en inglés)
 // ============================================================
-let uiLang = "es";
+let uiLang = "en";                       // las instrucciones salen en inglés; el estudiante puede leerlas en español
 const T = {
   es: {
-    toggle: "English", eyebrow: "Antes de empezar", hello: "Hola", title: "Así funciona tu examen",
+    toggle: "Read in English", eyebrow: "Antes de empezar", hello: "Hola", title: "Así funciona tu examen",
     intro: "Este examen diagnóstico ubica tu nivel de inglés según el Marco Común Europeo de Referencia (MCER): A1, A2, B1 o B2. Tiene tres pruebas, cada una con su propio reloj.",
     thSection: "Prueba", thItems: "Preguntas", thTime: "Tiempo", thPoints: "Puntos",
     scoringTitle: "Cómo se califica",
-    scoring: (w) => `<ul><li>El examen suma <b>100 puntos</b>: Use of Language ${w.u}, Reading ${w.r} y Listening ${w.l}.</li>
+    scoring: (w) => `<ul><li>El examen suma <b>100 puntos</b>: Language Use ${w.u}, Reading Comprehension ${w.r} y Listening Comprehension ${w.l}.</li>
       <li>Cada pregunta tiene una sola respuesta correcta. <b>Una respuesta incorrecta no resta puntos</b>; una pregunta sin responder vale 0.</li>
       <li>Las preguntas de nivel más alto aparecen más adelante dentro de cada prueba.</li></ul>`,
     levelsTitle: "Tu resultado",
@@ -336,21 +415,22 @@ const T = {
       "No copies, fotografíes ni compartas las preguntas. El texto no se puede seleccionar y las capturas de pantalla quedan ocultas.",
       "El examen se presenta en <b>pantalla completa</b>. Si sales de la ventana, el contenido se oculta y queda registrado.",
       "No puedes volver a una pregunta anterior. Si se acaba el tiempo de una prueba, pasas automáticamente a la siguiente.",
+      "El tiempo de cada prueba corre en hora real y no se detiene. Si se va la luz o el internet y estás fuera más de 25 segundos, <b>tu examen se cierra</b> y el supervisor debe reabrirlo. Si solo se cae el internet y la ventana sigue abierta, puedes seguir respondiendo: tus respuestas se envían cuando vuelva.",
       "Cada pantalla lleva tu nombre como marca de agua. Cualquier uso indebido se revisa junto con tu resultado."
     ],
     check: "Entiendo las reglas y acepto presentar el examen por mi cuenta, sin ayuda externa.",
     start: "Comenzar examen", starting: "Preparando…",
     min: "min", pts: "pts", total: "Total",
-    names: { UoL: "Use of Language", Reading: "Reading", Listening: "Listening" },
+    names: SKILL_LABELS,
     secStart: "Comenzar esta prueba", secEyebrow: "Antes de continuar", secOf: (i) => `Prueba ${i} de 3`,
     what: "Qué es", how: "Cómo funciona", score: "Cómo se califica", time: "Tiempo",
   },
   en: {
-    toggle: "Español", eyebrow: "Before you start", hello: "Hello", title: "How your exam works",
+    toggle: "Leer en español", eyebrow: "Before you start", hello: "Hello", title: "How your exam works",
     intro: "This diagnostic exam places your English level on the Common European Framework of Reference (CEFR): A1, A2, B1 or B2. It has three sections, each with its own clock.",
     thSection: "Section", thItems: "Questions", thTime: "Time", thPoints: "Points",
     scoringTitle: "How it is scored",
-    scoring: (w) => `<ul><li>The exam adds up to <b>100 points</b>: Use of Language ${w.u}, Reading ${w.r} and Listening ${w.l}.</li>
+    scoring: (w) => `<ul><li>The exam adds up to <b>100 points</b>: Language Use ${w.u}, Reading Comprehension ${w.r} and Listening Comprehension ${w.l}.</li>
       <li>Each question has one correct answer. <b>A wrong answer does not subtract points</b>; an unanswered question is worth 0.</li>
       <li>Higher-level questions appear later within each section.</li></ul>`,
     levelsTitle: "Your result",
@@ -361,12 +441,13 @@ const T = {
       "Do not copy, photograph or share the questions. Text cannot be selected and screenshots are hidden.",
       "The exam runs in <b>full screen</b>. If you leave the window, the content is hidden and the event is recorded.",
       "You cannot go back to a previous question. When a section's time runs out, you move on automatically.",
+      "Each section's clock runs in real time and never stops. If the power or internet fails and you are away for more than 25 seconds, <b>your exam is closed</b> and your proctor must reopen it. If only the internet drops and the window stays open, you can keep answering: your answers are sent when it returns.",
       "Every screen carries your name as a watermark. Any misuse is reviewed together with your result."
     ],
     check: "I understand the rules and agree to take the exam on my own, without outside help.",
     start: "Start exam", starting: "Getting ready…",
     min: "min", pts: "pts", total: "Total",
-    names: { UoL: "Use of Language", Reading: "Reading", Listening: "Listening" },
+    names: SKILL_LABELS,
     secStart: "Start this section", secEyebrow: "Before you continue", secOf: (i) => `Section ${i} of 3`,
     what: "What it is", how: "How it works", score: "How it is scored", time: "Time",
   }
@@ -383,6 +464,79 @@ const fmt1 = (n) => (Math.round(n * 10) / 10).toString().replace(/\.0$/, "");
 
 let pendingPlan = null;           // plan armado antes de que el estudiante acepte (así se cargan los bancos primero)
 let activePlan = () => (state ? state.plan : pendingPlan);
+
+// ---------- confirmación de datos (antes de las reglas) ----------
+const TC = {
+  en: {
+    eyebrow: "Step 1 of 2", title: "Confirm your details",
+    intro: "Check that your information is correct. You can fix your names and email; your ID comes from the list your supervisor loaded.",
+    nombres: "First name(s)", apellidos: "Last name(s)", id: "ID number (cédula)", email: "Email",
+    nivel: "Level you need for graduation", nivelHelp: "Choose the English level your program requires you to reach.",
+    ok: "The information above is correct.", next: "Continue →",
+    eNombres: "Write your first name(s).", eApellidos: "Write your last name(s).", eEmail: "Write a valid email address.", eNivel: "Choose the level you need for graduation.", eOk: "Please confirm that your information is correct."
+  },
+  es: {
+    eyebrow: "Paso 1 de 2", title: "Confirma tus datos",
+    intro: "Revisa que tu información sea correcta. Puedes corregir tus nombres y tu correo; tu cédula viene de la lista que cargó el supervisor.",
+    nombres: "Nombres", apellidos: "Apellidos", id: "Número de cédula", email: "Correo electrónico",
+    nivel: "Nivel que necesitas para grado", nivelHelp: "Elige el nivel de inglés que tu programa exige para graduarte.",
+    ok: "Los datos anteriores son correctos.", next: "Continuar →",
+    eNombres: "Escribe tus nombres.", eApellidos: "Escribe tus apellidos.", eEmail: "Escribe un correo válido.", eNivel: "Elige el nivel que necesitas para grado.", eOk: "Confirma que tus datos son correctos."
+  }
+};
+const confirmDraft = { nombres: null, apellidos: null, email: null, nivel: null };
+function renderConfirm() {
+  const t = TC[uiLang];
+  const pf = ctx.profile || {};
+  const val = (k) => confirmDraft[k] !== null ? confirmDraft[k] : (pf[k] || "");
+  const nv = val("nivel");
+  const card = document.getElementById("introCard");
+  card.innerHTML = `
+    <button class="lang-toggle" id="introLang" type="button">${T[uiLang].toggle}</button>
+    <div class="eyebrow">${t.eyebrow}</div>
+    <h2>${t.title}</h2>
+    <p class="muted">${t.intro}</p>
+    <div class="form-grid2">
+      <div><label for="cfNombres">${t.nombres}</label><input type="text" class="plain" id="cfNombres" autocomplete="off" value="${escapeHtml(val("nombres"))}"></div>
+      <div><label for="cfApellidos">${t.apellidos}</label><input type="text" class="plain" id="cfApellidos" autocomplete="off" value="${escapeHtml(val("apellidos"))}"></div>
+      <div><label for="cfId">${t.id}</label><input type="text" id="cfId" readonly value="${escapeHtml(ctx.cedula)}"></div>
+      <div><label for="cfEmail">${t.email}</label><input type="text" class="plain" id="cfEmail" inputmode="email" autocomplete="off" autocapitalize="off" spellcheck="false" value="${escapeHtml(val("email"))}"></div>
+    </div>
+    <label style="margin-top:20px;">${t.nivel}</label>
+    <div class="level-choice">
+      <label class="lvl-opt ${nv === "B1" ? "on" : ""}"><input type="radio" name="cfNivel" value="B1" ${nv === "B1" ? "checked" : ""}><b>B1</b></label>
+      <label class="lvl-opt ${nv === "B2" ? "on" : ""}"><input type="radio" name="cfNivel" value="B2" ${nv === "B2" ? "checked" : ""}><b>B2</b></label>
+    </div>
+    <p class="muted" style="font-size:.9rem; margin-top:8px;">${t.nivelHelp}</p>
+    <div class="integrity-check"><input type="checkbox" id="cfOk"><label for="cfOk">${t.ok}</label></div>
+    <div class="error-msg" id="cfErr"></div>
+    <button class="btn-primary" id="cfBtn" style="margin-top:6px;">${t.next}</button>`;
+  const grab = () => {
+    confirmDraft.nombres = document.getElementById("cfNombres").value;
+    confirmDraft.apellidos = document.getElementById("cfApellidos").value;
+    confirmDraft.email = document.getElementById("cfEmail").value;
+    const r = document.querySelector('input[name="cfNivel"]:checked'); confirmDraft.nivel = r ? r.value : "";
+  };
+  document.querySelectorAll('input[name="cfNivel"]').forEach(r => r.addEventListener("change", () => {
+    document.querySelectorAll(".lvl-opt").forEach(l => l.classList.toggle("on", l.querySelector("input").checked));
+  }));
+  document.getElementById("introLang").onclick = () => { grab(); uiLang = uiLang === "es" ? "en" : "es"; renderConfirm(); };
+  document.getElementById("cfBtn").onclick = () => {
+    grab();
+    const err = document.getElementById("cfErr");
+    const nombres = confirmDraft.nombres.trim().replace(/\s+/g, " "), apellidos = confirmDraft.apellidos.trim().replace(/\s+/g, " ");
+    const email = confirmDraft.email.trim();
+    if (nombres.length < 2) { err.textContent = t.eNombres; return; }
+    if (apellidos.length < 2) { err.textContent = t.eApellidos; return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { err.textContent = t.eEmail; return; }
+    if (!["B1", "B2"].includes(confirmDraft.nivel)) { err.textContent = t.eNivel; return; }
+    if (!document.getElementById("cfOk").checked) { err.textContent = t.eOk; return; }
+    ctx.profile = { nombres, apellidos, email, nivel: confirmDraft.nivel };
+    ctx.name = `${nombres} ${apellidos}`;
+    participantName = ctx.name;
+    renderOverview();
+  };
+}
 
 function renderOverview() {
   const t = T[uiLang];
@@ -402,7 +556,7 @@ function renderOverview() {
   const card = document.getElementById("introCard");
   card.innerHTML = `
     <button class="lang-toggle" id="introLang" type="button">${t.toggle}</button>
-    <div class="eyebrow">${t.eyebrow}</div>
+    <div class="eyebrow">${uiLang === "es" ? "Paso 2 de 2" : "Step 2 of 2"} · ${t.eyebrow}</div>
     <h2>${t.hello}${participantName ? ", " + escapeHtml(participantName.split(" ")[0]) : ""} — ${t.title}</h2>
     <p class="muted">${t.intro}</p>
     <table class="intro-table">
@@ -452,24 +606,30 @@ async function init() {
       sectionStartTimes: {},
       responses: {},
       audioPlayCounts: {},
-      startTimeMs: Date.now()
+      startTimeMs: Date.now(),
+      lastSeen: Date.now()
     };
     persist();
   }
   sessionIdRef = state.sessionId;
   examRunning = true;
-  applyDowntimeCredit();
+  state.lastSeen = Date.now(); persist();
   startHeartbeat();
   installBackTrap();
   updateNet();
   prefetchAssets(state.plan);
   applyWatermark();
   buildSegments();
+  if (resumedNow) { tryLog("reopened_by_admin"); resumedNow = false; }
   renderCurrentPage();
 }
 
+let resumedNow = false;
 async function boot() {
-  if (state) {                                   // examen en curso (recarga o cierre de pestaña): se retoma
+  resumedNow = applyResumeIfAny();
+  if (state) {                                   // examen en curso (recarga, cierre de pestaña o reapertura)
+    const gap = state.lastSeen ? Date.now() - state.lastSeen : 0;
+    if (!resumedNow && gap > INTERRUPTION_GRACE_SEC * 1000) { await closeAttempt(gap); return; }
     document.getElementById("integrityOverlay").style.display = "none";
     if (REQUIRE_FULLSCREEN) fsEnforced = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
     await init();
@@ -479,10 +639,10 @@ async function boot() {
   try {
     const banks = await loadAllBanks();
     pendingPlan = buildExamPlan(banks, username);
-    renderOverview();
+    renderConfirm();
   } catch (e) {
     console.error(e);
-    document.getElementById("introCard").innerHTML = "<p class='muted'>No se pudo cargar el examen. Revisa tu conexión y recarga la página.</p>";
+    document.getElementById("introCard").innerHTML = "<p class='muted'>The exam could not be loaded. Check your connection and reload the page. / No se pudo cargar el examen. Revisa tu conexión y recarga la página.</p>";
   }
 }
 
@@ -514,7 +674,8 @@ const SECTION_TEXT = {
   es: {
     UoL: (f) => ({
       what: "Mide tu dominio de gramática, vocabulario, colocaciones y preposiciones en contextos cotidianos.",
-      how: [`Verás <b>${f.questions} preguntas</b>, una por pantalla. Cada una tiene una frase y cuatro opciones; elige la que completa mejor la frase.`,
+      how: [`Verás <b>${f.questions} preguntas</b>, una por pantalla. Cada una empieza con un <b>Context</b> (contexto): una situación corta en un recuadro. Léelo primero, porque te ayuda a entender la frase.`,
+            "Debajo del Context hay una frase con un espacio en blanco y cuatro opciones; elige la que completa mejor la frase.",
             "Algunas incluyen una imagen; haz clic sobre ella para ampliarla.", "Cuando continúas no puedes volver atrás."],
       score: `Vale <b>${fmt1(f.points)} puntos</b>. Cada pregunta correcta suma ${fmt1(f.points / f.questions)} puntos (todas valen lo mismo). Incorrecta o sin responder: 0.`
     }),
@@ -529,14 +690,16 @@ const SECTION_TEXT = {
       what: "Mide qué tanto entiendes inglés hablado: conversaciones, anuncios y charlas cortas.",
       how: [`Escucharás <b>${f.pages} audios</b>, cada uno con sus preguntas en la misma pantalla (${f.questions} preguntas en total).`,
             `Puedes reproducir cada audio <b>hasta ${MAX_AUDIO_PLAYS} veces</b>. Puedes pausar, pero no adelantar ni retroceder.`,
-            "Verifica tu volumen antes de empezar; se recomiendan audífonos.", "Al pasar al siguiente audio no puedes volver."],
+            "Verifica tu volumen antes de empezar; se recomiendan audífonos. Durante el audio puedes subir o bajar el volumen con el control del reproductor o con las teclas de volumen de tu teclado: un cambio rápido de volumen no se registra como falta.",
+            "Al pasar al siguiente audio no puedes volver."],
       score: `Vale <b>${fmt1(f.points)} puntos</b>. Cada audio vale ${LISTENING_POINTS_PER_AUDIO} puntos, repartidos en partes iguales entre sus preguntas. Incorrecta o sin responder: 0.`
     })
   },
   en: {
     UoL: (f) => ({
       what: "Measures your command of grammar, vocabulary, collocations and prepositions in everyday contexts.",
-      how: [`You will see <b>${f.questions} questions</b>, one per screen. Each has a sentence and four options; choose the one that best completes it.`,
+      how: [`You will see <b>${f.questions} questions</b>, one per screen. Each one starts with a <b>Context</b>: a short situation in a box. Read it first, because it helps you understand the sentence.`,
+            "Below the Context there is a sentence with a blank and four options; choose the one that best completes the sentence.",
             "Some include a picture; click it to enlarge.", "Once you continue you cannot go back."],
       score: `Worth <b>${fmt1(f.points)} points</b>. Each correct answer adds ${fmt1(f.points / f.questions)} points (all are worth the same). Wrong or blank: 0.`
     }),
@@ -551,7 +714,8 @@ const SECTION_TEXT = {
       what: "Measures how well you understand spoken English: conversations, announcements and short talks.",
       how: [`You will listen to <b>${f.pages} recordings</b>, each with its questions on the same screen (${f.questions} questions in total).`,
             `You may play each recording <b>up to ${MAX_AUDIO_PLAYS} times</b>. You can pause, but not skip forward or back.`,
-            "Check your volume before starting; headphones are recommended.", "Once you move to the next recording you cannot go back."],
+            "Check your volume before starting; headphones are recommended. During a recording you can change the volume with the player's slider or your keyboard's volume keys: a quick volume change is not recorded as a violation.",
+            "Once you move to the next recording you cannot go back."],
       score: `Worth <b>${fmt1(f.points)} points</b>. Each recording is worth ${LISTENING_POINTS_PER_AUDIO} points, split equally among its questions. Wrong or blank: 0.`
     })
   }
@@ -574,7 +738,7 @@ function renderSectionIntro() {
   document.getElementById("sectionBody").innerHTML = `
     <div class="intro-block"><h4>${t.what}</h4><p>${info.what}</p></div>
     <div class="intro-block"><h4>${t.how}</h4><ul>${info.how.map(h => `<li>${h}</li>`).join("")}</ul></div>
-    <div class="intro-block"><h4>${t.time}</h4><p><b>${f.minutes} ${t.min}</b> — ${uiLang === "es" ? "el reloj de esta prueba empieza al pulsar el botón." : "this section's clock starts when you press the button."} ${sectionTimeoutNote(isLast)}</p></div>
+    <div class="intro-block"><h4>${t.time}</h4><p><b>${f.minutes} ${t.min}</b> — ${uiLang === "es" ? "el reloj de esta prueba empieza al pulsar el botón y no se detiene." : "this section's clock starts when you press the button and never stops."} ${sectionTimeoutNote(isLast)}</p></div>
     <div class="intro-block"><h4>${t.score}</h4><p>${info.score}</p></div>`;
   document.getElementById("sectionLang").textContent = t.toggle;
   document.getElementById("sectionBtn").textContent = t.secStart;
@@ -610,7 +774,7 @@ function renderCurrentPage() {
   maybeShowSectionInstructions(() => {
     const section = currentSection();
     document.getElementById("itemCounter").textContent =
-      `${section.name} — page ${state.pageIndex + 1} of ${pagesInSection(section)}`;
+      `${SKILL_LABELS[section.name]} — page ${state.pageIndex + 1} of ${pagesInSection(section)}`;
 
     if (section.kind === "items") {
       renderUolPage(section.items[state.pageIndex]);
@@ -710,7 +874,7 @@ function renderUolPage(item) {
 function buildAudioPlayer(group) {
   const box = document.createElement("div");
   box.className = "audio-card";
-  box.innerHTML = `<div class="audio-label">🎧 Listening Audio</div>`;
+  box.innerHTML = `<div class="audio-label">🎧 Listening Comprehension</div>`;
 
   const audio = new Audio();
   audio.preload = "auto";
@@ -736,7 +900,9 @@ function buildAudioPlayer(group) {
   vol.className = "audio-volume";
   vol.setAttribute("aria-label", "Volume");
   vol.addEventListener("input", () => { audio.volume = Number(vol.value); });
-  controls.append(playBtn, bar, time, vol);
+  const volIcon = document.createElement("span");
+  volIcon.className = "audio-volicon"; volIcon.textContent = "🔊"; volIcon.setAttribute("aria-hidden", "true");
+  controls.append(playBtn, bar, time, volIcon, vol);
 
   const label = document.createElement("div");
   label.className = "plays-left mono";
@@ -867,10 +1033,9 @@ async function goNext() {
     return;
   }
 
-  saveCurrentPageAnswers();
-
-  const isLastPageOfSection = state.pageIndex === pagesInSection(section) - 1;
-  const isLastSection = state.sectionIndex === state.plan.sections.length - 1;
+  const sIdx = state.sectionIndex, pIdx = state.pageIndex;
+  const isLastPageOfSection = pIdx === pagesInSection(section) - 1;
+  const isLastSection = sIdx === state.plan.sections.length - 1;
 
   if (isLastPageOfSection) {
     const startMs = state.sectionStartTimes[state.sectionIndex];
@@ -879,6 +1044,7 @@ async function goNext() {
   }
 
   if (isLastPageOfSection && isLastSection) {
+    saveAnswersOf(sIdx, pIdx);
     if (sectionTimerInterval) clearInterval(sectionTimerInterval);
     await submitExam();
     return;
@@ -891,6 +1057,7 @@ async function goNext() {
     state.pageIndex += 1;
   }
   persist();
+  saveAnswersOf(sIdx, pIdx);          // guarda las respuestas de la página que termina + el avance (ya con la página nueva)
   renderCurrentPage();
 }
 
@@ -918,9 +1085,11 @@ async function submitExam() {
     }
   });
   examRunning = false;
-  try { localStorage.setItem("lastSessionId", state.sessionId); localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+  const finishedId = state.sessionId;
+  state = null;                                   // el latido ya no debe volver a guardar el estado local
+  try { localStorage.setItem("lastSessionId", finishedId); localStorage.removeItem(STORAGE_KEY); } catch (e) {}
   try { if (document.exitFullscreen && inFs()) await document.exitFullscreen(); } catch (e) {}
-  window.location.href = "results.html?s=" + encodeURIComponent(state.sessionId);
+  window.location.href = "results.html?s=" + encodeURIComponent(finishedId);
 }
 
 // ---------- timer por sección ----------
@@ -931,6 +1100,7 @@ function ensureSectionTimerStarted() {
   if (state.sectionStartTimes[idx] === undefined) {
     state.sectionStartTimes[idx] = Date.now();
     persist();
+    saveProgress(state.sessionId, progressSnapshot()).catch(() => {});
   }
   startSectionTimerInterval();
 }
@@ -939,7 +1109,7 @@ function startSectionTimerInterval() {
   if (sectionTimerInterval) clearInterval(sectionTimerInterval);
   const timerEl = document.getElementById("timer");
   const section = currentSection();
-  document.getElementById("timerLabel").textContent = `${section.name} · time left`;
+  document.getElementById("timerLabel").textContent = `${SKILL_LABELS[section.name]} · time left`;
   const durationMin = SECTION_DURATIONS_MIN[section.name];
   const startMs = state.sectionStartTimes[state.sectionIndex];
 
@@ -960,18 +1130,17 @@ function startSectionTimerInterval() {
   sectionTimerInterval = setInterval(tick, 1000);
 }
 
-function saveCurrentPageAnswers() {
-  const section = currentSection();
-  const currentQuestions = section.kind === "items"
-    ? [section.items[state.pageIndex]]
-    : section.groups[state.pageIndex].questions;
+function saveAnswersOf(sIdx, pIdx) {
+  const section = state.plan.sections[sIdx];
+  const currentQuestions = section.kind === "items" ? [section.items[pIdx]] : section.groups[pIdx].questions;
   const entries = currentQuestions.filter(q => state.responses[q.id])
     .map(q => ({ item: q, selected: state.responses[q.id].selected, timeMs: state.responses[q.id].timeMs }));
-  if (entries.length) recordAnswers(state.sessionId, entries).catch(console.error);
+  if (entries.length) recordAnswers(state.sessionId, entries, progressSnapshot()).catch(console.error);
+  else saveProgress(state.sessionId, progressSnapshot()).catch(console.error);
 }
 
 async function forceAdvanceSection() {
-  saveCurrentPageAnswers();
+  const sIdx = state.sectionIndex, pIdx = state.pageIndex;
   const section = currentSection();
   const startMs = state.sectionStartTimes[state.sectionIndex];
   const elapsedSeconds = Math.round((Date.now() - startMs) / 1000);
@@ -980,12 +1149,14 @@ async function forceAdvanceSection() {
 
   const isLastSection = state.sectionIndex === state.plan.sections.length - 1;
   if (isLastSection) {
+    saveAnswersOf(sIdx, pIdx);
     await submitExam();
     return;
   }
   state.sectionIndex += 1;
   state.pageIndex = 0;
   persist();
+  saveAnswersOf(sIdx, pIdx);
   renderCurrentPage();
 }
 

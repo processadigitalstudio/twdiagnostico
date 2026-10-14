@@ -26,11 +26,11 @@
       <div>
         <div class="eyebrow">Qué vas a presentar</div>
         <ul class="info-list">
-          <li><span class="dot-skill dot-uol"></span><div><b>Use of Language · 18 preguntas · 15 min.</b><br>Gramática, vocabulario, colocaciones y preposiciones.</div></li>
-          <li><span class="dot-skill dot-reading"></span><div><b>Reading · 28 preguntas · 20 min.</b><br>8 textos y documentos cortos con sus preguntas.</div></li>
-          <li><span class="dot-skill dot-listening"></span><div><b>Listening · 22 preguntas · 20 min.</b><br>8 audios; puedes escuchar cada uno hasta 3 veces.</div></li>
+          <li><span class="dot-skill dot-uol"></span><div><b>Language Use · 18 preguntas · 15 min.</b><br>Gramática, vocabulario, colocaciones y preposiciones.</div></li>
+          <li><span class="dot-skill dot-reading"></span><div><b>Reading Comprehension · 28 preguntas · 20 min.</b><br>8 textos y documentos cortos con sus preguntas.</div></li>
+          <li><span class="dot-skill dot-listening"></span><div><b>Listening Comprehension · 22 preguntas · 20 min.</b><br>8 audios; puedes escuchar cada uno hasta 4 veces.</div></li>
         </ul>
-        <p class="muted" style="margin-top:14px;">Cada prueba tiene su propio reloj. Antes de empezar cada una verás cómo funciona y cómo se califica. Necesitas <b>audífonos</b> y una conexión estable. Duración total: unos 55 minutos.</p>
+        <p class="muted" style="margin-top:14px;">Cada prueba tiene su propio reloj, que no se detiene. Las instrucciones del examen están en inglés, con un botón para leerlas en español. Antes de empezar cada prueba verás cómo funciona y cómo se califica. Necesitas <b>audífonos</b> y una conexión estable. Duración total: unos 55 minutos.</p>
       </div>
 
       <div class="login-box">
@@ -42,7 +42,7 @@
 
         <div class="error-msg" id="errorMsg"></div>
         <button class="btn-primary" id="startBtn">Ingresar</button>
-        <p class="muted" style="font-size:12.5px; margin-top:12px;">Tu nombre y tu sesión salen de la lista que cargó el supervisor. La contraseña solo funciona en el horario de tu sesión; distingue mayúsculas y minúsculas.</p>
+        <p class="muted" style="font-size:12.5px; margin-top:12px;">Tu sesión sale de la lista que cargó el supervisor y, al entrar, confirmarás tus datos. La contraseña solo funciona en el horario de tu sesión; distingue mayúsculas y minúsculas.</p>
       </div>
     </div>
 
@@ -83,6 +83,8 @@
       sessionStorage.setItem("groupId", r.groupId);
       sessionStorage.setItem("groupName", r.groupName);
       sessionStorage.setItem("institution", r.institution || urlSlug || "tweetalig");
+      sessionStorage.setItem("profile", JSON.stringify(r.profile || {}));
+      if (r.resume) sessionStorage.setItem("resume", JSON.stringify(r.resume)); else sessionStorage.removeItem("resume");
       window.location.href = "exam.html";
     } catch (e) {
       console.error(e);

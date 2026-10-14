@@ -193,10 +193,15 @@ export async function loginToGroup({ cedula, password }) {
   let hasLocal = false;
   try { hasLocal = !!localStorage.getItem(`examState_${pid}`); } catch (e) {}
 
+  // Una reapertura de la administradora (con otra reanudación pendiente de usar) permite continuar desde cualquier equipo.
+  const rs = part.resume && part.resume.token && part.resumeConsumed !== part.resume.token ? part.resume : null;
+
   if (part.status === "completed") return { ok: false, reason: "Esta cédula ya presentó el examen." };
+  if (part.status === "closed") return { ok: false, reason: "Tu examen se cerró por una interrupción (se acabó el tiempo, se fue la luz o se cerró la ventana). Avisa al supervisor: él puede reabrirlo." };
   if (part.status === "in_progress") {
-    if (!hasLocal) return { ok: false, reason: "Este examen ya está en curso en otro equipo o navegador. Avisa al supervisor." };
+    if (!hasLocal && !rs) return { ok: false, reason: "Este examen ya está en curso en otro equipo o navegador. Avisa al supervisor." };
   } else {
+    if (hasLocal) { try { localStorage.removeItem(`examState_${pid}`); } catch (e) {} }   // intento anterior descartado por la administradora
     const now = Date.now(), opens = tsMs(group.opensAt), closes = tsMs(group.closesAt);
     if (group.enabled === false) return { ok: false, reason: "Esta sesión está pausada. Espera la indicación del supervisor." };
     if (now < opens - 60000) return { ok: false, reason: `La sesión abre el ${fmtDate(opens)}.` };
@@ -204,6 +209,8 @@ export async function loginToGroup({ cedula, password }) {
   }
   return {
     ok: true, participantId: pid, cedula: ced, name: part.name || "",
+    profile: { nombres: part.nombres || "", apellidos: part.apellidos || "", email: part.email || "", nivel: part.nivel || "" },
+    resume: rs,
     groupId, groupName: group.name || "", institution: group.institution || ""
   };
 }
@@ -218,11 +225,16 @@ function randomId(len = 14) {
 // ---------- crear intento ----------
 export async function createSession(ctx, plan) {
   const sessionId = `${ctx.cedula}_${randomId()}`;        // id no adivinable (el resultado se consulta con él)
+  const profile = ctx.profile || {};
   await setDoc(doc(db, "sessions", sessionId), {
-    username: ctx.cedula, name: ctx.name, email: "",
+    username: ctx.cedula, name: ctx.name, email: profile.email || "",
+    profile: { ...profile, cedula: ctx.cedula, confirmedAtMs: Date.now() },
     institution: ctx.institution, groupId: ctx.groupId, groupName: ctx.groupName, participantId: ctx.participantId,
     itemIds: allItemIdsFromPlan(plan),
+    planJson: JSON.stringify(plan),                      // permite que la administradora reabra el examen en otro equipo
+    progress: { sectionIndex: 0, pageIndex: 0, sectionStartTimes: {}, sectionInstructionShown: [false, false, false], audioPlayCounts: {} },
     startedAt: serverTimestamp(),
+    lastSavedAt: serverTimestamp(),
     status: "in_progress",
     durationMin: EXAM_DURATION_MIN,
     bankVersion: BANK_VERSION,
@@ -234,10 +246,32 @@ export async function createSession(ctx, plan) {
   return sessionId;
 }
 
+// Foto del avance (para poder continuar en otro equipo si se cae el actual). Va dentro de las escrituras que ya se hacen.
+const progressPatch = (progress) => progress ? { progress, lastSavedAt: serverTimestamp() } : { lastSavedAt: serverTimestamp() };
+
+export async function saveProgress(sessionId, progress) {
+  await updateDoc(doc(db, "sessions", sessionId), progressPatch(progress));
+}
+
+// El examen se CIERRA (interrupción): se reenvían todas las respuestas y queda pendiente de que la administradora lo reabra.
+export async function closeSession(sessionId, participantId, entries, closure, progress) {
+  const patch = { status: "closed", closedAt: serverTimestamp(), closure, ...progressPatch(progress) };
+  for (const { item, selected, timeMs } of entries) {
+    patch[`responses.${item.id}`] = { skill: item.skill, level: item.level, category: item.category, selected, timeMs };
+  }
+  await updateDoc(doc(db, "participants", participantId), { status: "closed" });   // primero el participante: así un reintento nunca se atasca
+  await updateDoc(doc(db, "sessions", sessionId), patch);
+}
+
+// La reanudación ya se aplicó en este equipo: no se puede usar otra vez desde otro equipo.
+export async function markResumeConsumed(participantId, token) {
+  await updateDoc(doc(db, "participants", participantId), { resumeConsumed: token });
+}
+
 // ---------- guardar respuestas (solo la opción elegida, nunca si es correcta) ----------
 // Una sola escritura por página (varias preguntas a la vez).
-export async function recordAnswers(sessionId, entries) {
-  const patch = {};
+export async function recordAnswers(sessionId, entries, progress) {
+  const patch = progressPatch(progress);
   for (const { item, selected, timeMs } of entries) {
     patch[`responses.${item.id}`] = {
       skill: item.skill, level: item.level, category: item.category, selected, timeMs

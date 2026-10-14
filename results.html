@@ -65,10 +65,11 @@ function render(r) {
   if (r.institution) { inst = resolveInstitution(r.institution); renderBrand(document.getElementById("brandBar"), inst); }
   const c = CANDO[r.level] || CANDO.A1;
   const colors = { UoL: "var(--teal)", Reading: "var(--gold)", Listening: "var(--lvl-b1)" };
+  const LABELS = { UoL: "Language Use", Reading: "Reading Comprehension", Listening: "Listening Comprehension" };
   const rows = ["UoL", "Reading", "Listening"].map(sk => {
     const p = r.points[sk];
     const pct = p.max > 0 ? Math.round((p.earned / p.max) * 100) : 0;
-    return `<div class="skill-row"><span>${sk === "UoL" ? "Use of Language" : sk}</span>
+    return `<div class="skill-row"><span>${LABELS[sk]}</span>
       <div class="bar"><div style="width:${pct}%; background:${colors[sk]};"></div></div>
       <span class="val">${p.earned.toFixed(1)} / ${p.max.toFixed(0)}</span></div>`;
   }).join("");

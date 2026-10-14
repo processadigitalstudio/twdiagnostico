@@ -24,7 +24,7 @@ export const LEVELS_ORDER = ["A1", "A2", "B1", "B2"];
 export const ORDER_BY_LEVEL = true;
 
 // Cuántas veces se puede reproducir cada audio de Listening
-export const MAX_AUDIO_PLAYS = 3;
+export const MAX_AUDIO_PLAYS = 4;
 
 // ---------- Puntaje (igual que Moodle: total = 100) ----------
 // UoL: 40 puntos repartidos en partes iguales entre sus 18 ítems (así lo califica Moodle).
@@ -75,6 +75,15 @@ export const ASSET_BASE = ON_FIREBASE_HOSTING ? "https://processadigitalstudio.g
 export const assetUrl = (path) => ASSET_BASE + path;
 
 // ---------- Cortes de luz / internet ----------
-// Si el examen se cierra o el equipo se apaga a mitad de una prueba, al volver se le devuelve el tiempo que
-// estuvo fuera, hasta este máximo en TOTAL por examen (para no penalizar un corte, pero sin permitir pausas largas).
-export const MAX_DOWNTIME_CREDIT_MIN = 10;
+// El reloj de cada prueba es hora real y NUNCA se detiene. Si el estudiante desaparece más de este tiempo
+// (se fue la luz, cerró la ventana, cambió de equipo), al volver el examen se CIERRA y solo la administradora
+// puede reabrirlo (por estudiante, en cualquier equipo, indicando cuántos minutos le quedan).
+// Una recarga rápida (F5) o un parpadeo de pocos segundos no cuenta como interrupción.
+export const INTERRUPTION_GRACE_SEC = 25;
+
+// Volumen: subir el volumen desde el sistema puede quitar el foco a la ventana unos segundos. Durante un audio
+// (o justo después de pulsar una tecla de volumen) una salida de foco más corta que esto NO se registra.
+export const VOLUME_BLUR_TOLERANCE_SEC = 10;
+
+// Nombres que ve el estudiante y la administradora para cada prueba (los códigos internos no cambian)
+export const SKILL_LABELS = { UoL: "Language Use", Reading: "Reading Comprehension", Listening: "Listening Comprehension" };

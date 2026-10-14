@@ -134,6 +134,7 @@
       <label style="margin:0;">Sesión:</label>
       <select id="boardGroup" style="padding:9px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--bg);"></select>
       <span class="mono muted" id="boardCounters"></span>
+      <button class="btn-secondary" id="boardAddBtn" style="padding:8px 16px;">＋ Agregar estudiante a esta sesión</button>
     </div>
     <div class="board">
       <div class="board-col col-wait"><h3>⚪ Sin iniciar <span id="cntNot" class="count">0</span></h3><div id="colNot"></div></div>
@@ -143,9 +144,10 @@
   </div>
 
   <div class="section" id="sessionsSection">
-    <button class="btn-secondary" id="exportCsvBtn">⬇ Exportar respuestas (CSV, para Python/Excel)</button>
+    <button class="btn-primary" id="exportStudentsBtn" style="width:auto; margin:0 8px 8px 0;">⬇ Exportar resultados por estudiante (CSV)</button>
+    <button class="btn-secondary" id="exportCsvBtn">⬇ Exportar respuestas por pregunta (CSV)</button>
     <table class="admin-table">
-      <thead><tr><th></th><th>Nombre</th><th>Usuario</th><th>UoL</th><th>Reading</th><th>Listening</th><th>Nota final</th><th>Nivel</th><th>Alertas</th><th>Eventos</th></tr></thead>
+      <thead><tr><th></th><th>Nombre</th><th>Usuario</th><th>Language Use</th><th>Reading Comp.</th><th>Listening Comp.</th><th>Nota final</th><th>Nivel</th><th>Alertas</th><th>Eventos</th></tr></thead>
       <tbody id="sessionsBody"></tbody>
     </table>
   </div>
@@ -168,8 +170,8 @@
       <div><label>Abre (fecha y hora)</label><input type="datetime-local" id="grpOpens"></div>
       <div><label>Cierra (fecha y hora)</label><input type="datetime-local" id="grpCloses"></div>
     </div>
-    <label>Estudiantes — una línea por persona: <code>cédula, nombre completo</code> (puedes pegar desde Excel)</label>
-    <textarea class="access-input" id="grpRoster" placeholder="1020304050, Ana María Pérez Gómez&#10;1098765432, Juan Carlos Rojas"></textarea>
+    <label>Estudiantes — una línea por persona: <code>cédula, nombres, apellidos, correo, nivel</code> (nivel B1 o B2, opcional; puedes pegar columnas desde Excel). Si solo pones <code>cédula, nombre completo</code> también sirve: el estudiante lo corrige al entrar.</label>
+    <textarea class="access-input" id="grpRoster" placeholder="1020304050, Ana María, Pérez Gómez, ana@correo.com, B1&#10;1098765432, Juan Carlos, Rojas Díaz, juan@correo.com, B2"></textarea>
     <br><br>
     <button class="btn-primary" id="createGroupBtn" style="width:auto;">Crear sesión</button>
     <div class="error-msg" id="grpMsg"></div>
@@ -221,7 +223,7 @@
 
 <script type="module">
 import { db, auth } from "./js/firebase-config.js";
-import { BANK_VERSION } from "./js/exam-config.js";
+import { BANK_VERSION, SECTION_DURATIONS_MIN, SKILL_LABELS } from "./js/exam-config.js";
 import { generateRandomPassword, groupIdFromPassword, participantIdOf, normalizeCedula, tsMs, loadAllBanks, flattenBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery, publishResult } from "./js/exam-engine.js";
 import { buildBookmarkOrder, saveBookmarkOrder, loadAllJudgments, loadAllJudgeCodes } from "./js/bookmark-engine.js";
 import { INSTITUTIONS } from "./js/institutions.js";
@@ -337,15 +339,43 @@ function groupState(g) {
   return { label: "🔴 Cerrada", open: false };
 }
 
+// "Ana María Pérez Gómez" -> nombres "Ana María", apellidos "Pérez Gómez" (el estudiante lo puede corregir al entrar)
+function splitFullName(full) {
+  const w = String(full).trim().split(/\s+/).filter(Boolean);
+  if (w.length <= 1) return { nombres: w[0] || "", apellidos: "" };
+  if (w.length === 2) return { nombres: w[0], apellidos: w[1] };
+  if (w.length === 3) return { nombres: w[0], apellidos: w.slice(1).join(" ") };
+  return { nombres: w.slice(0, -2).join(" "), apellidos: w.slice(-2).join(" ") };
+}
+const EMAIL_RE = /[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+/;
 function parseRoster(text) {
   const rows = [], bad = [];
   for (const raw of text.split("\n")) {
     const line = raw.trim();
     if (!line) continue;
-    const m = line.match(/^\s*(\d[\d.]*)\s*[\t;,]?\s*([^\d\s].*)$/);   // cédula, luego coma / punto y coma / tab / espacio, luego nombre
+    const m = line.match(/^\s*(\d[\d.]*)\s*(?:[\t;,]\s*)?(\S.*)$/);       // cédula + (coma | ; | tab | espacio) + resto
     const ced = m ? normalizeCedula(m[1]) : "";
-    const name = m ? m[2].trim().replace(/\s+/g, " ") : "";
-    if (ced.length >= 5 && name.length >= 3) rows.push({ cedula: ced, name }); else bad.push(line);
+    let parts = m ? m[2].split(/[\t;,]/).map(x => x.trim()).filter(Boolean) : [];
+    let email = "", nivel = "";
+    if (parts.length === 1) {                                              // formato con espacios: "cédula Nombre Apellido correo B1"
+      let one = parts[0];
+      const em = one.match(EMAIL_RE); if (em) { email = em[0]; one = one.replace(em[0], " "); }
+      const nv = one.match(/(^|\s)(B[12])(\s|$)/i); if (nv) { nivel = nv[2].toUpperCase(); one = one.replace(nv[0], " "); }
+      parts = [one.trim()];
+    } else {
+      const rest = [];
+      for (const p of parts) {
+        if (!email && EMAIL_RE.test(p)) email = p.match(EMAIL_RE)[0];
+        else if (!nivel && /^B[12]$/i.test(p)) nivel = p.toUpperCase();
+        else rest.push(p);
+      }
+      parts = rest;
+    }
+    let nombres = "", apellidos = "";
+    if (parts.length >= 2) { nombres = parts[0].replace(/\s+/g, " "); apellidos = parts.slice(1).join(" ").replace(/\s+/g, " "); }
+    else if (parts.length === 1) ({ nombres, apellidos } = splitFullName(parts[0].replace(/\s+/g, " ")));
+    if (ced.length >= 5 && nombres.length >= 2) rows.push({ cedula: ced, nombres, apellidos, name: `${nombres} ${apellidos}`.trim(), email, nivel });
+    else bad.push(line);
   }
   return { rows, bad };
 }
@@ -387,7 +417,7 @@ function renderDetail() {
   const box = document.getElementById("groupDetail");
   if (!g) { box.style.display = "none"; return; }
   const mine = partsCache.filter(p => p.groupId === g.id).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-  const labels = { not_started: "⚪ Sin iniciar", in_progress: "🟡 En proceso", completed: "✅ Finalizado" };
+  const labels = { not_started: "⚪ Sin iniciar", in_progress: "🟡 En proceso", closed: "⛔ Cerrado (interrupción)", completed: "✅ Finalizado" };
   box.style.display = "block";
   box.innerHTML = `
     <h3 style="margin-top:0;">${esc(g.name)} · ${groupState(g).label}</h3>
@@ -401,16 +431,27 @@ function renderDetail() {
     <button class="btn-secondary" id="dDelete" style="margin-left:8px; color:var(--bad);">🗑 Borrar sesión</button>
     <div class="error-msg" id="dMsg"></div>
 
-    <h4 style="margin-top:24px;">Agregar estudiantes</h4>
-    <textarea class="access-input" id="dRoster" style="min-height:80px;" placeholder="cédula, nombre completo"></textarea>
+    <h4 style="margin-top:24px;" id="dAddOneTitle">Agregar un estudiante a esta sesión (llegó tarde o se te escapó)</h4>
+    <div class="form-grid">
+      <div><label>Cédula</label><input type="text" id="aCed" inputmode="numeric" autocomplete="off"></div>
+      <div><label>Nombres</label><input type="text" class="plain" id="aNom" autocomplete="off"></div>
+      <div><label>Apellidos</label><input type="text" class="plain" id="aApe" autocomplete="off"></div>
+      <div><label>Correo</label><input type="text" class="plain" id="aEmail" autocomplete="off"></div>
+      <div><label>Nivel para grado</label><select id="aNivel"><option value="">— (lo elige él)</option><option>B1</option><option>B2</option></select></div>
+    </div>
+    <button class="btn-primary" id="aAdd" style="width:auto;">Agregar estudiante</button>
+    <div class="error-msg" id="aMsg"></div>
+
+    <h4 style="margin-top:24px;">Agregar varios (pegar lista)</h4>
+    <textarea class="access-input" id="dRoster" style="min-height:80px;" placeholder="cédula, nombres, apellidos, correo, nivel"></textarea>
     <br><button class="btn-secondary" id="dAdd" style="margin-top:8px;">Agregar a la lista</button>
 
     <h4 style="margin-top:24px;">Estudiantes (${mine.length})</h4>
-    <p class="muted"><strong>Reabrir</strong> sirve cuando a alguien se le cayó el equipo y debe empezar un examen nuevo; <strong>quitar</strong> lo borra de la lista.</p>
+    <p class="muted"><strong>▶ Reabrir</strong>: el estudiante continúa donde iba, <u>en el mismo u otro equipo</u>, y tú le fijas cuántos minutos le quedan en la prueba en curso. <strong>↺ Reiniciar</strong>: descarta su intento y le da un examen nuevo (otras preguntas). <strong>quitar</strong>: lo saca de la lista.</p>
     <table class="admin-table">
-      <thead><tr><th>Nombre</th><th>Cédula</th><th>Estado</th><th></th></tr></thead>
-      <tbody>${mine.map(p => `<tr><td>${esc(p.name)}</td><td class="mono">${esc(p.cedula)}</td><td>${labels[p.status] || p.status}</td>
-        <td>${p.status !== "not_started" ? `<span class="toggle-detail" data-reopen="${p.id}" style="margin-right:10px;">↺ reabrir</span>` : ""}<span class="toggle-detail" data-delpart="${p.id}" style="color:var(--bad);">quitar</span></td></tr>`).join("")}</tbody>
+      <thead><tr><th>Nombre</th><th>Cédula</th><th>Correo</th><th>Nivel</th><th>Estado</th><th></th></tr></thead>
+      <tbody>${mine.map(p => `<tr><td>${esc(p.name)}</td><td class="mono">${esc(p.cedula)}</td><td style="font-size:.85rem;">${esc(p.email || "—")}</td><td>${esc(p.nivel || "—")}</td><td>${labels[p.status] || p.status}</td>
+        <td>${["in_progress", "closed"].includes(p.status) ? `<span class="toggle-detail" data-resume="${p.id}" style="margin-right:10px;">▶ reabrir</span>` : ""}${p.status !== "not_started" ? `<span class="toggle-detail" data-restart="${p.id}" style="margin-right:10px;">↺ reiniciar</span>` : ""}<span class="toggle-detail" data-delpart="${p.id}" style="color:var(--bad);">quitar</span></td></tr>`).join("")}</tbody>
     </table>`;
 
   const msg = (t) => { document.getElementById("dMsg").textContent = t; };
@@ -433,14 +474,23 @@ function renderDetail() {
     msg(bad.length ? `Se agregaron ${rows.length}. No se entendieron ${bad.length} líneas: ${bad.slice(0, 3).join(" | ")}` : `Se agregaron ${rows.length}.`);
     await loadGroups();
   };
-  box.querySelectorAll("[data-reopen]").forEach(el => el.addEventListener("click", async () => {
-    const pid = el.dataset.reopen;
-    if (!confirm("¿Reabrir? Su intento actual queda descartado y empezará un examen nuevo (con otras preguntas).")) return;
-    const ss = await getDocs(query(collection(db, "sessions"), where("participantId", "==", pid), where("status", "==", "in_progress")));
-    for (const d of ss.docs) await updateDoc(doc(db, "sessions", d.id), { status: "abandoned" });
-    await updateDoc(doc(db, "participants", pid), { status: "not_started" });
+  document.getElementById("aAdd").onclick = async () => {
+    const out = document.getElementById("aMsg"); out.textContent = "";
+    const ced = normalizeCedula(document.getElementById("aCed").value);
+    const nombres = document.getElementById("aNom").value.trim().replace(/\s+/g, " "), apellidos = document.getElementById("aApe").value.trim().replace(/\s+/g, " ");
+    const email = document.getElementById("aEmail").value.trim(), nivel = document.getElementById("aNivel").value;
+    if (ced.length < 5) { out.textContent = "Escribe la cédula (solo números)."; return; }
+    if (nombres.length < 2) { out.textContent = "Escribe los nombres."; return; }
+    const pid = participantIdOf(g.id, ced);
+    const prev = await getDoc(doc(db, "participants", pid));
+    if (prev.exists()) { out.textContent = `Esa cédula ya está en esta sesión (${prev.data().name}). Si necesita repetir, usa «reiniciar» en la lista.`; return; }
+    await setDoc(doc(db, "participants", pid), newParticipant(g, { cedula: ced, nombres, apellidos, name: `${nombres} ${apellidos}`.trim(), email, nivel }));
+    out.textContent = `Agregado: ${nombres} ${apellidos}. Ya puede entrar con su cédula${groupState(g).open ? "." : ` (recuerda: la sesión está ${groupState(g).label.replace(/<[^>]+>/g, "")}).`}`;
+    for (const f of ["aCed", "aNom", "aApe", "aEmail"]) document.getElementById(f).value = "";
     await loadGroups();
-  }));
+  };
+  box.querySelectorAll("[data-resume]").forEach(el => el.addEventListener("click", () => resumeParticipant(el.dataset.resume)));
+  box.querySelectorAll("[data-restart]").forEach(el => el.addEventListener("click", () => restartParticipant(el.dataset.restart)));
   box.querySelectorAll("[data-delpart]").forEach(el => el.addEventListener("click", async () => {
     if (!confirm("¿Quitar a esta persona de la lista?")) return;
     await deleteDoc(doc(db, "participants", el.dataset.delpart));
@@ -448,7 +498,61 @@ function renderDetail() {
   }));
 }
 
-const newParticipant = (g, r) => ({ cedula: r.cedula, name: r.name, groupId: g.id, groupName: g.name, institution: g.institution, status: "not_started", createdAt: serverTimestamp() });
+// ---------- reabrir / reiniciar a UN estudiante ----------
+async function latestAttempt(pid) {
+  const ss = await getDocs(query(collection(db, "sessions"), where("participantId", "==", pid)));
+  const list = ss.docs.map(d => ({ id: d.id, ...d.data() })).filter(x => x.status !== "abandoned");
+  list.sort((a, b) => (b.startedAt?.seconds || 0) - (a.startedAt?.seconds || 0));
+  return list[0];
+}
+
+// ▶ Reabrir: el estudiante continúa donde iba (en cualquier equipo). La administradora fija los minutos que le quedan.
+async function resumeParticipant(pid) {
+  const p = partsCache.find(x => x.id === pid);
+  const s = await latestAttempt(pid);
+  if (!s || s.status === "completed") { alert("No hay un intento en curso para continuar. Si quieres darle un examen nuevo usa «↺ reiniciar»."); return; }
+  if (!s.planJson) { alert("Este intento es de una versión anterior y no guardó el examen completo. Usa «↺ reiniciar»."); return; }
+  const pr = s.progress || {};
+  const plan = JSON.parse(s.planJson);
+  const idx = pr.sectionIndex || 0, sec = plan.sections[idx];
+  const startMs = pr.sectionStartTimes ? pr.sectionStartTimes[idx] : undefined;
+  let remainingMs = null;
+  if (startMs !== undefined && sec) {
+    const durMs = SECTION_DURATIONS_MIN[sec.name] * 60000;
+    let remMs;
+    if (s.closure && s.closure.remainingMsAtDrop !== undefined) remMs = s.closure.remainingMsAtDrop;                       // se cerró al volver: ya sabemos cuánto le quedaba
+    else remMs = Math.min(durMs, Math.max(0, durMs - ((s.lastSavedAt?.seconds ? s.lastSavedAt.seconds * 1000 : Date.now()) - startMs)));       // estimado con el último guardado
+    const sug = Math.max(1, Math.ceil(remMs / 60000));
+    const ans = window.prompt(`${p?.name || ""}\nPrueba en curso: ${SKILL_LABELS[sec.name]} (${SECTION_DURATIONS_MIN[sec.name]} min en total).\n\n¿Cuántos MINUTOS le quedan en esta prueba?\nSugerido: ${sug} (lo que le quedaba cuando se interrumpió).`, String(sug));
+    if (ans === null) return;
+    const mins = Number(String(ans).replace(",", "."));
+    if (!(mins > 0)) { alert("Escribe un número de minutos mayor que 0."); return; }
+    remainingMs = Math.round(Math.min(mins, SECTION_DURATIONS_MIN[sec.name]) * 60000);
+  } else if (!confirm(`${p?.name || ""}: la prueba en curso todavía no había empezado su reloj. ¿Reabrir tal cual?`)) return;
+  const responses = {};
+  for (const [id, r] of Object.entries(s.responses || {})) responses[id] = { selected: r.selected, timeMs: r.timeMs || 0 };
+  const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  await updateDoc(doc(db, "participants", pid), {
+    status: "in_progress", resumeConsumed: null,
+    resume: { token, sessionId: s.id, planJson: s.planJson, progress: pr, responses, remainingMs, grantedAtMs: Date.now() }
+  });
+  await updateDoc(doc(db, "sessions", s.id), { status: "in_progress", reopenedAt: serverTimestamp(), reopenCount: (s.reopenCount || 0) + 1 });
+  alert(`Listo. ${p?.name || "El estudiante"} puede volver a entrar con su cédula y la contraseña de la sesión (en este u otro equipo) y continúa donde iba${remainingMs !== null ? ` con ${Math.round(remainingMs / 60000)} min en la prueba actual` : ""}.`);
+  await loadGroups();
+}
+
+// ↺ Reiniciar: se descarta el intento y empieza un examen nuevo
+async function restartParticipant(pid) {
+  const p = partsCache.find(x => x.id === pid);
+  if (!confirm(`¿Reiniciar a ${p?.name || "este estudiante"}? Su intento actual queda descartado y empezará un examen NUEVO (con otras preguntas).`)) return;
+  const ss = await getDocs(query(collection(db, "sessions"), where("participantId", "==", pid)));
+  for (const d of ss.docs) { const st = d.data().status; if (st === "in_progress" || st === "closed") await updateDoc(doc(db, "sessions", d.id), { status: "abandoned" }); }
+  await updateDoc(doc(db, "participants", pid), { status: "not_started", resume: null, resumeConsumed: null });
+  await loadGroups();
+}
+window.resumeParticipant = resumeParticipant; window.restartParticipant = restartParticipant;
+
+const newParticipant = (g, r) => ({ cedula: r.cedula, name: r.name, nombres: r.nombres || "", apellidos: r.apellidos || "", email: r.email || "", nivel: r.nivel || "", groupId: g.id, groupName: g.name, institution: g.institution, status: "not_started", createdAt: serverTimestamp() });
 
 const grpInst = document.getElementById("grpInstitution");
 for (const slug of Object.keys(INSTITUTIONS)) { const o = document.createElement("option"); o.value = slug; o.textContent = INSTITUTIONS[slug].name; grpInst.appendChild(o); }
@@ -530,6 +634,14 @@ function fillBoardSelect() {
   if ([...sel.options].some(o => o.value === cur)) sel.value = cur;
 }
 document.getElementById("boardGroup").addEventListener("change", renderBoard);
+document.getElementById("boardAddBtn").addEventListener("click", () => {
+  const gid = document.getElementById("boardGroup").value;
+  if (!gid) { alert("Primero elige la sesión en la lista de arriba."); return; }
+  selectedGroupId = gid;
+  document.querySelector('.tab[data-tab="access"]').click();
+  renderDetail();
+  setTimeout(() => { const t = document.getElementById("dAddOneTitle"); if (t) { t.scrollIntoView({ behavior: "smooth", block: "start" }); document.getElementById("aCed").focus(); } }, 150);
+});
 
 const tierOf = (events) => eventTierCounts(events);
 function renderBoard() {
@@ -542,17 +654,24 @@ function renderBoard() {
     if (!prev || (s.startedAt?.seconds || 0) >= (prev.startedAt?.seconds || 0)) byPart[s.participantId] = s;
   }
   const cols = { not_started: [], in_progress: [], completed: [] };
-  for (const p of parts) (cols[p.status] || cols.not_started).push(p);
+  for (const p of parts) (cols[p.status === "closed" ? "in_progress" : p.status] || cols.not_started).push(p);
 
   const sev = (events) => { const c = tierOf(events); return (c.high ? ` <span class="sev-badge" style="background:var(--sev-high);">🔴 ${c.high}</span>` : "") + (c.med ? ` <span class="sev-badge" style="background:var(--sev-med);">🟠 ${c.med}</span>` : ""); };
-  document.getElementById("colNot").innerHTML = cols.not_started.map(p => `<div class="board-card"><b>${esc(p.name)}</b><div class="sub mono">${esc(p.cedula)}</div></div>`).join("") || `<div class="muted">—</div>`;
+  const lvl = (p) => p.nivel ? ` · req. ${esc(p.nivel)}` : "";
+  document.getElementById("colNot").innerHTML = cols.not_started.map(p => `<div class="board-card"><b>${esc(p.name)}</b><div class="sub mono">${esc(p.cedula)}${lvl(p)}</div></div>`).join("") || `<div class="muted">—</div>`;
   document.getElementById("colProg").innerHTML = cols.in_progress.map(p => {
     const s = byPart[p.id];
     const total = (s?.itemIds || []).length || 68, answered = Object.keys(s?.responses || {}).length;
     const startedMs = s?.startedAt?.seconds ? s.startedAt.seconds * 1000 : 0;
     const mins = startedMs ? Math.floor((Date.now() - startedMs) / 60000) : null;
-    return `<div class="board-card"><b>${esc(p.name)}</b>${sev(s?.suspiciousEvents)}<div class="sub mono">${esc(p.cedula)}${mins !== null ? " · " + mins + " min" : ""}</div>
-      <div class="progress-mini" style="width:100%; margin-top:6px;"><div style="width:${Math.round(answered / total * 100)}%;"></div></div><div class="sub">${answered}/${total} respuestas guardadas</div></div>`;
+    const lastMs = s?.lastSavedAt?.seconds ? s.lastSavedAt.seconds * 1000 : 0;
+    const idle = lastMs ? Math.floor((Date.now() - lastMs) / 60000) : null;
+    const closed = p.status === "closed";
+    const warn = closed ? `<div class="sub" style="color:var(--bad); font-weight:800;">⛔ Cerrado por interrupción</div>`
+      : (idle !== null && idle >= 6 ? `<div class="sub" style="color:var(--sev-med); font-weight:800;">⚠ sin guardar hace ${idle} min</div>` : "");
+    return `<div class="board-card" style="${closed ? "border-color:var(--bad);" : ""}"><b>${esc(p.name)}</b>${sev(s?.suspiciousEvents)}<div class="sub mono">${esc(p.cedula)}${lvl(p)}${mins !== null ? " · " + mins + " min" : ""}</div>${warn}
+      <div class="progress-mini" style="width:100%; margin-top:6px;"><div style="width:${Math.round(answered / total * 100)}%;"></div></div><div class="sub">${answered}/${total} respuestas guardadas</div>
+      <div style="margin-top:6px;"><span class="toggle-detail" onclick="resumeParticipant('${p.id}')">▶ reabrir</span> &nbsp; <span class="toggle-detail" onclick="restartParticipant('${p.id}')" style="color:var(--ink-soft);">↺ reiniciar</span></div></div>`;
   }).join("") || `<div class="muted">—</div>`;
   document.getElementById("colDone").innerHTML = cols.completed.map(p => {
     const s = byPart[p.id];
@@ -575,7 +694,7 @@ function fmtMinSec(seconds) {
 }
 
 const SKILL_COLOR_HEX = { UoL: "#2F6F6B", Reading: "#B8912B", Listening: "#6B5B95" };
-const SKILL_SHORT = { UoL: "UoL", Reading: "Reading", Listening: "Listening" };
+const SKILL_SHORT = { UoL: "Language Use", Reading: "Reading Comp.", Listening: "Listening Comp." };
 
 // severidad de cada tipo de evento sospechoso
 const EVENT_TIER = {
@@ -584,6 +703,7 @@ const EVENT_TIER = {
   copy_attempt: "med", cut_attempt: "med", paste_attempt: "med", keyboard_copy_paste: "med", print_screen_key: "med",
   right_click: "low", selection_attempt: "low", drag_attempt: "low", keyboard_shortcut: "low"
 };
+const INFO_EVENTS = new Set(["audio_play", "was_offline", "reopened_by_admin", "section_timeout", "back_attempt"]);
 const TIER_COLOR = { high: "var(--sev-high)", med: "var(--sev-med)", low: "var(--sev-low)" };
 const TIER_LABEL = { high: "Alto", med: "Medio", low: "Bajo" };
 
@@ -599,6 +719,7 @@ function skillPctCell(pct, skill) {
 function eventTierCounts(events) {
   const counts = { high: 0, med: 0, low: 0 };
   for (const e of (events || [])) {
+    if (INFO_EVENTS.has(e.type)) continue;           // eventos informativos: no son faltas
     const tier = EVENT_TIER[e.type] || "low";
     counts[tier]++;
   }
@@ -667,7 +788,8 @@ document.addEventListener("change", (e) => {
 const EVENT_LABELS = {
   tab_hidden: "Cambió de pestaña / minimizó", copy_attempt: "Intentó copiar", cut_attempt: "Intentó cortar",
   paste_attempt: "Intentó pegar", right_click: "Click derecho", keyboard_copy_paste: "Atajo de teclado copiar/pegar",
-  print_screen_key: "Tecla Print Screen", browser_translate_detected: "Usó el traductor del navegador"
+  print_screen_key: "Tecla Print Screen", browser_translate_detected: "Usó el traductor del navegador",
+  reopened_by_admin: "Examen reabierto por la administradora", was_offline: "Se quedó sin internet", back_attempt: "Intentó volver atrás", audio_play: "Reprodujo un audio"
 };
 
 function buildDetailPanel(s, r) {
@@ -690,7 +812,7 @@ function buildDetailPanel(s, r) {
 
   // tiempos por sección
   html += `<h4>Tiempo usado por sección</h4>`;
-  const budgets = { UoL: 15, Reading: 30, Listening: 20 };
+  const budgets = { UoL: 15, Reading: 20, Listening: 20 };
   for (const skill of ["UoL", "Reading", "Listening"]) {
     const t = s.sectionTimings?.[skill];
     const budgetSec = budgets[skill] * 60;
@@ -743,7 +865,7 @@ function renderSessionsTable() {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><span class="toggle-detail" data-session="${s.id}">ver</span></td>
-      <td>${s.name || "—"}</td>
+      <td>${esc(s.name || "—")}<div class="muted" style="font-size:.8rem;">${esc(s.profile?.email || "")}${s.profile?.nivel ? " · req. " + esc(s.profile.nivel) : ""}</div></td>
       <td class="mono">${s.username || "—"}</td>
       <td>${r ? skillPctCell(r.pct.UoL, "UoL") : "—"}</td>
       <td>${r ? skillPctCell(r.pct.Reading, "Reading") : "—"}</td>
@@ -848,6 +970,27 @@ async function renderItemAnalysis() {
     });
   });
 }
+
+document.getElementById("exportStudentsBtn").addEventListener("click", () => {
+  const q = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const header = ["cedula", "nombres", "apellidos", "correo", "nivel_requerido_grado", "sesion", "estado", "nivel_obtenido", "cumple_nivel_requerido", "nota_final",
+    "language_use_pct", "reading_comprehension_pct", "listening_comprehension_pct", "eventos_sospechosos", "reaperturas"];
+  const order = { A1: 1, A2: 2, B1: 3, B2: 4 };
+  const lines = [header.join(",")];
+  for (const p of partsCache.slice().sort((a, b) => (a.groupName || "").localeCompare(b.groupName || "") || (a.name || "").localeCompare(b.name || ""))) {
+    const sess = latestSessions.filter(x => x.participantId === p.id && x.status !== "abandoned").sort((a, b) => (b.startedAt?.seconds || 0) - (a.startedAt?.seconds || 0))[0];
+    const prof = sess?.profile || {};
+    let r = null; if (sess && p.status === "completed" && sess.status === "completed" && answerKey) { try { r = computeSessionResults(sess, answerKey); } catch (e) {} }
+    const req = prof.nivel || p.nivel || "";
+    const meets = r && req ? (order[r.level] >= order[req] ? "SI" : "NO") : "";
+    const status = { not_started: "sin iniciar", in_progress: "en proceso", closed: "cerrado por interrupcion", completed: "finalizado" }[p.status] || p.status;
+    lines.push([p.cedula, prof.nombres || p.nombres, prof.apellidos || p.apellidos, prof.email || p.email, req, p.groupName, status, r?.level, meets, r?.finalScore,
+      r?.pct?.UoL, r?.pct?.Reading, r?.pct?.Listening, (sess?.suspiciousEvents || []).length, sess?.reopenCount || 0].map(q).join(","));
+  }
+  const blob = new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = `resultados_por_estudiante_${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+});
 
 document.getElementById("exportCsvBtn").addEventListener("click", () => {
   const lines = ["session_id,username,name,item_id,skill,level,category,selected,correct,time_ms,final_score,level_assigned,suspicious_events_count,time_uol_sec,time_reading_sec,time_listening_sec,uol_timed_out,reading_timed_out,listening_timed_out,pattern_alerts_count,uol_A1,uol_A2,uol_B1,uol_B2,reading_A1,reading_A2,reading_B1,reading_B2,listening_A1,listening_A2,listening_B1,listening_B2"];

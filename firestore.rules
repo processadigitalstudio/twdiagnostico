@@ -23,23 +23,26 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
-    // Participante = cédula + nombre cargados por la admin en una sesión. El estudiante solo puede pasar
-    // su propio estado de not_started -> in_progress (con la sesión abierta) -> completed.
+    // Participante = estudiante cargado por la admin en una sesión (cédula, nombres, apellidos, correo, nivel).
+    // El estudiante solo puede pasar su propio estado: not_started -> in_progress (con la sesión abierta) -> completed o
+    // closed (interrupción). Una vez "closed" solo la admin puede reabrirlo. También marca como usada la reanudación que
+    // la admin le dio (resumeConsumed), para que no se pueda repetir desde otro equipo.
     match /participants/{pid} {
       allow get: if true;
       allow list, create, delete: if isAdmin();
       allow update: if isAdmin() || (
-        resource.data.status != 'completed' &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'usedAt']) &&
+        resource.data.status in ['not_started', 'in_progress'] &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'usedAt', 'resumeConsumed']) &&
         (
-          (request.resource.data.status == 'completed') ||
-          (request.resource.data.status == 'in_progress' && groupOpen(resource.data.groupId))
+          (request.resource.data.status in ['completed', 'closed']) ||
+          (request.resource.data.status == 'in_progress' &&
+            (resource.data.status == 'in_progress' || groupOpen(resource.data.groupId)))
         )
       );
     }
 
     // Intentos. Solo la admin los lee. El estudiante crea el suyo (sesión abierta, participante sin iniciar)
-    // y lo actualiza mientras esté en curso.
+    // y lo actualiza mientras esté en curso (respuestas, avance, eventos, cierre por interrupción o final).
     match /sessions/{id} {
       allow read, delete: if isAdmin();
       allow create: if request.resource.data.status == 'in_progress'
@@ -48,8 +51,8 @@ service cloud.firestore {
       allow update: if isAdmin() || (
         resource.data.status == 'in_progress' &&
         !request.resource.data.diff(resource.data).affectedKeys()
-          .hasAny(['username', 'name', 'email', 'institution', 'groupId', 'groupName', 'participantId', 'itemIds', 'bankVersion', 'resultDelivery', 'startedAt']) &&
-        request.resource.data.status in ['in_progress', 'completed']
+          .hasAny(['username', 'name', 'email', 'profile', 'institution', 'groupId', 'groupName', 'participantId', 'itemIds', 'planJson', 'bankVersion', 'resultDelivery', 'startedAt', 'reopenedAt', 'reopenCount']) &&
+        request.resource.data.status in ['in_progress', 'completed', 'closed']
       );
     }
 

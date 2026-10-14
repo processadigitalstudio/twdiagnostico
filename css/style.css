@@ -707,7 +707,7 @@ button { font-family: "Nunito", sans-serif; font-weight: 800; font-size: 1.05rem
 .lvl-pill.A2 { background: var(--lvl-a2-soft); color: var(--lvl-a2-ink); border: 2px solid var(--lvl-a2); }
 .lvl-pill.B1 { background: var(--lvl-b1-soft); color: var(--lvl-b1-ink); border: 2px solid var(--lvl-b1); }
 .lvl-pill.B2 { background: var(--lvl-b2-soft); color: var(--lvl-b2-ink); border: 2px solid var(--lvl-b2); }
-.skill-row { grid-template-columns: 150px 1fr 100px; font-size: 1rem; font-weight: 700; }
+.skill-row { grid-template-columns: 210px 1fr 100px; font-size: 1rem; font-weight: 700; }
 .skill-row .bar { height: 16px; border-radius: 8px; }
 .skill-row .bar > div { border-radius: 8px; }
 .cando-box { border-radius: 14px; }
@@ -762,3 +762,16 @@ table.admin-table th { font-family: "Nunito", sans-serif; font-size: .75rem; }
 .skill-row > span:first-child { text-align: left; }
 .topbar .brand-bar::after { display: none; }
 .board-card .sub b { display: inline; }
+
+/* ---------- Confirmación de datos y volumen ---------- */
+.form-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 18px; }
+@media (max-width: 640px) { .form-grid2 { grid-template-columns: 1fr; } }
+input.plain { font-family: "Nunito Sans", system-ui, sans-serif; letter-spacing: 0; }
+input[readonly] { background: #EFEBDF; color: var(--ink-soft); }
+.level-choice { display: flex; gap: 12px; }
+.lvl-opt { flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0; padding: 14px; border: 2px solid var(--line); border-radius: 12px; cursor: pointer; background: #fff; font-size: 1.2rem; color: var(--ink); }
+.lvl-opt input { width: 20px; height: 20px; accent-color: var(--teal-dark); }
+.lvl-opt.on { border-color: var(--teal-dark); background: #E8F5F0; box-shadow: 0 0 0 3px rgba(93,182,156,.25); }
+.audio-volicon { font-size: 1.1rem; }
+.audio-volume { width: 120px; }
+@media (max-width: 640px) { .skill-row { grid-template-columns: 1fr; } }
