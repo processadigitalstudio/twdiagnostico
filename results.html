@@ -78,7 +78,10 @@ function routeCardHtml(key, card, recommended) {
     <p>${esc(card.what)}</p>
     <ul>${li(card.facts)}</ul>
     <div class="route-sub">${esc(card.priceTitle || "Valor")}</div>${prices}
-    <div class="route-sub">Fechas</div><dl class="route-dl">${dl(card.dates)}</dl>
+    <div class="route-sub">Fechas</div>${card.dateGroups
+      ? card.dateGroups.map(g => `<div class="route-grp">${esc(g.title)}</div><dl class="route-dl">${dl(g.rows)}</dl>`).join("")
+      : `<dl class="route-dl">${dl(card.dates)}</dl>`}
+    ${card.payNote ? `<div class="route-pay">💳 ${esc(card.payNote)}</div>` : ""}
   </div>`;
 }
 
