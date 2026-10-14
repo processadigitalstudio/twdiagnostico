@@ -99,7 +99,7 @@ export function routeCards(level, institutionSlug) {
           ["Fin de clases y exámenes finales", "hasta el 5 de febrero de 2027"]
         ] }
       ],
-      payNote: `Puedes pagar en 2 cuotas y hay facilidades de pago. Para más información escribe a ${CONTACT_EMAIL}.`
+      payNote: `Pregunta por las facilidades de pago y créditos: ${CONTACT_EMAIL}`
     }
   };
 }
