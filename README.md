@@ -4,11 +4,15 @@
 
 1. **Reglas de Firestore**: abre `firestore.rules`, reemplaza `PEGA_AQUI_TU_UID` por tu UID (Firebase Console → Authentication → Users) y pega el contenido en Firestore → Rules → Publicar.
 2. **Cierra el registro público**: Authentication → Settings → User actions → desactiva "Enable create (sign-up)". Deja solo tu usuario administrador.
-3. **Logos**: sube `img/brand/tweetalig-logo.png` y el de cada universidad (`img/brand/eam.png`, etc.). Si falta un archivo se muestra el nombre en texto.
+3. **Logos**: Tweetalig y EAM ya están en `img/brand/`. Otra universidad: sube su logo ahí y regístralo en `js/institutions.js`.
 4. **Instituciones**: `js/institutions.js` (nombre, logo, link de inscripción). El link se elige por institución del acceso o por `?u=slug`.
 5. **Clave**: en `admin.html` → "Cargar answer_key_PRIVADO_NO_SUBIR.json" (una sola vez).
 6. **Accesos**: `admin.html` → Gestionar accesos → una persona por línea `Nombre,usuario,correo,institución` → descargar el CSV.
 7. **Día del examen**: deja `admin.html` abierto con la clave cargada. Cada examen que termina se califica ahí y el resultado aparece en pantalla al estudiante.
+
+## Publicar como "Twtest"
+- **GitHub Pages (recomendado, sin costo):** Settings → Rename repository → `twtest`; luego Settings → Pages → rama `main`. Link: `https://processadigitalstudio.github.io/twtest/index.html?u=eam`. Añade `processadigitalstudio.github.io` a Authentication → Settings → Authorized domains.
+- **Firebase Hosting (`twtest.web.app`):** requiere plan Blaze (el plan gratis solo permite 360 MB/día de descarga y 200 estudiantes bajan ~1 GB). `firebase hosting:sites:create twtest` y `firebase deploy --only hosting`.
 
 Link para estudiantes: `https://<tu-sitio>/index.html?u=eam` (cambia `eam` por la institución).
 

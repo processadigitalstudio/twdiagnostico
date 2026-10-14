@@ -47,7 +47,7 @@
   "level": "A1",
   "title": "Regional train schedule",
   "paragraphs": [],
-  "image": "img/A1_Text02.png",
+  "image": "img/A1_Text02.webp",
   "questions": [
    {
     "id": "A1_R_T02_Q1",
@@ -129,7 +129,7 @@
   "level": "A1",
   "title": "Grocery store receipt",
   "paragraphs": [],
-  "image": "img/A1_Text04.png",
+  "image": "img/A1_Text04.webp",
   "questions": [
    {
     "id": "A1_R_T04_Q1",
@@ -169,7 +169,7 @@
   "level": "A1",
   "title": "Clinic appointment card",
   "paragraphs": [],
-  "image": "img/A1_Text05.png",
+  "image": "img/A1_Text05.webp",
   "questions": [
    {
     "id": "A1_R_T05_Q1",
@@ -251,7 +251,7 @@
   "level": "A1",
   "title": "Weekend trip itinerary",
   "paragraphs": [],
-  "image": "img/A1_Text07.png",
+  "image": "img/A1_Text07.webp",
   "questions": [
    {
     "id": "A1_R_T07_Q1",
@@ -333,7 +333,7 @@
   "level": "A1",
   "title": "Westfield School week",
   "paragraphs": [],
-  "image": "img/A1_Text09.png",
+  "image": "img/A1_Text09.webp",
   "questions": [
    {
     "id": "A1_R_T09_Q1",
@@ -373,7 +373,7 @@
   "level": "A1",
   "title": "Riverside community notice board",
   "paragraphs": [],
-  "image": "img/A1_Text10.png",
+  "image": "img/A1_Text10.webp",
   "questions": [
    {
     "id": "A1_R_T10_Q1",
@@ -455,7 +455,7 @@
   "level": "A1",
   "title": "Weekly weather in Riverton",
   "paragraphs": [],
-  "image": "img/A1_Text12.png",
+  "image": "img/A1_Text12.webp",
   "questions": [
    {
     "id": "A1_R_T12_Q1",
@@ -957,7 +957,7 @@
   "level": "A2",
   "title": "Flight e-ticket with connection",
   "paragraphs": [],
-  "image": "img/A2_Text08.png",
+  "image": "img/A2_Text08.webp",
   "questions": [
    {
     "id": "A2_R_T11_Q1",
@@ -997,7 +997,7 @@
   "level": "A2",
   "title": "Gym membership application",
   "paragraphs": [],
-  "image": "img/A2_Text09.png",
+  "image": "img/A2_Text09.webp",
   "questions": [
    {
     "id": "A2_R_T12_Q1",
@@ -1037,7 +1037,7 @@
   "level": "A2",
   "title": "Conference day program",
   "paragraphs": [],
-  "image": "img/A2_Text10.png",
+  "image": "img/A2_Text10.webp",
   "questions": [
    {
     "id": "A2_R_T13_Q1",

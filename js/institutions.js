@@ -29,7 +29,7 @@ export const INSTITUTIONS = {
   },
   eam: {
     name: "EAM",
-    logo: "img/brand/eam.png",
+    logo: "img/brand/eam.svg",
     enrollUrl: ENROLL_URL,
     enrollLabel: "Inscribirme en el curso de inglés",
     contact: ""

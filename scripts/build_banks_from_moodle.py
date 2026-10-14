@@ -109,9 +109,14 @@ def save_images(question_el, out_dir):
         name = f.get("name")
         data = base64.b64decode(f.text or "")
         os.makedirs(out_dir, exist_ok=True)
-        with open(os.path.join(out_dir, name), "wb") as fh:
+        path = os.path.join(out_dir, name)
+        with open(path, "wb") as fh:
             fh.write(data)
-        names.append(name)
+        # WebP: ~15x más liviano que el PNG original (importa con 200 estudiantes a la vez)
+        from PIL import Image
+        Image.open(path).convert("RGB").save(os.path.splitext(path)[0] + ".webp", "WEBP", quality=88, method=6)
+        os.remove(path)
+        names.append(os.path.splitext(name)[0] + ".webp")
     return names
 
 
@@ -158,7 +163,7 @@ def build_uol(folder, key, img_dir):
                 "options": options,
             }
             if m_img:
-                item["image"] = f"img/{m_img.group(1)}"
+                item["image"] = f"img/{os.path.splitext(m_img.group(1))[0]}.webp"
             items.append(item)
             key[qid] = {"correct": correct, "skill": "UoL", "level": lvl, "category": cat}
     return items
@@ -202,7 +207,7 @@ def build_reading(folder, key, img_dir):
             paragraphs = [strip_tags(p) for p in re.findall(r"<p[^>]*>(.*?)</p>", left, re.S)]
             paragraphs = [p for p in paragraphs if p]
             if m_img:
-                image = f"img/{m_img.group(1)}"
+                image = f"img/{os.path.splitext(m_img.group(1))[0]}.webp"
                 save_images(q, img_dir)
             if not image and not paragraphs:
                 raise ValueError(f"{name}: texto vacío")
