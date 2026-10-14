@@ -4,3 +4,4 @@ scripts/firestore_import.json
 scripts/codes_para_enviar.csv
 answer_key_PRIVADO_NO_SUBIR.json
 .DS_Store
+scripts/__pycache__/

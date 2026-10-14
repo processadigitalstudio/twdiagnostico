@@ -1,30 +1,111 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" translate="no" class="notranslate">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gracias — Tweetalig</title>
+<meta name="google" content="notranslate">
+<meta name="robots" content="noindex, nofollow">
+<title>Tu resultado — Tweetalig</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="notranslate">
 
-<div class="page-center">
-  <div class="card" style="text-align:center;">
-    <div class="eyebrow">Piloto completado</div>
-    <h1>¡Gracias por tu tiempo!</h1>
-    <p class="muted">
-      Terminaste el examen piloto. Tus respuestas ya quedaron guardadas y se van a
-      usar para calibrar el examen antes de aplicarlo a los estudiantes.
-    </p>
-    <p class="muted">
-      El resultado no se muestra aquí — el equipo del proyecto lo revisa junto con
-      el de las demás personas para ajustar los puntos de corte del examen.
-    </p>
-    <p class="muted" style="margin-top:28px;">Puedes cerrar esta ventana. Gracias por ayudarnos a calibrar el examen 🙏</p>
+<div class="page-center top">
+  <div class="card result-card" style="max-width:760px;">
+    <div class="brand-bar" id="brandBar"></div>
+
+    <div id="waiting" style="text-align:center; padding:30px 0;">
+      <div class="spinner"></div>
+      <h2>Calculando tu resultado…</h2>
+      <p class="muted" id="waitingMsg">Tus respuestas ya quedaron guardadas. En unos segundos verás tu nivel.</p>
+    </div>
+
+    <div id="resultView" style="display:none;"></div>
   </div>
 </div>
 
+<script type="module">
+import { watchResult } from "./js/exam-engine.js";
+import { CANDO } from "./js/cando.js";
+import { resolveInstitution, renderBrand, currentInstitutionSlug } from "./js/institutions.js";
+
+const params = new URLSearchParams(location.search);
+let sessionId = params.get("s");
+try { sessionId = sessionId || localStorage.getItem("lastSessionId"); } catch (e) {}
+
+let inst = resolveInstitution(currentInstitutionSlug());
+renderBrand(document.getElementById("brandBar"), inst);
+
+const waiting = document.getElementById("waiting");
+const view = document.getElementById("resultView");
+
+if (!sessionId) {
+  document.querySelector("#waiting h2").textContent = "No encontramos tu resultado";
+  document.querySelector("#waiting .spinner").style.display = "none";
+  document.getElementById("waitingMsg").textContent = "Avisa al supervisor de la aplicación.";
+} else {
+  const slowTimer = setTimeout(() => {
+    document.getElementById("waitingMsg").textContent =
+      "Tu resultado todavía se está procesando. Mantén esta página abierta: aparecerá automáticamente. Si tarda más de unos minutos, avisa al supervisor.";
+  }, 45000);
+
+  watchResult(sessionId, (r) => {
+    if (!r) return;
+    clearTimeout(slowTimer);
+    render(r);
+  });
+}
+
+const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+function render(r) {
+  // la institución guardada en el resultado manda sobre la del navegador
+  if (r.institution) { inst = resolveInstitution(r.institution); renderBrand(document.getElementById("brandBar"), inst); }
+  const c = CANDO[r.level] || CANDO.A1;
+  const colors = { UoL: "var(--teal)", Reading: "var(--gold)", Listening: "#6B5B95" };
+  const rows = ["UoL", "Reading", "Listening"].map(sk => {
+    const p = r.points[sk];
+    const pct = p.max > 0 ? Math.round((p.earned / p.max) * 100) : 0;
+    return `<div class="skill-row"><span>${sk === "UoL" ? "Use of Language" : sk}</span>
+      <div class="bar"><div style="width:${pct}%; background:${colors[sk]};"></div></div>
+      <span class="val">${p.earned.toFixed(1)} / ${p.max.toFixed(0)}</span></div>`;
+  }).join("");
+
+  const cta = inst.enrollUrl
+    ? `<div class="cta-box">
+         <h3>¿Listo para empezar a avanzar?</h3>
+         <p style="margin:0; opacity:.9;">Con este resultado ya sabes en qué nivel iniciar. Haz tu preinscripción en Tweetalig.</p>
+         <a class="cta-btn" href="${esc(inst.enrollUrl)}" target="_blank" rel="noopener">${esc(inst.enrollLabel || "Inscribirme")} →</a>
+       </div>`
+    : (inst.contact ? `<div class="cta-box"><h3>¿Quieres inscribirte?</h3><p>Escríbenos a ${esc(inst.contact)}</p></div>` : "");
+
+  view.innerHTML = `
+    <div class="result-hero">
+      <div class="eyebrow">${r.name ? esc(r.name) + " · " : ""}Tu resultado</div>
+      <div class="result-level">${esc(r.level)}</div>
+      <div style="font-family:'Newsreader',serif; font-size:22px;">Nivel ${esc(r.level)} · ${esc(c.name)}</div>
+      <div class="result-score">Puntaje total: <b>${r.finalScore.toFixed(1)}</b> / 100</div>
+    </div>
+
+    <div class="skill-rows">${rows}</div>
+
+    <div class="cando-box">
+      <div class="eyebrow">Nivel ${esc(r.level)} · ${esc(c.range)}</div>
+      <h3>Tu resultado indica un nivel ${esc(r.level)} según el Marco Común Europeo de Referencia (MCER)</h3>
+      <p class="muted" style="margin:0;">En este nivel, puedes:</p>
+      <ul>${c.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
+    </div>
+
+    ${cta}
+
+    <p class="muted" style="font-size:12.5px; margin-top:22px; text-align:center;">
+      Este resultado es un diagnóstico para ubicarte en el nivel adecuado. Puedes cerrar esta ventana.
+    </p>`;
+  waiting.style.display = "none";
+  view.style.display = "block";
+}
+</script>
 </body>
 </html>

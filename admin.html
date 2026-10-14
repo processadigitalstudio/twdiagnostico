@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Piloto — Tweetalig</title>
+<title>Dashboard del examen — Tweetalig</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
@@ -83,7 +83,7 @@
 <div class="page-center" id="loginGate">
   <div class="card">
     <div class="eyebrow">Solo administración</div>
-    <h1>Dashboard del piloto</h1>
+    <h1>Dashboard del examen</h1>
     <label for="emailInput">Correo</label>
     <input type="text" id="emailInput" autocomplete="off">
     <label for="pw">Contraseña</label>
@@ -120,6 +120,13 @@
   </div>
 
   <div class="section active" id="liveSection">
+    <div class="key-banner" style="margin-bottom:14px;">
+      <div>
+        <strong>Los estudiantes ven su resultado cuando este panel lo publica.</strong>
+        <div class="muted" style="margin-top:4px;">Deja esta página abierta durante el examen (con la clave cargada). <span id="liveCounters" class="mono"></span></div>
+      </div>
+      <label style="display:flex; gap:8px; align-items:center; margin:0;"><input type="checkbox" id="autoPublishChk" checked> Publicar resultados automáticamente</label>
+    </div>
     <p class="muted"><span class="live-dot"></span>Actualiza en tiempo real mientras las personas responden.</p>
     <table class="admin-table">
       <thead><tr><th>Nombre</th><th>Usuario</th><th>Estado</th><th>Progreso</th><th>Tiempo transcurrido</th><th>Eventos</th></tr></thead>
@@ -144,7 +151,8 @@
   </div>
 
   <div class="section" id="accessSection">
-    <p class="muted">Escribe una persona por línea, en formato <code>Nombre,usuario,correo</code> (tú eliges el usuario). La contraseña se genera automáticamente.</p>
+    <p class="muted">Escribe una persona por línea, en formato <code>Nombre,usuario,correo,institución</code> (tú eliges el usuario; el correo y la institución son opcionales). La contraseña se genera automáticamente. Usa usuarios <strong>difíciles de adivinar</strong> (ej. el número de documento).</p>
+    <p class="muted">Institución por defecto de este lote: <select id="batchInstitution"></select> (se usa cuando la línea no trae institución).</p>
     <textarea class="access-input" id="accessInput" placeholder="Rossana Restrepo,rossana,rossana@tweetalig.edu.co&#10;Julio Perez,julio,julio@tweetalig.edu.co&#10;..."></textarea>
     <br><br>
     <button class="btn-primary" id="generateBtn" style="width:auto;">Generar accesos</button>
@@ -152,7 +160,7 @@
       <p class="muted"><strong>Recién generados en esta sesión</strong> (guarda este CSV ahora, la contraseña no se vuelve a mostrar después):</p>
       <button class="btn-secondary" id="downloadAccessCsvBtn">⬇ Descargar CSV (nombre, usuario, contraseña)</button>
       <table class="admin-table">
-        <thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Contraseña</th></tr></thead>
+        <thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Institución</th><th>Contraseña</th></tr></thead>
         <tbody id="accessResultBody"></tbody>
       </table>
     </div>
@@ -160,7 +168,7 @@
     <h3 style="margin-top:36px;">Todos los accesos existentes</h3>
     <p class="muted">Solo tú puedes ver estas contraseñas (esta pantalla está detrás de tu login) — click en "ver" para revelarla.</p>
     <table class="admin-table">
-      <thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Contraseña</th><th>Estado</th><th></th></tr></thead>
+      <thead><tr><th>Nombre</th><th>Usuario</th><th>Institución</th><th>Contraseña</th><th>Estado</th><th></th></tr></thead>
       <tbody id="allAccessBody"></tbody>
     </table>
   </div>
@@ -204,16 +212,14 @@
 <script type="module">
 import { db, auth } from "./js/firebase-config.js";
 import { BANK_VERSION } from "./js/exam-config.js";
-import { generateRandomPassword, loadAllBanks, flattenBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery } from "./js/exam-engine.js";
+import { generateRandomPassword, loadAllBanks, flattenBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery, publishResult, hashPassword } from "./js/exam-engine.js";
 import { buildBookmarkOrder, saveBookmarkOrder, loadAllJudgments, loadAllJudgeCodes } from "./js/bookmark-engine.js";
-import { EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY, EMAILJS_ENABLED } from "./js/emailjs-config.js";
+import { INSTITUTIONS } from "./js/institutions.js";
 import {
-  collection, getDocs, query, where, onSnapshot, setDoc, doc, deleteDoc
+  collection, getDocs, query, where, onSnapshot, setDoc, updateDoc, doc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import emailjs from "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm";
 
-if (EMAILJS_ENABLED) emailjs.init(EMAILJS_PUBLIC_KEY);
 
 document.getElementById("pwBtn").addEventListener("click", async () => {
   const email = document.getElementById("emailInput").value.trim();
@@ -273,6 +279,7 @@ document.getElementById("keyFileInput").addEventListener("change", async (e) => 
     await uploadAnswerKey(parsed);
     await checkAnswerKey();
     await loadDashboard();
+    publishPending();
     alert("Clave de respuestas cargada correctamente.");
   } catch (err) {
     alert("El archivo no parece un JSON válido. Revisa que sea answer_key_PRIVADO_NO_SUBIR.json.");
@@ -307,24 +314,30 @@ async function loadDashboard() {
 }
 
 async function loadAllAccessCodes() {
-  const snap = await getDocs(collection(db, "access_codes"));
+  const [snap, secretsSnap] = await Promise.all([getDocs(collection(db, "access_codes")), getDocs(collection(db, "access_secrets"))]);
+  const secrets = {};
+  secretsSnap.forEach(d => { secrets[d.id] = d.data().password; });
   const tbody = document.getElementById("allAccessBody");
   tbody.innerHTML = "";
   const statusLabels = { not_started: "⚪ No ha empezado", in_progress: "🟡 En curso", completed: "✅ Completado" };
   const rows = snap.docs.map(d => ({ username: d.id, ...d.data() }))
     .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   for (const r of rows) {
+    const pass = secrets[r.username] || r.password || "";
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${r.name || "—"}</td>
       <td class="mono">${r.username}</td>
-      <td class="mono">${r.email || "—"}</td>
+      <td>${r.institution || "—"}</td>
       <td>
-        <span class="mono" id="pw-${r.username}" data-real="${r.password || ""}">••••••••</span>
+        <span class="mono" id="pw-${r.username}" data-real="${pass}">••••••••</span>
         <span class="toggle-detail" data-reveal="${r.username}" style="margin-left:6px;">👁 ver</span>
       </td>
       <td>${statusLabels[r.status] || r.status || "—"}</td>
-      <td><span class="toggle-detail" data-del="${r.username}" style="color:var(--bad);">🗑 borrar</span></td>
+      <td>
+        ${r.status === "in_progress" ? `<span class="toggle-detail" data-reopen="${r.username}" style="margin-right:10px;">↺ reabrir</span>` : ""}
+        <span class="toggle-detail" data-del="${r.username}" style="color:var(--bad);">🗑 borrar</span>
+      </td>
     `;
     tbody.appendChild(tr);
   }
@@ -336,10 +349,22 @@ async function loadAllAccessCodes() {
       el.textContent = showing ? "👁 ver" : "🙈 ocultar";
     });
   });
+  document.querySelectorAll("[data-reopen]").forEach(el => {
+    el.addEventListener("click", async () => {
+      const u = el.dataset.reopen;
+      if (!confirm(`¿Reabrir el acceso de "${u}"? Su intento actual quedará descartado y empezará un examen nuevo (con otras preguntas).`)) return;
+      const q = query(collection(db, "sessions"), where("username", "==", u), where("status", "==", "in_progress"));
+      const ss = await getDocs(q);
+      for (const d of ss.docs) await updateDoc(doc(db, "sessions", d.id), { status: "abandoned" });
+      await updateDoc(doc(db, "access_codes", u), { status: "not_started" });
+      await loadAllAccessCodes();
+    });
+  });
   document.querySelectorAll("[data-del]").forEach(el => {
     el.addEventListener("click", async () => {
       if (!confirm(`¿Borrar el acceso de "${el.dataset.del}"? Esto no se puede deshacer.`)) return;
       await deleteDoc(doc(db, "access_codes", el.dataset.del));
+      try { await deleteDoc(doc(db, "access_secrets", el.dataset.del)); } catch (e) {}
       await loadAllAccessCodes();
     });
   });
@@ -362,10 +387,13 @@ function eventBadges(events) {
   const labels = {
     tab_hidden: "cambió de pestaña", copy_attempt: "intentó copiar", cut_attempt: "intentó cortar",
     paste_attempt: "intentó pegar", right_click: "click derecho", keyboard_copy_paste: "atajo copiar/pegar",
-    print_screen_key: "tecla Print Screen", browser_translate_detected: "⚠ usó traductor"
+    print_screen_key: "tecla Print Screen", browser_translate_detected: "⚠ usó traductor",
+    window_blur: "salió de la ventana", fullscreen_exit: "salió de pantalla completa", screenshot_key: "intento de captura",
+    print_attempt: "intento de imprimir", selection_attempt: "intentó seleccionar", drag_attempt: "intentó arrastrar",
+    keyboard_shortcut: "atajo bloqueado", devtools_key: "intentó abrir DevTools", devtools_suspected: "posible DevTools"
   };
   return Object.entries(counts).map(([type, count]) => {
-    const high = type === "browser_translate_detected" || type === "tab_hidden";
+    const high = ["browser_translate_detected","tab_hidden","screenshot_key","devtools_suspected"].includes(type);
     return `<span class="badge-event ${high ? 'high' : ''}">${labels[type] || type} × ${count}</span>`;
   }).join(" ");
 }
@@ -375,10 +403,12 @@ function startLiveListener() {
   onSnapshot(collection(db, "sessions"), (snap) => {
     const sessions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    // dispara el envío/retención automático para sesiones recién completadas
-    for (const s of sessions) {
-      if (s.status === "completed") processOneSessionDelivery(s).catch(console.error);
-    }
+    latestSessions = sessions;
+    publishPending();
+    const done = sessions.filter(s => s.status === "completed").length;
+    const pub = sessions.filter(s => s.resultDelivery?.status === "published").length;
+    const act = sessions.filter(s => s.status === "in_progress").length;
+    document.getElementById("liveCounters").textContent = `En curso: ${act} · Completados: ${done} · Resultados publicados: ${pub}`;
 
     const tbody = document.getElementById("liveBody");
     tbody.innerHTML = "";
@@ -416,9 +446,10 @@ const SKILL_SHORT = { UoL: "UoL", Reading: "Reading", Listening: "Listening" };
 
 // severidad de cada tipo de evento sospechoso
 const EVENT_TIER = {
-  tab_hidden: "high", browser_translate_detected: "high",
+  tab_hidden: "high", browser_translate_detected: "high", screenshot_key: "high", devtools_suspected: "high",
+  window_blur: "med", fullscreen_exit: "med", print_attempt: "med", devtools_key: "med",
   copy_attempt: "med", cut_attempt: "med", paste_attempt: "med", keyboard_copy_paste: "med", print_screen_key: "med",
-  right_click: "low"
+  right_click: "low", selection_attempt: "low", drag_attempt: "low", keyboard_shortcut: "low"
 };
 const TIER_COLOR = { high: "var(--sev-high)", med: "var(--sev-med)", low: "var(--sev-low)" };
 const TIER_LABEL = { high: "Alto", med: "Medio", low: "Bajo" };
@@ -467,61 +498,37 @@ function eventsCell(events) {
   return `<div class="sev-badges">${parts.join("")}</div>`;
 }
 
-// ---------------- ENTREGA DE RESULTADOS (EmailJS) — sigue corriendo en segundo plano,
-// pero ya no se muestra columna en la tabla mientras no se active EmailJS ----------------
-async function processOneSessionDelivery(session) {
-  if (!answerKey) return;
-  const currentStatus = session.resultDelivery?.status || "pending";
-  if (currentStatus !== "pending") return;
+// ---------------- PUBLICACIÓN DE RESULTADOS ----------------
+// Mientras este panel esté abierto, cada sesión que se completa se califica aquí (la clave nunca sale
+// de este navegador) y el resultado se publica en results/{sessionId}, que es lo que ve el estudiante.
+let latestSessions = [];
+const publishing = new Set();
+let autoPublish = true;
 
-  const r = computeSessionResults(session, answerKey);
-
-  if (r.alerts.length === 0) {
-    if (EMAILJS_ENABLED && session.email) {
-      try {
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-          to_email: session.email,
-          to_name: session.name || session.username,
-          level: r.level,
-          pct_uol: r.pct.UoL,
-          pct_reading: r.pct.Reading,
-          pct_listening: r.pct.Listening
-        });
-        await setResultDelivery(session.id, "sent", { finalScore: r.finalScore, level: r.level });
-      } catch (e) {
-        console.error("Error enviando correo:", e);
-        await setResultDelivery(session.id, "error", { errorMsg: String(e) });
-      }
-    } else {
-      await setResultDelivery(session.id, "ready_no_email", { finalScore: r.finalScore, level: r.level });
-    }
-  } else {
-    await setResultDelivery(session.id, "held_for_review", { finalScore: r.finalScore, level: r.level, alerts: r.alerts });
+async function processOneSessionDelivery(session, force = false) {
+  if (!answerKey || (!autoPublish && !force)) return;
+  if (session.bankVersion !== BANK_VERSION) return;
+  const status = session.resultDelivery?.status || "pending";
+  if (status !== "pending" && !force) return;
+  if (publishing.has(session.id)) return;
+  publishing.add(session.id);
+  try {
+    const r = computeSessionResults(session, answerKey);
+    await publishResult(session, r);
+    await setResultDelivery(session.id, "published", { finalScore: r.finalScore, level: r.level });
+  } catch (e) {
+    console.error("No se pudo publicar el resultado:", session.id, e);
+    publishing.delete(session.id);
   }
 }
-
-async function manualRelease(sessionId) {
-  const session = allSessions.find(s => s.id === sessionId);
-  const r = computedById[sessionId];
-  if (!session || !r) return;
-  if (EMAILJS_ENABLED && session.email) {
-    try {
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        to_email: session.email, to_name: session.name || session.username, level: r.level,
-        pct_uol: r.pct.UoL, pct_reading: r.pct.Reading, pct_listening: r.pct.Listening
-      });
-      await setResultDelivery(sessionId, "sent_after_review", { finalScore: r.finalScore, level: r.level });
-    } catch (e) {
-      alert("Error enviando el correo: " + e);
-      return;
-    }
-  } else {
-    alert(EMAILJS_ENABLED ? "Esta persona no tiene correo registrado." : "Configura EmailJS en js/emailjs-config.js primero.");
-    return;
-  }
-  await loadDashboard();
-}
-window.manualRelease = manualRelease;
+function publishPending() { for (const s of latestSessions) if (s.status === "completed") processOneSessionDelivery(s).catch(console.error); }
+window.republish = async (sessionId) => {
+  const s = latestSessions.find(x => x.id === sessionId);
+  if (s) { publishing.delete(sessionId); await processOneSessionDelivery(s, true); alert("Resultado publicado."); }
+};
+document.addEventListener("change", (e) => {
+  if (e.target && e.target.id === "autoPublishChk") { autoPublish = e.target.checked; if (autoPublish) publishPending(); }
+});
 
 // ---------------- RESULTADOS ----------------
 const EVENT_LABELS = {
@@ -742,23 +749,34 @@ document.getElementById("exportCsvBtn").addEventListener("click", () => {
 
 // ---------------- GESTIONAR ACCESOS ----------------
 let lastGenerated = [];
+const batchSel = document.getElementById("batchInstitution");
+for (const slug of Object.keys(INSTITUTIONS)) { const o = document.createElement("option"); o.value = slug; o.textContent = INSTITUTIONS[slug].name; batchSel.appendChild(o); }
+batchSel.value = "eam";
+
 document.getElementById("generateBtn").addEventListener("click", async () => {
   const raw = document.getElementById("accessInput").value.trim();
   if (!raw) return;
+  const btn = document.getElementById("generateBtn");
   const lines = raw.split("\n").map(l => l.trim()).filter(Boolean);
   lastGenerated = [];
+  btn.disabled = true;
+  let n = 0;
   for (const line of lines) {
-    const [name, username, email] = line.split(",").map(s => s.trim());
+    const [name, username, email, inst] = line.split(",").map(s => s.trim());
     if (!name || !username) continue;
+    const institution = (inst && INSTITUTIONS[inst.toLowerCase()]) ? inst.toLowerCase() : batchSel.value;
     const password = generateRandomPassword(8);
-    await setDoc(doc(db, "access_codes", username), { name, password, email: email || "", status: "not_started" });
-    lastGenerated.push({ name, username, email: email || "", password });
+    await setDoc(doc(db, "access_codes", username), { name, pwHash: await hashPassword(username, password), email: email || "", institution, status: "not_started" });
+    await setDoc(doc(db, "access_secrets", username), { password });
+    lastGenerated.push({ name, username, email: email || "", institution, password });
+    btn.textContent = `Generando… ${++n}/${lines.length}`;
   }
+  btn.disabled = false; btn.textContent = "Generar accesos";
   const tbody = document.getElementById("accessResultBody");
   tbody.innerHTML = "";
   for (const r of lastGenerated) {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${r.name}</td><td class="mono">${r.username}</td><td class="mono">${r.email}</td><td class="mono">${r.password}</td>`;
+    tr.innerHTML = `<td>${r.name}</td><td class="mono">${r.username}</td><td class="mono">${r.email}</td><td>${r.institution}</td><td class="mono">${r.password}</td>`;
     tbody.appendChild(tr);
   }
   document.getElementById("accessResultWrap").style.display = "block";
@@ -766,12 +784,12 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 });
 
 document.getElementById("downloadAccessCsvBtn").addEventListener("click", () => {
-  const lines = ["nombre,usuario,correo,contraseña", ...lastGenerated.map(r => `${r.name},${r.username},${r.email},${r.password}`)];
+  const lines = ["nombre,usuario,correo,institucion,contraseña", ...lastGenerated.map(r => `${r.name},${r.username},${r.email},${r.institution},${r.password}`)];
   const blob = new Blob([lines.join("\n")], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "accesos_piloto.csv";
+  a.download = "accesos_examen.csv";
   a.click();
 });
 

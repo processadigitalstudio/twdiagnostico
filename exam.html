@@ -1,57 +1,62 @@
 <!DOCTYPE html>
-<html lang="en" translate="no">
+<html lang="en" translate="no" class="notranslate">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google" content="notranslate">
+<meta name="robots" content="noindex, nofollow">
 <title>English Diagnostic Test — Tweetalig</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="notranslate proctored">
 
-<!-- Aviso de integridad academica -->
+<!-- Pantalla inicial: estructura, calificación y compromiso de integridad -->
 <div class="integrity-overlay" id="integrityOverlay">
-  <div class="integrity-card">
-    <div class="eyebrow">Antes de empezar</div>
-    <h2>Compromiso de integridad</h2>
-    <p class="muted">Este examen diagnóstico determina tu punto de partida en el programa de inglés. Para que el resultado refleje tu nivel real, es esencial que respondas por tu cuenta.</p>
-    <ul>
-      <li>No uses traductores, diccionarios externos, ni asistentes de IA durante el examen.</li>
-      <li>No copies, fotografíes, ni compartas las preguntas.</li>
-      <li>Responde solo, sin ayuda de otra persona.</li>
-      <li>El sistema registra cambios de pestaña y otras señales durante el examen — esto se revisa junto con tu resultado.</li>
-    </ul>
-    <div class="integrity-check">
-      <input type="checkbox" id="integrityCheck">
-      <label for="integrityCheck">Entiendo y acepto presentar el examen por mi cuenta, sin ayuda externa.</label>
-    </div>
-    <button class="btn-primary" id="integrityBtn" disabled>Comenzar examen</button>
-  </div>
+  <div class="integrity-card intro-card" id="introCard"><div class="spinner"></div><p class="muted" style="text-align:center;">Cargando el examen…</p></div>
 </div>
 
 <!-- Instrucciones por sección (en ingles) -->
 <div class="integrity-overlay" id="sectionOverlay" style="display:none;">
-  <div class="integrity-card">
+  <div class="integrity-card intro-card">
+    <button class="lang-toggle" id="sectionLang" type="button">English</button>
     <div class="eyebrow" id="sectionEyebrow">Section</div>
     <h2 id="sectionTitle">—</h2>
     <div id="sectionBody" class="muted"></div>
-    <button class="btn-primary" id="sectionBtn" style="margin-top:24px;">Start this section</button>
+    <button class="btn-primary" id="sectionBtn" style="margin-top:24px;">Comenzar esta prueba</button>
   </div>
 </div>
 
 <!-- Overlay que aparece si cambia de pestaña/ventana -->
 <div class="focus-blur-overlay hidden" id="focusBlurOverlay">
-  <div class="msg">⏸ El examen se pausó porque saliste de esta pestaña.<br><br>Vuelve aquí para continuar. Esto queda registrado.</div>
+  <div class="msg">El contenido está oculto porque saliste de esta ventana o se detectó una captura.<br><br>Vuelve a esta ventana para continuar. Esto queda registrado.</div>
 </div>
+
+<div class="hard-block hidden" id="translateBlock">
+  <div class="msg">
+    <h2>Traducción detectada</h2>
+    <p>Se detectó un traductor activo en tu navegador. Desactívalo y recarga la página para continuar. El tiempo sigue corriendo y este evento queda registrado.</p>
+    <button class="btn-primary" id="translateReload" style="width:auto;">Recargar página</button>
+  </div>
+</div>
+
+<div class="hard-block hidden" id="fsBlock">
+  <div class="msg">
+    <h2>Pantalla completa requerida</h2>
+    <p>El examen debe presentarse en pantalla completa. Pulsa el botón para volver. El tiempo sigue corriendo y esta salida queda registrada.</p>
+    <button class="btn-primary" id="fsReturn" style="width:auto;">Volver a pantalla completa</button>
+  </div>
+</div>
+
+<div class="watermark" id="watermark"></div>
 
 <div class="exam-shell">
   <div class="exam-header-sticky">
     <div class="segments" id="segments"></div>
     <div class="topbar">
-      <div class="brand">Tweetalig · English Diagnostic Test</div>
-      <div class="timer mono" id="timer">60:00</div>
+      <div class="brand-bar" id="brandBar"></div>
+      <div class="timer-wrap"><span class="timer-label" id="timerLabel">Time left</span><div class="timer mono" id="timer">--:--</div></div>
     </div>
   </div>
 
@@ -67,78 +72,288 @@
 </div>
 
 <script type="module">
-import { loadAllBanks, buildExamPlan, createSession, recordAnswer, finishSession, logSuspiciousEvent, logSectionTiming } from "./js/exam-engine.js";
-import { SECTION_DURATIONS_MIN, MAX_AUDIO_PLAYS } from "./js/exam-config.js";
+import { loadAllBanks, buildExamPlan, createSession, recordAnswers, finishSession, logSuspiciousEvent, logSectionTiming } from "./js/exam-engine.js";
+import { SECTION_DURATIONS_MIN, MAX_AUDIO_PLAYS, WEIGHTS, LEVEL_CUTS, REQUIRE_FULLSCREEN, ENABLE_WATERMARK, UOL_TOTAL_POINTS, READING_POINTS_PER_TEXT, LISTENING_POINTS_PER_AUDIO } from "./js/exam-config.js";
+import { resolveInstitution, renderBrand } from "./js/institutions.js";
 
 const username = sessionStorage.getItem("username");
 const participantName = sessionStorage.getItem("participantName") || "";
 const participantEmail = sessionStorage.getItem("participantEmail") || "";
+const institutionSlug = sessionStorage.getItem("institution") || "tweetalig";
 if (!username) window.location.href = "index.html";
 
+const inst = resolveInstitution(institutionSlug);
+renderBrand(document.getElementById("brandBar"), inst);
+
+// El estado del examen vive en localStorage: sobrevive si se cierra la pestaña o se recarga.
 const STORAGE_KEY = `examState_${username}`;
-
 let state = null;
-const saved = sessionStorage.getItem(STORAGE_KEY);
-if (saved) state = JSON.parse(saved);
-
-function persist() { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+try { const saved = localStorage.getItem(STORAGE_KEY); if (saved) state = JSON.parse(saved); } catch (e) {}
+function persist() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
 
 // ============================================================
-// AVISO DE INTEGRIDAD
-// ============================================================
-const integrityOverlay = document.getElementById("integrityOverlay");
-const integrityCheck = document.getElementById("integrityCheck");
-const integrityBtn = document.getElementById("integrityBtn");
-integrityCheck.addEventListener("change", () => { integrityBtn.disabled = !integrityCheck.checked; });
-integrityBtn.addEventListener("click", () => { integrityOverlay.style.display = "none"; init(); });
-
-// ============================================================
-// ANTI-COPIA / DETECCION
+// PROTECCIONES (disuasivos del lado del navegador)
 // ============================================================
 let sessionIdRef = null;
-function tryLog(type, meta) { if (sessionIdRef) logSuspiciousEvent(sessionIdRef, type, meta); }
+let examRunning = false;               // true mientras hay un examen en pantalla
+const lastLogged = {};
+function tryLog(type, meta) {
+  if (!sessionIdRef) return;
+  const now = Date.now();
+  if (lastLogged[type] && now - lastLogged[type] < 3000) return;   // no inundar Firestore
+  lastLogged[type] = now;
+  logSuspiciousEvent(sessionIdRef, type, meta);
+}
 
-document.addEventListener("copy", (e) => { e.preventDefault(); tryLog("copy_attempt"); });
+const focusBlurOverlay = document.getElementById("focusBlurOverlay");
+let flashTimer = null;
+function lockView() { focusBlurOverlay.classList.remove("hidden"); document.body.classList.add("exam-locked"); }
+function unlockView() {
+  if (document.hidden || !document.hasFocus()) return;          // sigue oculto mientras la ventana no tenga el foco
+  focusBlurOverlay.classList.add("hidden"); document.body.classList.remove("exam-locked");
+}
+// Oculta (blur) el contenido un momento: ante teclas de captura, impresión, etc.
+function flashBlur(ms = 2500) {
+  lockView();
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(unlockView, ms);
+}
+
+document.addEventListener("copy", (e) => { e.preventDefault(); try { e.clipboardData.setData("text/plain", ""); } catch (_) {} tryLog("copy_attempt"); });
 document.addEventListener("cut", (e) => { e.preventDefault(); tryLog("cut_attempt"); });
 document.addEventListener("paste", (e) => { e.preventDefault(); tryLog("paste_attempt"); });
 document.addEventListener("contextmenu", (e) => { e.preventDefault(); tryLog("right_click"); });
-document.addEventListener("keydown", (e) => {
-  const k = e.key.toLowerCase();
-  if ((e.ctrlKey || e.metaKey) && ["c", "v", "x"].includes(k)) { e.preventDefault(); tryLog("keyboard_copy_paste", { key: k }); }
-  if (e.key === "PrintScreen") tryLog("print_screen_key");
+document.addEventListener("selectstart", (e) => { e.preventDefault(); });
+document.addEventListener("dragstart", (e) => { e.preventDefault(); tryLog("drag_attempt"); });
+document.addEventListener("drop", (e) => e.preventDefault());
+// Click izquierdo: no se puede iniciar una selección sobre el texto (solo sobre opciones, botones e imágenes).
+document.addEventListener("mousedown", (e) => {
+  if (e.button !== 0) return;
+  if (e.detail > 1 || !e.target.closest("label, button, input, a, select, .image-box, .lightbox")) e.preventDefault();
 });
+setInterval(() => {
+  const sel = window.getSelection && window.getSelection();
+  if (sel && sel.rangeCount && !sel.isCollapsed) { sel.removeAllRanges(); tryLog("selection_attempt"); }
+}, 400);
 
-const focusBlurOverlay = document.getElementById("focusBlurOverlay");
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    focusBlurOverlay.classList.remove("hidden");
-    document.body.classList.add("exam-locked");
-    tryLog("tab_hidden");
-  } else {
-    focusBlurOverlay.classList.add("hidden");
-    document.body.classList.remove("exam-locked");
+document.addEventListener("keydown", (e) => {
+  const k = (e.key || "").toLowerCase();
+  const mod = e.ctrlKey || e.metaKey;
+  if (mod && ["c", "v", "x", "a", "p", "s", "u", "f", "g", "o"].includes(k)) {
+    e.preventDefault();
+    if (k === "p") { flashBlur(); tryLog("print_attempt"); } else tryLog("keyboard_shortcut", { key: k });
+    return;
+  }
+  if (e.key === "F12" || (mod && e.shiftKey && ["i", "j", "c", "k"].includes(k)) || (e.metaKey && e.altKey && ["i", "j", "c", "u"].includes(k))) {
+    e.preventDefault(); tryLog("devtools_key"); return;
+  }
+  // capturas de pantalla del sistema: Win+Shift+S, Cmd+Shift+3/4/5, PrintScreen
+  const digit = ["Digit3", "Digit4", "Digit5"].includes(e.code);
+  if ((e.metaKey && e.shiftKey && (k === "s" || digit)) || e.key === "PrintScreen" || (e.key === "Meta" && e.shiftKey)) {
+    flashBlur(4000); tryLog("screenshot_key");
+  }
+}, true);
+document.addEventListener("keyup", (e) => {
+  if (e.key === "PrintScreen") {
+    flashBlur(4000);
+    try { navigator.clipboard.writeText(" "); } catch (_) {}      // borra lo que haya copiado la tecla
+    tryLog("screenshot_key");
   }
 });
-window.addEventListener("blur", () => { focusBlurOverlay.classList.remove("hidden"); document.body.classList.add("exam-locked"); });
-window.addEventListener("focus", () => { if (!document.hidden) { focusBlurOverlay.classList.add("hidden"); document.body.classList.remove("exam-locked"); } });
+window.addEventListener("beforeprint", () => { flashBlur(); tryLog("print_attempt"); });
 
-const htmlObserver = new MutationObserver(() => {
-  const cls = document.documentElement.className || "";
-  if (cls.includes("translated")) tryLog("browser_translate_detected", { htmlClass: cls });
+document.addEventListener("visibilitychange", () => {
+  if (!examRunning) return;
+  if (document.hidden) { lockView(); tryLog("tab_hidden"); } else { unlockView(); }
 });
-htmlObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+window.addEventListener("blur", () => { if (!examRunning) return; lockView(); tryLog("window_blur"); });
+window.addEventListener("focus", () => { if (examRunning) unlockView(); });
+
+// ---- Traductores del navegador / extensiones ----
+const translateBlock = document.getElementById("translateBlock");
+function translatorActive() {
+  const h = document.documentElement;
+  const cls = (h.className || "") + " " + (document.body.className || "");
+  if (/translated-(ltr|rtl)/.test(cls)) return true;
+  const lang = (h.getAttribute("lang") || "en").toLowerCase();
+  if (!lang.startsWith("en")) return true;                                  // el traductor cambia <html lang>
+  return !!document.querySelector("font[style*='vertical-align'], [_msttexthash], #goog-gt-tt, .goog-te-banner-frame, iframe.skiptranslate, [class*='immersive-translate'], [class*='trancy'], deepl-inline-translate");
+}
+let translateLogged = false;
+function checkTranslator() {
+  if (!examRunning) return;
+  if (translatorActive()) {
+    translateBlock.classList.remove("hidden");
+    if (!translateLogged) { translateLogged = true; tryLog("browser_translate_detected", { htmlClass: document.documentElement.className }); }
+  }
+}
+new MutationObserver(checkTranslator).observe(document.documentElement, { attributes: true, attributeFilter: ["class", "lang"] });
+new MutationObserver(checkTranslator).observe(document.body, { childList: true, subtree: true });
+setInterval(checkTranslator, 2000);
+document.getElementById("translateReload").addEventListener("click", () => location.reload());
+
+// ---- Pantalla completa ----
+const fsBlock = document.getElementById("fsBlock");
+let fsEnforced = false;
+function requestFs() {
+  const el = document.documentElement;
+  const f = el.requestFullscreen || el.webkitRequestFullscreen;
+  if (!f) return Promise.resolve(false);
+  return Promise.resolve(f.call(el)).then(() => true).catch(() => false);
+}
+function inFs() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+function onFsChange() {
+  if (!examRunning || !fsEnforced) return;
+  if (inFs()) fsBlock.classList.add("hidden");
+  else { fsBlock.classList.remove("hidden"); tryLog("fullscreen_exit"); }
+}
+document.addEventListener("fullscreenchange", onFsChange);
+document.addEventListener("webkitfullscreenchange", onFsChange);
+document.getElementById("fsReturn").addEventListener("click", () => requestFs());
+
+// ---- Posible herramienta de desarrollo abierta (solo se registra; no bloquea, para no dar falsos positivos) ----
+setInterval(() => {
+  if (!examRunning) return;
+  if (window.outerWidth - window.innerWidth > 220 || window.outerHeight - window.innerHeight > 260) tryLog("devtools_suspected");
+}, 3000);
+
+// ---- Marca de agua con nombre y usuario (si alguien fotografía la pantalla, queda identificado) ----
+function applyWatermark() {
+  if (!ENABLE_WATERMARK) return;
+  const x = (t) => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const label = x(`${participantName || username} · ${username} · ${new Date().toLocaleDateString("es-CO")}`);
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='420' height='230'><text x='210' y='115' text-anchor='middle' transform='rotate(-24 210 115)' font-family='Arial' font-size='15' font-weight='700' fill='#000'>${label}</text></svg>`;
+  document.getElementById("watermark").style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
+
+// ============================================================
+// IDIOMA DE LAS PANTALLAS INFORMATIVAS (el examen siempre va en inglés)
+// ============================================================
+let uiLang = "es";
+const T = {
+  es: {
+    toggle: "English", eyebrow: "Antes de empezar", hello: "Hola", title: "Así funciona tu examen",
+    intro: "Este examen diagnóstico ubica tu nivel de inglés según el Marco Común Europeo de Referencia (MCER): A1, A2, B1 o B2. Tiene tres pruebas, cada una con su propio reloj.",
+    thSection: "Prueba", thItems: "Preguntas", thTime: "Tiempo", thPoints: "Puntos",
+    scoringTitle: "Cómo se califica",
+    scoring: (w) => `<ul><li>El examen suma <b>100 puntos</b>: Use of Language ${w.u}, Reading ${w.r} y Listening ${w.l}.</li>
+      <li>Cada pregunta tiene una sola respuesta correcta. <b>Una respuesta incorrecta no resta puntos</b>; una pregunta sin responder vale 0.</li>
+      <li>Las preguntas de nivel más alto aparecen más adelante dentro de cada prueba.</li></ul>`,
+    levelsTitle: "Tu resultado",
+    levels: "Al terminar verás tu nivel, tu puntaje por prueba y lo que puedes hacer en ese nivel (Can-do). Según el puntaje total:",
+    rulesTitle: "Reglas del examen",
+    rules: [
+      "Responde solo, sin traductores, diccionarios, asistentes de IA ni ayuda de otra persona.",
+      "No copies, fotografíes ni compartas las preguntas. El texto no se puede seleccionar y las capturas de pantalla quedan ocultas.",
+      "El examen se presenta en <b>pantalla completa</b>. Si sales de la ventana, el contenido se oculta y queda registrado.",
+      "No puedes volver a una pregunta anterior. Si se acaba el tiempo de una prueba, pasas automáticamente a la siguiente.",
+      "Cada pantalla lleva tu nombre como marca de agua. Cualquier uso indebido se revisa junto con tu resultado."
+    ],
+    check: "Entiendo las reglas y acepto presentar el examen por mi cuenta, sin ayuda externa.",
+    start: "Comenzar examen", starting: "Preparando…",
+    min: "min", pts: "pts", total: "Total",
+    names: { UoL: "Use of Language", Reading: "Reading", Listening: "Listening" },
+    secStart: "Comenzar esta prueba", secEyebrow: "Antes de continuar", secOf: (i) => `Prueba ${i} de 3`,
+    what: "Qué es", how: "Cómo funciona", score: "Cómo se califica", time: "Tiempo",
+  },
+  en: {
+    toggle: "Español", eyebrow: "Before you start", hello: "Hello", title: "How your exam works",
+    intro: "This diagnostic exam places your English level on the Common European Framework of Reference (CEFR): A1, A2, B1 or B2. It has three sections, each with its own clock.",
+    thSection: "Section", thItems: "Questions", thTime: "Time", thPoints: "Points",
+    scoringTitle: "How it is scored",
+    scoring: (w) => `<ul><li>The exam adds up to <b>100 points</b>: Use of Language ${w.u}, Reading ${w.r} and Listening ${w.l}.</li>
+      <li>Each question has one correct answer. <b>A wrong answer does not subtract points</b>; an unanswered question is worth 0.</li>
+      <li>Higher-level questions appear later within each section.</li></ul>`,
+    levelsTitle: "Your result",
+    levels: "When you finish you will see your level, your score per section and what you can do at that level (Can-do). By total score:",
+    rulesTitle: "Exam rules",
+    rules: [
+      "Work alone: no translators, dictionaries, AI assistants or help from anyone else.",
+      "Do not copy, photograph or share the questions. Text cannot be selected and screenshots are hidden.",
+      "The exam runs in <b>full screen</b>. If you leave the window, the content is hidden and the event is recorded.",
+      "You cannot go back to a previous question. When a section's time runs out, you move on automatically.",
+      "Every screen carries your name as a watermark. Any misuse is reviewed together with your result."
+    ],
+    check: "I understand the rules and agree to take the exam on my own, without outside help.",
+    start: "Start exam", starting: "Getting ready…",
+    min: "min", pts: "pts", total: "Total",
+    names: { UoL: "Use of Language", Reading: "Reading", Listening: "Listening" },
+    secStart: "Start this section", secEyebrow: "Before you continue", secOf: (i) => `Section ${i} of 3`,
+    what: "What it is", how: "How it works", score: "How it is scored", time: "Time",
+  }
+};
+
+// ---------- cifras reales del plan (cada estudiante responde 68 preguntas) ----------
+function sectionFacts(section) {
+  const pages = section.kind === "items" ? section.items.length : section.groups.length;
+  const questions = section.kind === "items" ? section.items.length : section.groups.reduce((n, g) => n + g.questions.length, 0);
+  const points = { UoL: UOL_TOTAL_POINTS, Reading: READING_POINTS_PER_TEXT * pages, Listening: LISTENING_POINTS_PER_AUDIO * pages }[section.name];
+  return { pages, questions, points, minutes: SECTION_DURATIONS_MIN[section.name] };
+}
+const fmt1 = (n) => (Math.round(n * 10) / 10).toString().replace(/\.0$/, "");
+
+let pendingPlan = null;           // plan armado antes de que el estudiante acepte (así se cargan los bancos primero)
+let activePlan = () => (state ? state.plan : pendingPlan);
+
+function renderOverview() {
+  const t = T[uiLang];
+  const plan = activePlan();
+  const rows = plan.sections.map(sec => {
+    const f = sectionFacts(sec);
+    return `<tr><td><b>${t.names[sec.name]}</b></td><td>${f.questions}</td><td>${f.minutes} ${t.min}</td><td>${fmt1(f.points)}</td></tr>`;
+  }).join("");
+  const totQ = plan.sections.reduce((n, s) => n + sectionFacts(s).questions, 0);
+  const totMin = plan.sections.reduce((n, s) => n + sectionFacts(s).minutes, 0);
+  const w = { u: Math.round(WEIGHTS.UoL * 100), r: Math.round(WEIGHTS.Reading * 100), l: Math.round(WEIGHTS.Listening * 100) };
+  const cuts = ["A1", "A2", "B1", "B2"].map((lv, i) => {
+    const from = i === 0 ? 0 : LEVEL_CUTS[i - 1].max;
+    const to = i === 3 ? 100 : LEVEL_CUTS[i].max - 1;
+    return `<div><b>${lv}</b>${from}–${to}</div>`;
+  }).join("");
+  const card = document.getElementById("introCard");
+  card.innerHTML = `
+    <button class="lang-toggle" id="introLang" type="button">${t.toggle}</button>
+    <div class="eyebrow">${t.eyebrow}</div>
+    <h2>${t.hello}${participantName ? ", " + escapeHtml(participantName.split(" ")[0]) : ""} — ${t.title}</h2>
+    <p class="muted">${t.intro}</p>
+    <table class="intro-table">
+      <thead><tr><th>${t.thSection}</th><th>${t.thItems}</th><th>${t.thTime}</th><th>${t.thPoints}</th></tr></thead>
+      <tbody>${rows}<tr><td><b>${t.total}</b></td><td><b>${totQ}</b></td><td><b>${totMin} ${t.min}</b></td><td><b>100</b></td></tr></tbody>
+    </table>
+    <div class="intro-block"><h4>${t.scoringTitle}</h4>${t.scoring(w)}</div>
+    <div class="intro-block"><h4>${t.levelsTitle}</h4><p>${t.levels}</p><div class="level-strip">${cuts}</div></div>
+    <div class="intro-block"><h4>${t.rulesTitle}</h4><ul>${t.rules.map(r => `<li>${r}</li>`).join("")}</ul></div>
+    <div class="integrity-check">
+      <input type="checkbox" id="integrityCheck">
+      <label for="integrityCheck">${t.check}</label>
+    </div>
+    <button class="btn-primary" id="integrityBtn" disabled>${t.start}</button>`;
+  document.getElementById("introLang").onclick = () => { uiLang = uiLang === "es" ? "en" : "es"; renderOverview(); };
+  const chk = document.getElementById("integrityCheck"), btn = document.getElementById("integrityBtn");
+  chk.addEventListener("change", () => { btn.disabled = !chk.checked; });
+  btn.addEventListener("click", async () => {
+    btn.disabled = true; btn.textContent = t.starting;
+    if (REQUIRE_FULLSCREEN) fsEnforced = await requestFs();
+    try {
+      await init();
+      document.getElementById("integrityOverlay").style.display = "none";
+    } catch (e) {
+      console.error(e);
+      btn.disabled = false; btn.textContent = t.start;
+      alert("No se pudo iniciar el examen (conexión). Intenta de nuevo. / Could not start the exam. Please try again.");
+    }
+  });
+}
 
 // ============================================================
 // MOTOR
 // ============================================================
 async function init() {
   if (!state) {
-    const banks = await loadAllBanks();
-    const plan = buildExamPlan(banks, username);
-    const sessionId = await createSession(username, participantName, participantEmail, plan);
+    const sessionId = await createSession(username, participantName, participantEmail, pendingPlan, institutionSlug);
     state = {
       sessionId,
-      plan,
+      plan: pendingPlan,
       sectionIndex: 0,
       pageIndex: 0,
       sectionInstructionShown: [false, false, false],
@@ -150,8 +365,28 @@ async function init() {
     persist();
   }
   sessionIdRef = state.sessionId;
+  examRunning = true;
+  applyWatermark();
   buildSegments();
   renderCurrentPage();
+}
+
+async function boot() {
+  if (state) {                                   // examen en curso (recarga o cierre de pestaña): se retoma
+    document.getElementById("integrityOverlay").style.display = "none";
+    if (REQUIRE_FULLSCREEN) fsEnforced = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+    await init();
+    if (fsEnforced && !inFs()) fsBlock.classList.remove("hidden");
+    return;
+  }
+  try {
+    const banks = await loadAllBanks();
+    pendingPlan = buildExamPlan(banks, username);
+    renderOverview();
+  } catch (e) {
+    console.error(e);
+    document.getElementById("introCard").innerHTML = "<p class='muted'>No se pudo cargar el examen. Revisa tu conexión y recarga la página.</p>";
+  }
 }
 
 function currentSection() { return state.plan.sections[state.sectionIndex]; }
@@ -177,42 +412,81 @@ function buildSegments() {
   }
 }
 
-const SECTION_INSTRUCTIONS = {
-  UoL: (n) => ({
-    title: "Section 1 of 3 — Use of Language",
-    body: `
-      <p>This section tests your knowledge of English grammar, vocabulary, collocations, and prepositions.</p>
-      <ul>
-        <li>You will answer <strong>${n} short items</strong>, each with a sentence and four options. Some items include a picture; click it to enlarge.</li>
-        <li>You have <strong>${SECTION_DURATIONS_MIN.UoL} minutes</strong> for this section. If time runs out, you'll automatically move to the next section with whatever you've answered so far.</li>
-        <li>Choose the option that best completes the sentence.</li>
-        <li>You cannot go back to a previous item once you continue.</li>
-      </ul>`
-  }),
-  Reading: (n) => ({
-    title: "Section 2 of 3 — Reading",
-    body: `
-      <p>In this section, you will read <strong>${n} short texts and documents</strong> in English (articles, messages, schedules, notices).</p>
-      <ul>
-        <li>Each text has several questions next to it, all on the same page. Click an image to enlarge it.</li>
-        <li>You have <strong>${SECTION_DURATIONS_MIN.Reading} minutes</strong> for this section. If time runs out, you'll automatically move to the next section with whatever you've answered so far.</li>
-        <li>You can reread the passage as many times as you like while answering its questions.</li>
-        <li>Once you continue to the next passage, you cannot go back.</li>
-      </ul>`
-  }),
-  Listening: (n) => ({
-    title: "Section 3 of 3 — Listening",
-    body: `
-      <p>In this section, you will listen to <strong>${n} short audio recordings</strong> — conversations, announcements, and talks.</p>
-      <ul>
-        <li>Each recording has a few questions below it, all on the same page.</li>
-        <li>You have <strong>${SECTION_DURATIONS_MIN.Listening} minutes</strong> for this section. If time runs out, the exam will submit automatically with whatever you've answered so far.</li>
-        <li>You may play each recording <strong>up to ${MAX_AUDIO_PLAYS} times</strong>. You can pause, but you cannot skip forward or back.</li>
-        <li>Make sure your volume is on before starting. Headphones are recommended.</li>
-        <li>Once you continue to the next recording, you cannot go back.</li>
-      </ul>`
-  })
+// ---------- pantalla informativa antes de cada prueba ----------
+const SECTION_TEXT = {
+  es: {
+    UoL: (f) => ({
+      what: "Mide tu dominio de gramática, vocabulario, colocaciones y preposiciones en contextos cotidianos.",
+      how: [`Verás <b>${f.questions} preguntas</b>, una por pantalla. Cada una tiene una frase y cuatro opciones; elige la que completa mejor la frase.`,
+            "Algunas incluyen una imagen; haz clic sobre ella para ampliarla.", "Cuando continúas no puedes volver atrás."],
+      score: `Vale <b>${fmt1(f.points)} puntos</b>. Cada pregunta correcta suma ${fmt1(f.points / f.questions)} puntos (todas valen lo mismo). Incorrecta o sin responder: 0.`
+    }),
+    Reading: (f) => ({
+      what: "Mide qué tanto entiendes textos y documentos cortos en inglés: mensajes, avisos, horarios, artículos.",
+      how: [`Leerás <b>${f.pages} textos o documentos</b>, cada uno con sus preguntas en la misma pantalla (${f.questions} preguntas en total).`,
+            "Puedes releer el texto las veces que quieras mientras respondes. Haz clic en una imagen para ampliarla.",
+            "Debes responder todas las preguntas de la pantalla para continuar. Al pasar al siguiente texto no puedes volver."],
+      score: `Vale <b>${fmt1(f.points)} puntos</b>. Cada texto vale ${READING_POINTS_PER_TEXT} puntos, repartidos en partes iguales entre sus preguntas. Incorrecta o sin responder: 0.`
+    }),
+    Listening: (f) => ({
+      what: "Mide qué tanto entiendes inglés hablado: conversaciones, anuncios y charlas cortas.",
+      how: [`Escucharás <b>${f.pages} audios</b>, cada uno con sus preguntas en la misma pantalla (${f.questions} preguntas en total).`,
+            `Puedes reproducir cada audio <b>hasta ${MAX_AUDIO_PLAYS} veces</b>. Puedes pausar, pero no adelantar ni retroceder.`,
+            "Verifica tu volumen antes de empezar; se recomiendan audífonos.", "Al pasar al siguiente audio no puedes volver."],
+      score: `Vale <b>${fmt1(f.points)} puntos</b>. Cada audio vale ${LISTENING_POINTS_PER_AUDIO} puntos, repartidos en partes iguales entre sus preguntas. Incorrecta o sin responder: 0.`
+    })
+  },
+  en: {
+    UoL: (f) => ({
+      what: "Measures your command of grammar, vocabulary, collocations and prepositions in everyday contexts.",
+      how: [`You will see <b>${f.questions} questions</b>, one per screen. Each has a sentence and four options; choose the one that best completes it.`,
+            "Some include a picture; click it to enlarge.", "Once you continue you cannot go back."],
+      score: `Worth <b>${fmt1(f.points)} points</b>. Each correct answer adds ${fmt1(f.points / f.questions)} points (all are worth the same). Wrong or blank: 0.`
+    }),
+    Reading: (f) => ({
+      what: "Measures how well you understand short texts and documents in English: messages, notices, schedules, articles.",
+      how: [`You will read <b>${f.pages} texts or documents</b>, each with its questions on the same screen (${f.questions} questions in total).`,
+            "You can reread the text as often as you like while answering. Click an image to enlarge it.",
+            "Answer every question on the screen to continue. Once you move to the next text you cannot go back."],
+      score: `Worth <b>${fmt1(f.points)} points</b>. Each text is worth ${READING_POINTS_PER_TEXT} points, split equally among its questions. Wrong or blank: 0.`
+    }),
+    Listening: (f) => ({
+      what: "Measures how well you understand spoken English: conversations, announcements and short talks.",
+      how: [`You will listen to <b>${f.pages} recordings</b>, each with its questions on the same screen (${f.questions} questions in total).`,
+            `You may play each recording <b>up to ${MAX_AUDIO_PLAYS} times</b>. You can pause, but not skip forward or back.`,
+            "Check your volume before starting; headphones are recommended.", "Once you move to the next recording you cannot go back."],
+      score: `Worth <b>${fmt1(f.points)} points</b>. Each recording is worth ${LISTENING_POINTS_PER_AUDIO} points, split equally among its questions. Wrong or blank: 0.`
+    })
+  }
 };
+
+function sectionTimeoutNote(isLast) {
+  return uiLang === "es"
+    ? (isLast ? "Si se acaba el tiempo, el examen se envía solo con lo que hayas respondido." : "Si se acaba el tiempo, pasas solo a la siguiente prueba con lo que hayas respondido.")
+    : (isLast ? "If time runs out, the exam is submitted automatically with what you have answered." : "If time runs out, you move on automatically to the next section with what you have answered.");
+}
+
+function renderSectionIntro() {
+  const t = T[uiLang];
+  const section = currentSection();
+  const f = sectionFacts(section);
+  const info = SECTION_TEXT[uiLang][section.name](f);
+  const isLast = state.sectionIndex === state.plan.sections.length - 1;
+  document.getElementById("sectionEyebrow").textContent = `${t.secEyebrow} · ${t.secOf(state.sectionIndex + 1)}`;
+  document.getElementById("sectionTitle").textContent = t.names[section.name];
+  document.getElementById("sectionBody").innerHTML = `
+    <div class="intro-block"><h4>${t.what}</h4><p>${info.what}</p></div>
+    <div class="intro-block"><h4>${t.how}</h4><ul>${info.how.map(h => `<li>${h}</li>`).join("")}</ul></div>
+    <div class="intro-block"><h4>${t.time}</h4><p><b>${f.minutes} ${t.min}</b> — ${uiLang === "es" ? "el reloj de esta prueba empieza al pulsar el botón." : "this section's clock starts when you press the button."} ${sectionTimeoutNote(isLast)}</p></div>
+    <div class="intro-block"><h4>${t.score}</h4><p>${info.score}</p></div>`;
+  document.getElementById("sectionLang").textContent = t.toggle;
+  document.getElementById("sectionBtn").textContent = t.secStart;
+}
+
+document.getElementById("sectionLang").addEventListener("click", () => {
+  uiLang = uiLang === "es" ? "en" : "es";
+  renderSectionIntro();
+});
 
 function maybeShowSectionInstructions(callback) {
   const idx = state.sectionIndex;
@@ -221,12 +495,9 @@ function maybeShowSectionInstructions(callback) {
     callback();
     return;
   }
-  const section = currentSection();
-  const n = pagesInSection(section);
-  const info = SECTION_INSTRUCTIONS[section.name](n);
-  document.getElementById("sectionEyebrow").textContent = "Before you continue";
-  document.getElementById("sectionTitle").textContent = info.title;
-  document.getElementById("sectionBody").innerHTML = info.body;
+  document.getElementById("timer").textContent = "--:--";
+  document.getElementById("timerLabel").textContent = "";
+  renderSectionIntro();
   const overlay = document.getElementById("sectionOverlay");
   overlay.style.display = "flex";
   document.getElementById("sectionBtn").onclick = () => {
@@ -498,10 +769,7 @@ async function goNext() {
     return;
   }
 
-  for (const q of currentQuestions) {
-    const r = state.responses[q.id];
-    if (r) recordAnswer(state.sessionId, q, r.selected, r.timeMs).catch(console.error);
-  }
+  saveCurrentPageAnswers();
 
   const isLastPageOfSection = state.pageIndex === pagesInSection(section) - 1;
   const isLastSection = state.sectionIndex === state.plan.sections.length - 1;
@@ -531,9 +799,13 @@ async function goNext() {
 async function submitExam() {
   document.getElementById("nextBtn").disabled = true;
   document.getElementById("nextBtn").textContent = "Submitting...";
-  await finishSession(state.sessionId);
-  sessionStorage.removeItem(STORAGE_KEY);
-  window.location.href = "results.html";
+  examRunning = false;
+  if (sectionTimerInterval) clearInterval(sectionTimerInterval);
+  try { await finishSession(state.sessionId, username); }
+  catch (e) { console.error(e); examRunning = true; document.getElementById("nextBtn").disabled = false; document.getElementById("nextBtn").textContent = "Retry submit"; return; }
+  try { localStorage.setItem("lastSessionId", state.sessionId); localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+  try { if (document.exitFullscreen && inFs()) await document.exitFullscreen(); } catch (e) {}
+  window.location.href = "results.html?s=" + encodeURIComponent(state.sessionId);
 }
 
 // ---------- timer por sección ----------
@@ -552,6 +824,7 @@ function startSectionTimerInterval() {
   if (sectionTimerInterval) clearInterval(sectionTimerInterval);
   const timerEl = document.getElementById("timer");
   const section = currentSection();
+  document.getElementById("timerLabel").textContent = `${section.name} · time left`;
   const durationMin = SECTION_DURATIONS_MIN[section.name];
   const startMs = state.sectionStartTimes[state.sectionIndex];
 
@@ -577,10 +850,9 @@ function saveCurrentPageAnswers() {
   const currentQuestions = section.kind === "items"
     ? [section.items[state.pageIndex]]
     : section.groups[state.pageIndex].questions;
-  for (const q of currentQuestions) {
-    const r = state.responses[q.id];
-    if (r) recordAnswer(state.sessionId, q, r.selected, r.timeMs).catch(console.error);
-  }
+  const entries = currentQuestions.filter(q => state.responses[q.id])
+    .map(q => ({ item: q, selected: state.responses[q.id].selected, timeMs: state.responses[q.id].timeMs }));
+  if (entries.length) recordAnswers(state.sessionId, entries).catch(console.error);
 }
 
 async function forceAdvanceSection() {
@@ -604,10 +876,7 @@ async function forceAdvanceSection() {
 
 document.getElementById("nextBtn").addEventListener("click", goNext);
 
-if (state) {
-  integrityOverlay.style.display = "none";
-  init();
-}
+boot();
 </script>
 
 </body>

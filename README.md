@@ -1,3 +1,20 @@
+# Examen diagnóstico de inglés — Tweetalig
+
+## Puesta en marcha (checklist)
+
+1. **Reglas de Firestore**: abre `firestore.rules`, reemplaza `PEGA_AQUI_TU_UID` por tu UID (Firebase Console → Authentication → Users) y pega el contenido en Firestore → Rules → Publicar.
+2. **Cierra el registro público**: Authentication → Settings → User actions → desactiva "Enable create (sign-up)". Deja solo tu usuario administrador.
+3. **Logos**: sube `img/brand/tweetalig-logo.png` y el de cada universidad (`img/brand/eam.png`, etc.). Si falta un archivo se muestra el nombre en texto.
+4. **Instituciones**: `js/institutions.js` (nombre, logo, link de inscripción). El link se elige por institución del acceso o por `?u=slug`.
+5. **Clave**: en `admin.html` → "Cargar answer_key_PRIVADO_NO_SUBIR.json" (una sola vez).
+6. **Accesos**: `admin.html` → Gestionar accesos → una persona por línea `Nombre,usuario,correo,institución` → descargar el CSV.
+7. **Día del examen**: deja `admin.html` abierto con la clave cargada. Cada examen que termina se califica ahí y el resultado aparece en pantalla al estudiante.
+
+Link para estudiantes: `https://<tu-sitio>/index.html?u=eam` (cambia `eam` por la institución).
+
+## Protecciones del examen (disuasivos del navegador)
+Sin selección/arrastre/copiar/pegar/clic derecho; blur al perder el foco, al pulsar PrintScreen o atajos de captura; pantalla completa obligatoria; bloqueo si se detecta traductor; marca de agua con nombre y usuario; eventos registrados en el panel. **No** pueden impedir una foto con otro celular ni herramientas de captura del sistema: para eso se necesita supervisión presencial.
+
 # Examen de diagnóstico Tweetalig (versión espejo de Moodle/Splavia)
 
 Mismos bancos, misma estructura y mismo puntaje que el examen de Moodle: 12 bancos

@@ -1,11 +1,11 @@
 import { db } from "./firebase-config.js";
 import {
-  doc, getDoc, setDoc, updateDoc, arrayUnion, serverTimestamp
+  doc, getDoc, setDoc, updateDoc, arrayUnion, serverTimestamp, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import {
   UOL_DISTRIBUTION, READING_TEXTS_PER_LEVEL, LISTENING_AUDIOS_PER_LEVEL,
   LEVELS_ORDER, ORDER_BY_LEVEL, WEIGHTS, ALERT_THRESHOLD, EXAM_DURATION_MIN, scoreToLevel,
-  BANK_VERSION, UOL_POINTS, READING_POINTS_PER_TEXT, LISTENING_POINTS_PER_AUDIO
+  BANK_VERSION, UOL_TOTAL_POINTS, READING_POINTS_PER_TEXT, LISTENING_POINTS_PER_AUDIO, MAX_EVENTS_PER_SESSION
 } from "./exam-config.js";
 
 // ---------- utilidades ----------
@@ -159,48 +159,76 @@ export function allItemIdsFromPlan(plan) {
 }
 
 // ---------- validar usuario / contraseña ----------
+// La contraseña NO se guarda en access_codes (que se puede leer con el usuario): solo su hash.
+// La contraseña en claro vive en access_secrets (solo admin) para poder entregarla.
+export async function hashPassword(username, password) {
+  const data = new TextEncoder().encode(`${username.trim()}:${password.trim()}`);
+  const buf = await crypto.subtle.digest("SHA-256", data);
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
 export async function validateLogin(username, password) {
   const uname = username.trim();
   const ref = doc(db, "access_codes", uname);
   const snap = await getDoc(ref);
-  if (!snap.exists()) return { ok: false, reason: "Usuario no encontrado. Revisa mayúsculas/minúsculas." };
+  if (!snap.exists()) return { ok: false, reason: "Usuario o contraseña incorrectos." };
   const data = snap.data();
-  if (data.password !== password.trim()) return { ok: false, reason: "Contraseña incorrecta." };
+  const good = data.pwHash
+    ? data.pwHash === await hashPassword(uname, password)
+    : data.password === password.trim();            // accesos antiguos (piloto)
+  if (!good) return { ok: false, reason: "Usuario o contraseña incorrectos." };
   if (data.status === "completed") return { ok: false, reason: "Este usuario ya completó el examen." };
-  return { ok: true, name: data.name || "", email: data.email || "" };
+  let hasLocal = false;
+  try { hasLocal = !!localStorage.getItem(`examState_${uname}`); } catch (e) {}
+  if (data.status === "in_progress" && !hasLocal) {
+    return { ok: false, reason: "Este examen ya está en curso en otro equipo o navegador. Avisa al supervisor." };
+  }
+  return { ok: true, name: data.name || "", email: data.email || "", institution: data.institution || "" };
+}
+
+function randomId(len = 14) {
+  const chars = "abcdefghijkmnpqrstuvwxyz23456789";
+  const arr = new Uint32Array(len);
+  crypto.getRandomValues(arr);
+  return [...arr].map(n => chars[n % chars.length]).join("");
 }
 
 // ---------- crear sesión ----------
-export async function createSession(username, name, email, plan) {
-  const sessionId = `${username}_${Date.now()}`;
+export async function createSession(username, name, email, plan, institution = "") {
+  const sessionId = `${username}_${randomId()}`;          // id no adivinable (el resultado se consulta con él)
   const ref = doc(db, "sessions", sessionId);
   await setDoc(ref, {
-    username, name, email,
+    username, name, email, institution,
     itemIds: allItemIdsFromPlan(plan),
     startedAt: serverTimestamp(),
     status: "in_progress",
     durationMin: EXAM_DURATION_MIN,
     bankVersion: BANK_VERSION,
     suspiciousEvents: [],
+    eventCount: 0,
     resultDelivery: { status: "pending" }
   });
   await updateDoc(doc(db, "access_codes", username), { status: "in_progress", usedAt: serverTimestamp() });
   return sessionId;
 }
 
-// ---------- guardar una respuesta (solo la opción elegida, nunca si es correcta) ----------
-export async function recordAnswer(sessionId, item, selectedIndex, timeMs) {
-  const ref = doc(db, "sessions", sessionId);
-  await updateDoc(ref, {
-    [`responses.${item.id}`]: {
-      skill: item.skill, level: item.level, category: item.category,
-      selected: selectedIndex, timeMs
-    }
-  });
+// ---------- guardar respuestas (solo la opción elegida, nunca si es correcta) ----------
+// Una sola escritura por página (varias preguntas a la vez).
+export async function recordAnswers(sessionId, entries) {
+  const patch = {};
+  for (const { item, selected, timeMs } of entries) {
+    patch[`responses.${item.id}`] = {
+      skill: item.skill, level: item.level, category: item.category, selected, timeMs
+    };
+  }
+  await updateDoc(doc(db, "sessions", sessionId), patch);
 }
 
 // ---------- registrar evento sospechoso ----------
+let eventsSent = 0;
 export async function logSuspiciousEvent(sessionId, type, meta = {}) {
+  if (eventsSent >= MAX_EVENTS_PER_SESSION) return;
+  eventsSent++;
   try {
     await updateDoc(doc(db, "sessions", sessionId), {
       suspiciousEvents: arrayUnion({ type, meta, atClientMs: Date.now() })
@@ -223,8 +251,24 @@ export async function logSectionTiming(sessionId, sectionName, elapsedSeconds, t
 }
 
 // ---------- cerrar la sesión (sin calcular resultado) ----------
-export async function finishSession(sessionId) {
+export async function finishSession(sessionId, username) {
   await updateDoc(doc(db, "sessions", sessionId), { status: "completed", completedAt: serverTimestamp() });
+  try { await updateDoc(doc(db, "access_codes", username), { status: "completed" }); } catch (e) { console.warn(e); }
+}
+
+// ---------- resultado publicado por el panel de administración ----------
+// results/{sessionId}: lo escribe el admin al calificar; el estudiante lo lee con su id (no adivinable).
+export function watchResult(sessionId, callback) {
+  return onSnapshot(doc(db, "results", sessionId), snap => callback(snap.exists() ? snap.data() : null),
+    err => { console.warn(err); callback(null, err); });
+}
+
+export async function publishResult(session, r) {
+  await setDoc(doc(db, "results", session.id), {
+    name: session.name || "", institution: session.institution || "",
+    level: r.level, finalScore: r.finalScore, pct: r.pct, points: r.points,
+    publishedAt: serverTimestamp()
+  });
 }
 
 // ============================================================
@@ -239,7 +283,7 @@ export async function uploadAnswerKey(keyObject) {
   await setDoc(doc(db, "answer_key", "all"), keyObject);
 }
 
-// Puntaje igual que Moodle: UoL 2 pts por ítem (B2: 3); cada texto de Reading vale 2.5 y cada
+// Puntaje igual que Moodle: UoL 40 puntos repartidos en partes iguales; cada texto de Reading vale 2.5 y cada
 // audio de Listening 5, repartidos en partes iguales entre sus preguntas. Con la estructura
 // fija del examen los máximos son UoL 40 / Reading 20 / Listening 40 = 100.
 // El denominador sale de las preguntas que le TOCARON (session.itemIds), no solo de las
@@ -251,12 +295,15 @@ export function computeSessionResults(session, answerKey) {
   const ids = (session.itemIds && session.itemIds.length) ? session.itemIds : Object.keys(responses);
 
   const groupSize = {};
+  let uolCount = 0;
   for (const id of ids) {
     const k = answerKey[id];
-    if (k && k.skill !== "UoL") groupSize[pageIdOf(id)] = (groupSize[pageIdOf(id)] || 0) + 1;
+    if (!k) continue;
+    if (k.skill === "UoL") uolCount++;
+    else groupSize[pageIdOf(id)] = (groupSize[pageIdOf(id)] || 0) + 1;
   }
   const pointsOf = (id, k) => {
-    if (k.skill === "UoL") return UOL_POINTS[k.level];
+    if (k.skill === "UoL") return UOL_TOTAL_POINTS / uolCount;
     const perPage = k.skill === "Reading" ? READING_POINTS_PER_TEXT : LISTENING_POINTS_PER_AUDIO;
     return perPage / groupSize[pageIdOf(id)];
   };

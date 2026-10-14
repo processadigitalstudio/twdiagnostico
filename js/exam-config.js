@@ -27,8 +27,8 @@ export const ORDER_BY_LEVEL = true;
 export const MAX_AUDIO_PLAYS = 3;
 
 // ---------- Puntaje (igual que Moodle: total = 100) ----------
-// UoL: 14 ítems x 2 (A1, A2, B1) + 4 ítems x 3 (B2) = 40
-export const UOL_POINTS = { A1: 2, A2: 2, B1: 2, B2: 3 };
+// UoL: 40 puntos repartidos en partes iguales entre sus 18 ítems (así lo califica Moodle).
+export const UOL_TOTAL_POINTS = 40;
 // Reading: cada texto vale 2.5 y se reparte entre sus preguntas (8 textos = 20)
 export const READING_POINTS_PER_TEXT = 2.5;
 // Listening: cada audio vale 5 y se reparte entre sus preguntas (8 audios = 40)
@@ -54,9 +54,15 @@ export const SECTION_DURATIONS_MIN = { UoL: 15, Reading: 20, Listening: 20 };
 export const EXAM_DURATION_MIN = Object.values(SECTION_DURATIONS_MIN).reduce((a, b) => a + b, 0);
 export const TRANSITION_SECONDS = 3;
 
+// Igual que Moodle: A1 = 0–24.9, A2 = 25–49.9, B1 = 50–74.9, B2 = 75–100.
 export function scoreToLevel(pct) {
   for (const cut of LEVEL_CUTS) {
-    if (pct <= cut.max) return cut.level;
+    if (pct < cut.max) return cut.level;
   }
   return "B2";
 }
+
+// ---------- Seguridad del examen (disuasivos del lado del navegador) ----------
+export const REQUIRE_FULLSCREEN = true;     // pide pantalla completa y bloquea si la abandonan
+export const ENABLE_WATERMARK = true;       // marca de agua con nombre y documento en cada pantalla
+export const MAX_EVENTS_PER_SESSION = 150;  // tope de eventos sospechosos guardados por estudiante

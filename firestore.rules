@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // SOLO la administradora. Reemplaza el valor por TU uid (Firebase Console → Authentication → Users → "User UID").
+    function isAdmin() {
+      return request.auth != null && request.auth.uid == 'PEGA_AQUI_TU_UID';
+    }
+
+    // Usuario del estudiante: se lee SOLO conociendo el usuario (no se puede listar). Contiene el hash de la
+    // contraseña, no la contraseña. El estudiante solo puede cambiar status/usedAt (y nunca reabrir uno completado).
+    match /access_codes/{u} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (
+        resource.data.status != 'completed' &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'usedAt']) &&
+        request.resource.data.status in ['in_progress', 'completed']
+      );
+    }
+
+    // Contraseñas en claro, para entregarlas. Solo admin.
+    match /access_secrets/{u} {
+      allow read, write: if isAdmin();
+    }
+
+    // Intentos. Nadie puede leerlos salvo la admin. El estudiante crea la suya y la actualiza mientras esté en curso.
+    match /sessions/{id} {
+      allow read, delete: if isAdmin();
+      allow create: if request.resource.data.status == 'in_progress'
+                    && exists(/databases/$(database)/documents/access_codes/$(request.resource.data.username));
+      allow update: if isAdmin() || (
+        resource.data.status == 'in_progress' &&
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['username', 'name', 'email', 'institution', 'itemIds', 'bankVersion', 'resultDelivery', 'startedAt']) &&
+        request.resource.data.status in ['in_progress', 'completed']
+      );
+    }
+
+    // Resultado publicado por la admin; el estudiante lo lee con el id (aleatorio) de su intento.
+    match /results/{id} {
+      allow get: if true;
+      allow list, write: if isAdmin();
+    }
+
+    // Clave de respuestas: solo admin.
+    match /answer_key/{d} {
+      allow read, write: if isAdmin();
+    }
+
+    // ---- Panel Bookmark (jueces) ----
+    match /judge_codes/{u} {
+      allow get: if true;
+      allow list, create, delete: if isAdmin();
+      allow update: if isAdmin() || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+    }
+    match /bookmark_order/{d} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /bookmark_judgments/{d} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
