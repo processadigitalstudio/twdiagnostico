@@ -54,10 +54,10 @@
 
 <script type="module">
   import { loginToGroup } from "./js/exam-engine.js";
-  import { resolveInstitution, renderBrand } from "./js/institutions.js";
+  import { resolveInstitution, renderBrand, slugFromLocation } from "./js/institutions.js";
 
   const params = new URLSearchParams(location.search);
-  const urlSlug = params.get("u") || "";
+  const urlSlug = slugFromLocation();
   renderBrand(document.getElementById("brandBar"), resolveInstitution(urlSlug));
 
   const btn = document.getElementById("startBtn");
