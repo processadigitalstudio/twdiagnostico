@@ -30,6 +30,10 @@
 import { watchResult } from "./js/exam-engine.js";
 import { CANDO } from "./js/cando.js";
 import { resolveInstitution, renderBrand, currentInstitutionSlug } from "./js/institutions.js";
+import { ROUTE_STEPS, ROUTE_BY_LEVEL, routeCards } from "./js/routes.js";
+import { RESULTS_EMAIL_ENDPOINT } from "./js/exam-config.js";
+
+const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 const params = new URLSearchParams(location.search);
 let sessionId = params.get("s");
@@ -58,13 +62,89 @@ if (!sessionId) {
   });
 }
 
-const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+// ---------- Ruta según el resultado ----------
+function routeCardHtml(key, card, recommended) {
+  const li = (arr) => arr.map(x => `<li>${esc(x)}</li>`).join("");
+  const dl = (rows) => rows.map(([a, b]) => `<div><dt>${esc(a)}</dt><dd>${esc(b)}</dd></div>`).join("");
+  const isMe = (lv) => lv === card.highlightPrice || (card.highlightPrice === "B1" && lv === "B1.1");
+  const prices = card.highlightPrice !== undefined
+    ? `<div class="route-price-grid">${card.price.map(([lv, v]) => `<span class="${isMe(lv) ? "me" : ""}"><b>${esc(lv)}</b> ${esc(v)}</span>`).join("")}</div>`
+    : `<dl class="route-dl">${dl(card.price)}</dl>`;
+  return `<div class="route-card ${recommended ? "rec" : ""}">
+    ${recommended ? `<span class="route-badge">Recomendado para ti</span>` : ""}
+    <div class="route-step">${esc(card.step)}</div>
+    <h4>${esc(card.title)}</h4>
+    <p>${esc(card.what)}</p>
+    <ul>${li(card.facts)}</ul>
+    <div class="route-sub">${esc(card.priceTitle || "Valor")}</div>${prices}
+    <div class="route-sub">Fechas</div><dl class="route-dl">${dl(card.dates)}</dl>
+  </div>`;
+}
+
+function routeSection(level, instSlug) {
+  const plan = ROUTE_BY_LEVEL[level] || ROUTE_BY_LEVEL.A1;
+  const cards = routeCards(level, instSlug);
+  const chips = ROUTE_STEPS.map((st, i) => `<div class="route-chip ${[].concat(plan.entry).includes(st.id) ? "here" : ""}"><span>${i + 1}</span><b>${esc(st.name)}</b><small>${esc(st.sub)}</small></div>`).join('<i class="route-arrow">›</i>');
+  const rec = plan.recommended.map(k => routeCardHtml(k, cards[k], true)).join("");
+  const others = plan.others.map(k => routeCardHtml(k, cards[k], false)).join("");
+  return `<div class="route-box">
+    <div class="eyebrow">Tu ruta</div>
+    <h3>${esc(plan.headline)}</h3>
+    <p class="muted" style="margin:0 0 14px;">Según tu resultado, estas son tus opciones. Revisa qué es cada una y sus fechas antes de inscribirte.</p>
+    <div class="route-chips">${chips}</div>
+    <p class="route-text">${esc(plan.text)}</p>
+    ${rec}
+    ${others ? `<details class="route-more"><summary>Ver otras opciones</summary>${others}</details>` : ""}
+  </div>`;
+}
+
+// ---------- Enviar el resultado al correo ----------
+function emailBlock(r) {
+  let prefill = "";
+  try { prefill = (JSON.parse(sessionStorage.getItem("profile") || "{}").email) || ""; } catch (e) {}
+  return `<div class="email-box">
+    <h4>Recibe tu resultado en tu correo</h4>
+    <div class="email-row">
+      <input type="email" id="mailTo" class="plain" placeholder="tucorreo@ejemplo.com" autocomplete="email" value="${esc(prefill)}">
+      <button class="btn-primary" id="mailBtn" type="button">Enviar a mi correo</button>
+    </div>
+    <div class="email-msg" id="mailMsg"></div>
+  </div>`;
+}
+
+function wireEmail(r) {
+  const btn = document.getElementById("mailBtn"), input = document.getElementById("mailTo"), msg = document.getElementById("mailMsg");
+  if (!btn) return;
+  const resultUrl = location.origin + location.pathname.replace(/[^/]*$/, "") + "results.html?s=" + encodeURIComponent(sessionId);
+  btn.addEventListener("click", async () => {
+    const email = input.value.trim();
+    msg.className = "email-msg";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { msg.textContent = "Escribe un correo válido."; msg.classList.add("err"); return; }
+    if (!RESULTS_EMAIL_ENDPOINT) {
+      // sin servidor de correo configurado: se abre el correo del estudiante con el resultado ya escrito
+      const body = `Mi resultado del examen diagnóstico de inglés Tweetalig\n\nNivel: ${r.level}\nPuntaje total: ${r.finalScore.toFixed(1)} / 100\nValido para el periodo academico 2026-2\n\nVer mi resultado y mi ruta: ${resultUrl}`;
+      location.href = "mailto:" + encodeURIComponent(email) + "?subject=" + encodeURIComponent("Mi resultado - Examen diagnostico de ingles") + "&body=" + encodeURIComponent(body);
+      msg.textContent = "Se abrió tu aplicación de correo: pulsa Enviar para recibir el resultado."; return;
+    }
+    btn.disabled = true; btn.textContent = "Enviando…";
+    try {
+      const res = await fetch(RESULTS_EMAIL_ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ id: sessionId, email, url: resultUrl }) });
+      let out = null; try { out = await res.json(); } catch (e) {}
+      if (out && out.ok === false) throw new Error(out.error || "error");
+      msg.textContent = "Listo: te enviamos el resultado a " + email + ". Revisa también la carpeta de spam."; msg.classList.add("ok");
+    } catch (e) {
+      msg.textContent = "No pudimos confirmar el envío. Si no llega en unos minutos, avisa al supervisor."; msg.classList.add("err");
+    }
+    btn.disabled = false; btn.textContent = "Enviar a mi correo";
+  });
+}
 
 function render(r) {
   // la institución guardada en el resultado manda sobre la del navegador
   if (r.institution) { inst = resolveInstitution(r.institution); renderBrand(document.getElementById("brandBar"), inst); }
   const c = CANDO[r.level] || CANDO.A1;
-  const colors = { UoL: "var(--teal)", Reading: "var(--gold)", Listening: "var(--lvl-b1)" };
+  const colors = { UoL: "var(--teal)", Reading: "var(--gold)", Listening: "var(--ink)" };
   const LABELS = { UoL: "Language Use", Reading: "Reading Comprehension", Listening: "Listening Comprehension" };
   const rows = ["UoL", "Reading", "Listening"].map(sk => {
     const p = r.points[sk];
@@ -76,8 +156,8 @@ function render(r) {
 
   const cta = inst.enrollUrl
     ? `<div class="cta-box">
-         <h3>¿Listo para empezar a avanzar?</h3>
-         <p style="margin:0; opacity:.9;">Con este resultado ya sabes en qué nivel iniciar. Haz tu preinscripción en Tweetalig.</p>
+         <h3>¿Ya elegiste tu ruta?</h3>
+         <p style="margin:0; opacity:.9;">Cuando hayas decidido, haz tu inscripción en Tweetalig.</p>
          <a class="cta-btn" href="${esc(inst.enrollUrl)}" target="_blank" rel="noopener">${esc(inst.enrollLabel || "Inscribirme")} →</a>
        </div>`
     : (inst.contact ? `<div class="cta-box"><h3>¿Quieres inscribirte?</h3><p>Escríbenos a ${esc(inst.contact)}</p></div>` : "");
@@ -92,20 +172,27 @@ function render(r) {
 
     <div class="skill-rows">${rows}</div>
 
-    <div class="cando-box">
+    <div class="cando-box lvl-${esc(r.level)}">
       <div class="eyebrow">Nivel ${esc(r.level)} · ${esc(c.range)}</div>
       <h3>Tu resultado indica un nivel ${esc(r.level)} según el Marco Común Europeo de Referencia (MCER)</h3>
       <p class="muted" style="margin:0;">En este nivel, puedes:</p>
       <ul>${c.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
     </div>
 
+    ${routeSection(r.level, inst.slug || (r.institution || "").toLowerCase())}
+
+    ${emailBlock(r)}
+
     ${cta}
+
+    ${inst.slug === "eam" ? `<p class="muted" style="font-size:13px; text-align:center; margin-top:14px;">¿Dudas? Escríbenos a <b>info.eam@tweetalig.edu.co</b></p>` : ""}
 
     <p class="muted" style="font-size:12.5px; margin-top:22px; text-align:center;">
       Este resultado es válido para el periodo académico 2026-2. Puedes cerrar esta ventana.
     </p>`;
   waiting.style.display = "none";
   view.style.display = "block";
+  wireEmail(r);
 }
 </script>
 </body>

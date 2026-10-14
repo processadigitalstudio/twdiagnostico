@@ -775,3 +775,56 @@ input[readonly] { background: #EFEBDF; color: var(--ink-soft); }
 .audio-volicon { font-size: 1.1rem; }
 .audio-volume { width: 120px; }
 @media (max-width: 640px) { .skill-row { grid-template-columns: 1fr; } }
+
+
+/* ---------- Resultados: colores por nivel, ruta y correo ---------- */
+.cando-box.lvl-A1 { background: var(--lvl-a1-soft); border-left-color: var(--lvl-a1); }
+.cando-box.lvl-A2 { background: var(--lvl-a2-soft); border-left-color: var(--lvl-a2); }
+.cando-box.lvl-B1 { background: var(--lvl-b1-soft); border-left-color: var(--lvl-b1); }
+.cando-box.lvl-B2 { background: var(--lvl-b2-soft); border-left-color: var(--lvl-b2); }
+.cando-box.lvl-A1 .eyebrow { color: var(--lvl-a1-ink); } .cando-box.lvl-A2 .eyebrow { color: var(--lvl-a2-ink); }
+.cando-box.lvl-B1 .eyebrow { color: var(--lvl-b1-ink); } .cando-box.lvl-B2 .eyebrow { color: var(--lvl-b2-ink); }
+
+.route-box { margin: 26px 0 8px; text-align: left; }
+.route-box h3 { margin: 2px 0 6px; }
+.route-chips { display: flex; align-items: stretch; gap: 6px; margin: 4px 0 14px; }
+.route-chip { flex: 1; min-width: 0; text-align: center; padding: 10px 6px; border: 2px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink-soft); display: flex; flex-direction: column; gap: 1px; }
+.route-chip span { font-weight: 800; font-size: .8rem; }
+.route-chip b { font-family: "Nunito", sans-serif; font-size: .98rem; }
+.route-chip small { font-size: .78rem; }
+.route-chip.here { border-color: var(--teal-dark); background: #E8F5F0; color: var(--ink); box-shadow: 0 0 0 3px rgba(93,182,156,.25); }
+.route-arrow { align-self: center; font-style: normal; font-size: 1.5rem; color: var(--ink-soft); }
+.route-text { font-size: 1.02rem; margin: 0 0 14px; }
+.route-card { position: relative; border: 2px solid var(--line); border-radius: 14px; padding: 16px 18px 14px; margin-bottom: 12px; background: #fff; }
+.route-card.rec { border-color: var(--teal-dark); box-shadow: 0 0 0 3px rgba(93,182,156,.18); }
+.route-badge { position: absolute; top: -11px; right: 14px; background: var(--teal-dark); color: #fff; font-size: .78rem; font-weight: 800; padding: 3px 12px; border-radius: 999px; }
+.route-step { font-size: .78rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--teal-dark); font-weight: 800; }
+.route-card h4 { margin: 2px 0 6px; font-size: 1.15rem; }
+.route-card p { margin: 0 0 8px; font-size: .97rem; }
+.route-card ul { margin: 0 0 8px; padding-left: 20px; font-size: .95rem; } .route-card li { margin-bottom: 3px; }
+.route-sub { margin-top: 10px; font-size: .78rem; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-soft); font-weight: 800; }
+.route-dl { margin: 4px 0 0; } .route-dl > div { display: flex; gap: 10px; padding: 4px 0; border-bottom: 1px dashed var(--line); font-size: .95rem; }
+.route-dl > div:last-child { border-bottom: 0; }
+.route-dl dt { flex: 0 0 46%; color: var(--ink-soft); } .route-dl dd { margin: 0; font-weight: 700; }
+.route-price-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.route-price-grid span { border: 2px solid var(--line); border-radius: 10px; padding: 5px 10px; font-size: .95rem; background: #fff; }
+.route-price-grid span.me { border-color: var(--teal-dark); background: #E8F5F0; font-weight: 800; }
+.route-more { margin-top: 6px; } .route-more summary { cursor: pointer; font-weight: 800; color: var(--teal-dark); padding: 8px 0; }
+.route-more .route-card { margin-top: 10px; }
+@media (max-width: 640px) { .route-chips { flex-direction: column; } .route-arrow { display: none; } .route-dl dt { flex-basis: 40%; } }
+
+.email-box { margin: 22px 0 6px; padding: 16px 18px; border: 2px solid var(--line); border-radius: 14px; background: #fff; text-align: left; }
+.email-box h4 { margin: 0 0 10px; }
+.email-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.email-row input { flex: 1 1 240px; margin: 0; }
+.email-row button { margin: 0; width: auto; flex: 0 0 auto; }
+.email-msg { margin-top: 8px; font-size: .92rem; min-height: 1.2em; } .email-msg.ok { color: var(--teal-dark); font-weight: 700; } .email-msg.err { color: #B3261E; font-weight: 700; }
+
+/* ---------- Reading: opciones sin caja ---------- */
+.reading-layout .option, .reading-layout .option:hover, .reading-layout .option.selected {
+  border: 0; background: transparent; box-shadow: none; border-radius: 0; padding: 5px 2px; margin: 0; gap: 12px;
+}
+.reading-layout .option.selected .opt-text { font-weight: 800; color: var(--teal-dark); }
+.reading-layout .option:hover .opt-text { color: var(--teal-dark); }
+.reading-layout .options { gap: 0; }
+.reading-layout .q-block { margin-bottom: 22px; }
