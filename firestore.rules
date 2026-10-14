@@ -7,12 +7,24 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == 'UIsTtqPwumUidDNfbvCQqbCUpbx1';
     }
 
-    // Usuario del estudiante: se lee SOLO conociendo el usuario (no se puede listar). Contiene el hash de la
-    // contraseña, no la contraseña. El estudiante solo puede cambiar status/usedAt (y nunca reabrir uno completado).
-    match /access_codes/{u} {
+    function groupOpen(gid) {
+      return get(/databases/$(database)/documents/exam_groups/$(gid)).data.status == 'open';
+    }
+
+    // Sesión de examen (grupo con contraseña compartida). Su id es el hash de la contraseña: solo se
+    // encuentra sabiendo la contraseña (no se puede listar). La admin la abre y la cierra.
+    match /exam_groups/{gid} {
       allow get: if true;
-      allow list: if isAdmin();
-      allow create, delete: if isAdmin();
+      allow list, write: if isAdmin();
+    }
+
+    // Participante = cédula dentro de una sesión. Solo se puede registrar mientras la sesión está abierta.
+    match /participants/{pid} {
+      allow get: if true;
+      allow list, delete: if isAdmin();
+      allow create: if request.resource.data.status == 'registered'
+                    && pid == request.resource.data.groupId + '_' + request.resource.data.cedula
+                    && groupOpen(request.resource.data.groupId);
       allow update: if isAdmin() || (
         resource.data.status != 'completed' &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'usedAt']) &&
@@ -20,20 +32,16 @@ service cloud.firestore {
       );
     }
 
-    // Contraseñas en claro, para entregarlas. Solo admin.
-    match /access_secrets/{u} {
-      allow read, write: if isAdmin();
-    }
-
-    // Intentos. Nadie puede leerlos salvo la admin. El estudiante crea la suya y la actualiza mientras esté en curso.
+    // Intentos. Solo la admin los lee. El estudiante crea el suyo (con la sesión abierta) y lo actualiza mientras esté en curso.
     match /sessions/{id} {
       allow read, delete: if isAdmin();
       allow create: if request.resource.data.status == 'in_progress'
-                    && exists(/databases/$(database)/documents/access_codes/$(request.resource.data.username));
+                    && groupOpen(request.resource.data.groupId)
+                    && exists(/databases/$(database)/documents/participants/$(request.resource.data.participantId));
       allow update: if isAdmin() || (
         resource.data.status == 'in_progress' &&
         !request.resource.data.diff(resource.data).affectedKeys()
-          .hasAny(['username', 'name', 'email', 'institution', 'itemIds', 'bankVersion', 'resultDelivery', 'startedAt']) &&
+          .hasAny(['username', 'name', 'email', 'institution', 'groupId', 'groupName', 'participantId', 'itemIds', 'bankVersion', 'resultDelivery', 'startedAt']) &&
         request.resource.data.status in ['in_progress', 'completed']
       );
     }

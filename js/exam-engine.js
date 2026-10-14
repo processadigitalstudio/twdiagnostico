@@ -158,32 +158,54 @@ export function allItemIdsFromPlan(plan) {
   return ids;
 }
 
-// ---------- validar usuario / contraseña ----------
-// La contraseña NO se guarda en access_codes (que se puede leer con el usuario): solo su hash.
-// La contraseña en claro vive en access_secrets (solo admin) para poder entregarla.
-export async function hashPassword(username, password) {
-  const data = new TextEncoder().encode(`${username.trim()}:${password.trim()}`);
-  const buf = await crypto.subtle.digest("SHA-256", data);
+// ---------- sesiones de examen (grupos) ----------
+// La administradora crea una sesión con una contraseña COMPARTIDA y la abre/cierra a mano. El estudiante
+// entra con su cédula, su nombre y esa contraseña; si la sesión está cerrada, no hay acceso.
+// El id del grupo es el hash de la contraseña: así se encuentra la sesión sin listar ni exponer las demás.
+async function sha256hex(text) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
+export const normalizeCedula = (c) => String(c || "").replace(/\D/g, "");
+export function groupIdFromPassword(password) {
+  return sha256hex("twtest:" + String(password || "").trim().toLowerCase());
+}
+export const participantIdOf = (groupId, cedula) => `${groupId}_${cedula}`;
 
-export async function validateLogin(username, password) {
-  const uname = username.trim();
-  const ref = doc(db, "access_codes", uname);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return { ok: false, reason: "Usuario o contraseña incorrectos." };
-  const data = snap.data();
-  const good = data.pwHash
-    ? data.pwHash === await hashPassword(uname, password)
-    : data.password === password.trim();            // accesos antiguos (piloto)
-  if (!good) return { ok: false, reason: "Usuario o contraseña incorrectos." };
-  if (data.status === "completed") return { ok: false, reason: "Este usuario ya completó el examen." };
+export async function loginToGroup({ cedula, name, password }) {
+  const ced = normalizeCedula(cedula);
+  const fullName = String(name || "").trim().replace(/\s+/g, " ");
+  if (ced.length < 5) return { ok: false, reason: "Escribe tu número de cédula (solo números)." };
+  if (fullName.length < 5 || !fullName.includes(" ")) return { ok: false, reason: "Escribe tu nombre completo (nombre y apellido)." };
+  if (!String(password || "").trim()) return { ok: false, reason: "Escribe la contraseña de la sesión." };
+
+  const groupId = await groupIdFromPassword(password);
+  const gSnap = await getDoc(doc(db, "exam_groups", groupId));
+  if (!gSnap.exists()) return { ok: false, reason: "Contraseña incorrecta." };
+  const group = gSnap.data();
+  const pid = participantIdOf(groupId, ced);
+  const pSnap = await getDoc(doc(db, "participants", pid));
+  const part = pSnap.exists() ? pSnap.data() : null;
+
   let hasLocal = false;
-  try { hasLocal = !!localStorage.getItem(`examState_${uname}`); } catch (e) {}
-  if (data.status === "in_progress" && !hasLocal) {
-    return { ok: false, reason: "Este examen ya está en curso en otro equipo o navegador. Avisa al supervisor." };
+  try { hasLocal = !!localStorage.getItem(`examState_${pid}`); } catch (e) {}
+
+  if (part && part.status === "completed") return { ok: false, reason: "Esta cédula ya presentó el examen en esta sesión." };
+  if (part && part.status === "in_progress") {
+    if (!hasLocal) return { ok: false, reason: "Este examen ya está en curso en otro equipo o navegador. Avisa al supervisor." };
+  } else if (group.status !== "open") {
+    return { ok: false, reason: "La sesión de examen todavía no está abierta. Espera la indicación del supervisor." };
   }
-  return { ok: true, name: data.name || "", email: data.email || "", institution: data.institution || "" };
+  if (!part) {
+    await setDoc(doc(db, "participants", pid), {
+      cedula: ced, name: fullName, groupId, groupName: group.name || "", institution: group.institution || "",
+      status: "registered", createdAt: serverTimestamp()
+    });
+  }
+  return {
+    ok: true, participantId: pid, cedula: ced, name: part ? part.name : fullName,
+    groupId, groupName: group.name || "", institution: group.institution || ""
+  };
 }
 
 function randomId(len = 14) {
@@ -193,12 +215,12 @@ function randomId(len = 14) {
   return [...arr].map(n => chars[n % chars.length]).join("");
 }
 
-// ---------- crear sesión ----------
-export async function createSession(username, name, email, plan, institution = "") {
-  const sessionId = `${username}_${randomId()}`;          // id no adivinable (el resultado se consulta con él)
-  const ref = doc(db, "sessions", sessionId);
-  await setDoc(ref, {
-    username, name, email, institution,
+// ---------- crear intento ----------
+export async function createSession(ctx, plan) {
+  const sessionId = `${ctx.cedula}_${randomId()}`;        // id no adivinable (el resultado se consulta con él)
+  await setDoc(doc(db, "sessions", sessionId), {
+    username: ctx.cedula, name: ctx.name, email: "",
+    institution: ctx.institution, groupId: ctx.groupId, groupName: ctx.groupName, participantId: ctx.participantId,
     itemIds: allItemIdsFromPlan(plan),
     startedAt: serverTimestamp(),
     status: "in_progress",
@@ -208,7 +230,7 @@ export async function createSession(username, name, email, plan, institution = "
     eventCount: 0,
     resultDelivery: { status: "pending" }
   });
-  await updateDoc(doc(db, "access_codes", username), { status: "in_progress", usedAt: serverTimestamp() });
+  await updateDoc(doc(db, "participants", ctx.participantId), { status: "in_progress", usedAt: serverTimestamp() });
   return sessionId;
 }
 
@@ -251,9 +273,9 @@ export async function logSectionTiming(sessionId, sectionName, elapsedSeconds, t
 }
 
 // ---------- cerrar la sesión (sin calcular resultado) ----------
-export async function finishSession(sessionId, username) {
+export async function finishSession(sessionId, participantId) {
   await updateDoc(doc(db, "sessions", sessionId), { status: "completed", completedAt: serverTimestamp() });
-  try { await updateDoc(doc(db, "access_codes", username), { status: "completed" }); } catch (e) { console.warn(e); }
+  try { await updateDoc(doc(db, "participants", participantId), { status: "completed" }); } catch (e) { console.warn(e); }
 }
 
 // ---------- resultado publicado por el panel de administración ----------

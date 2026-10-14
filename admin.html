@@ -115,7 +115,7 @@
     <div class="tab active" data-tab="live">🔴 En vivo</div>
     <div class="tab" data-tab="sessions">Resultados</div>
     <div class="tab" data-tab="items">Análisis por ítem</div>
-    <div class="tab" data-tab="access">Gestionar accesos</div>
+    <div class="tab" data-tab="access">Sesiones de examen</div>
     <div class="tab" data-tab="bookmark">📊 Panel Bookmark</div>
   </div>
 
@@ -129,7 +129,7 @@
     </div>
     <p class="muted"><span class="live-dot"></span>Actualiza en tiempo real mientras las personas responden.</p>
     <table class="admin-table">
-      <thead><tr><th>Nombre</th><th>Usuario</th><th>Estado</th><th>Progreso</th><th>Tiempo transcurrido</th><th>Eventos</th></tr></thead>
+      <thead><tr><th>Nombre</th><th>Cédula</th><th>Sesión</th><th>Estado</th><th>Progreso</th><th>Tiempo transcurrido</th><th>Eventos</th></tr></thead>
       <tbody id="liveBody"></tbody>
     </table>
   </div>
@@ -151,25 +151,27 @@
   </div>
 
   <div class="section" id="accessSection">
-    <p class="muted">Escribe una persona por línea, en formato <code>Nombre,usuario,correo,institución</code> (tú eliges el usuario; el correo y la institución son opcionales). La contraseña se genera automáticamente. Usa usuarios <strong>difíciles de adivinar</strong> (ej. el número de documento).</p>
-    <p class="muted">Institución por defecto de este lote: <select id="batchInstitution"></select> (se usa cuando la línea no trae institución).</p>
-    <textarea class="access-input" id="accessInput" placeholder="Rossana Restrepo,rossana,rossana@tweetalig.edu.co&#10;Julio Perez,julio,julio@tweetalig.edu.co&#10;..."></textarea>
-    <br><br>
-    <button class="btn-primary" id="generateBtn" style="width:auto;">Generar accesos</button>
-    <div id="accessResultWrap" style="margin-top:24px; display:none;">
-      <p class="muted"><strong>Recién generados en esta sesión</strong> (guarda este CSV ahora, la contraseña no se vuelve a mostrar después):</p>
-      <button class="btn-secondary" id="downloadAccessCsvBtn">⬇ Descargar CSV (nombre, usuario, contraseña)</button>
-      <table class="admin-table">
-        <thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Institución</th><th>Contraseña</th></tr></thead>
-        <tbody id="accessResultBody"></tbody>
-      </table>
+    <h3>Crear una sesión de examen</h3>
+    <p class="muted">Una sesión es un grupo de estudiantes que comparte <strong>una sola contraseña</strong> (la eliges tú). Entran con su cédula, su nombre y esa contraseña, y <strong>solo mientras la sesión esté abierta</strong>. Puedes crearla con anticipación y abrirla en el momento.</p>
+    <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin:14px 0;">
+      <div><label>Nombre de la sesión</label><input type="text" id="grpName" placeholder="EAM · jornada mañana" style="width:260px;"></div>
+      <div><label>Institución</label><select id="grpInstitution" style="padding:11px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--bg);"></select></div>
+      <div><label>Contraseña de la sesión</label><input type="text" id="grpPassword" placeholder="ej. EAM2026" style="width:200px;" autocomplete="off"></div>
+      <button class="btn-primary" id="createGroupBtn" style="width:auto; margin:0;">Crear sesión</button>
     </div>
+    <div class="error-msg" id="grpMsg"></div>
 
-    <h3 style="margin-top:36px;">Todos los accesos existentes</h3>
-    <p class="muted">Solo tú puedes ver estas contraseñas (esta pantalla está detrás de tu login) — click en "ver" para revelarla.</p>
+    <h3 style="margin-top:28px;">Sesiones</h3>
     <table class="admin-table">
-      <thead><tr><th>Nombre</th><th>Usuario</th><th>Institución</th><th>Contraseña</th><th>Estado</th><th></th></tr></thead>
-      <tbody id="allAccessBody"></tbody>
+      <thead><tr><th>Sesión</th><th>Institución</th><th>Contraseña</th><th>Estado</th><th>Participantes</th><th></th></tr></thead>
+      <tbody id="groupsBody"></tbody>
+    </table>
+
+    <h3 style="margin-top:36px;">Participantes</h3>
+    <p class="muted">Quien se registró con la contraseña de una sesión. <strong>Reabrir</strong> sirve cuando a alguien se le cayó el equipo y debe empezar de nuevo; <strong>quitar</strong> borra el registro.</p>
+    <table class="admin-table">
+      <thead><tr><th>Nombre</th><th>Cédula</th><th>Sesión</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="participantsBody"></tbody>
     </table>
   </div>
 
@@ -212,11 +214,11 @@
 <script type="module">
 import { db, auth } from "./js/firebase-config.js";
 import { BANK_VERSION } from "./js/exam-config.js";
-import { generateRandomPassword, loadAllBanks, flattenBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery, publishResult, hashPassword } from "./js/exam-engine.js";
+import { generateRandomPassword, groupIdFromPassword, loadAllBanks, flattenBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery, publishResult } from "./js/exam-engine.js";
 import { buildBookmarkOrder, saveBookmarkOrder, loadAllJudgments, loadAllJudgeCodes } from "./js/bookmark-engine.js";
 import { INSTITUTIONS } from "./js/institutions.js";
 import {
-  collection, getDocs, query, where, onSnapshot, setDoc, updateDoc, doc, deleteDoc
+  collection, getDocs, getDoc, query, where, onSnapshot, setDoc, updateDoc, doc, deleteDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
@@ -309,66 +311,97 @@ async function loadDashboard() {
   renderSummary();
   renderSessionsTable();
   await renderItemAnalysis();
-  await loadAllAccessCodes();
+  await loadGroups();
   await loadJudgeStatus();
 }
 
-async function loadAllAccessCodes() {
-  const [snap, secretsSnap] = await Promise.all([getDocs(collection(db, "access_codes")), getDocs(collection(db, "access_secrets"))]);
-  const secrets = {};
-  secretsSnap.forEach(d => { secrets[d.id] = d.data().password; });
-  const tbody = document.getElementById("allAccessBody");
-  tbody.innerHTML = "";
-  const statusLabels = { not_started: "⚪ No ha empezado", in_progress: "🟡 En curso", completed: "✅ Completado" };
-  const rows = snap.docs.map(d => ({ username: d.id, ...d.data() }))
-    .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-  for (const r of rows) {
-    const pass = secrets[r.username] || r.password || "";
+// ---------------- SESIONES DE EXAMEN ----------------
+async function loadGroups() {
+  const [gSnap, pSnap] = await Promise.all([getDocs(collection(db, "exam_groups")), getDocs(collection(db, "participants"))]);
+  const groups = gSnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+  const parts = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const gname = Object.fromEntries(groups.map(g => [g.id, g.name]));
+
+  const tb = document.getElementById("groupsBody");
+  tb.innerHTML = "";
+  for (const g of groups) {
+    const mine = parts.filter(p => p.groupId === g.id);
+    const c = (st) => mine.filter(p => p.status === st).length;
+    const open = g.status === "open";
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${r.name || "—"}</td>
-      <td class="mono">${r.username}</td>
-      <td>${r.institution || "—"}</td>
+      <td><b>${esc(g.name)}</b></td>
+      <td>${esc((INSTITUTIONS[g.institution] || {}).name || g.institution || "—")}</td>
+      <td class="mono">${esc(g.password || "")}</td>
+      <td>${open ? "🟢 <b>ABIERTA</b>" : "🔴 Cerrada"}</td>
+      <td class="mono">${mine.length} · en curso ${c("in_progress")} · terminaron ${c("completed")}</td>
       <td>
-        <span class="mono" id="pw-${r.username}" data-real="${pass}">••••••••</span>
-        <span class="toggle-detail" data-reveal="${r.username}" style="margin-left:6px;">👁 ver</span>
-      </td>
-      <td>${statusLabels[r.status] || r.status || "—"}</td>
-      <td>
-        ${r.status === "in_progress" ? `<span class="toggle-detail" data-reopen="${r.username}" style="margin-right:10px;">↺ reabrir</span>` : ""}
-        <span class="toggle-detail" data-del="${r.username}" style="color:var(--bad);">🗑 borrar</span>
-      </td>
-    `;
-    tbody.appendChild(tr);
+        <button class="btn-secondary" data-toggle="${g.id}" style="padding:6px 14px;">${open ? "Cerrar sesión" : "Abrir sesión"}</button>
+        <span class="toggle-detail" data-delgroup="${g.id}" style="color:var(--bad); margin-left:10px;">🗑</span>
+      </td>`;
+    tb.appendChild(tr);
   }
-  document.querySelectorAll("[data-reveal]").forEach(el => {
-    el.addEventListener("click", () => {
-      const span = document.getElementById(`pw-${el.dataset.reveal}`);
-      const showing = span.textContent !== "••••••••";
-      span.textContent = showing ? "••••••••" : span.dataset.real;
-      el.textContent = showing ? "👁 ver" : "🙈 ocultar";
-    });
-  });
-  document.querySelectorAll("[data-reopen]").forEach(el => {
-    el.addEventListener("click", async () => {
-      const u = el.dataset.reopen;
-      if (!confirm(`¿Reabrir el acceso de "${u}"? Su intento actual quedará descartado y empezará un examen nuevo (con otras preguntas).`)) return;
-      const q = query(collection(db, "sessions"), where("username", "==", u), where("status", "==", "in_progress"));
-      const ss = await getDocs(q);
-      for (const d of ss.docs) await updateDoc(doc(db, "sessions", d.id), { status: "abandoned" });
-      await updateDoc(doc(db, "access_codes", u), { status: "not_started" });
-      await loadAllAccessCodes();
-    });
-  });
-  document.querySelectorAll("[data-del]").forEach(el => {
-    el.addEventListener("click", async () => {
-      if (!confirm(`¿Borrar el acceso de "${el.dataset.del}"? Esto no se puede deshacer.`)) return;
-      await deleteDoc(doc(db, "access_codes", el.dataset.del));
-      try { await deleteDoc(doc(db, "access_secrets", el.dataset.del)); } catch (e) {}
-      await loadAllAccessCodes();
-    });
-  });
+  if (!groups.length) tb.innerHTML = `<tr><td colspan="6" class="muted">Aún no hay sesiones. Crea la primera arriba.</td></tr>`;
+  tb.querySelectorAll("[data-toggle]").forEach(btn => btn.addEventListener("click", async () => {
+    const g = groups.find(x => x.id === btn.dataset.toggle);
+    const next = g.status === "open" ? "closed" : "open";
+    await updateDoc(doc(db, "exam_groups", g.id), { status: next, [next === "open" ? "openedAt" : "closedAt"]: serverTimestamp() });
+    await loadGroups();
+  }));
+  tb.querySelectorAll("[data-delgroup]").forEach(el => el.addEventListener("click", async () => {
+    if (!confirm("¿Borrar esta sesión? Los resultados ya guardados no se borran.")) return;
+    await deleteDoc(doc(db, "exam_groups", el.dataset.delgroup));
+    await loadGroups();
+  }));
+
+  const pb = document.getElementById("participantsBody");
+  pb.innerHTML = "";
+  const labels = { registered: "⚪ Registrado", in_progress: "🟡 En curso", completed: "✅ Terminó" };
+  for (const p of parts.sort((a, b) => (a.name || "").localeCompare(b.name || ""))) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${esc(p.name)}</td><td class="mono">${esc(p.cedula)}</td><td>${esc(gname[p.groupId] || "—")}</td>
+      <td>${labels[p.status] || p.status}</td>
+      <td>
+        ${p.status === "in_progress" ? `<span class="toggle-detail" data-reopen="${p.id}" style="margin-right:10px;">↺ reabrir</span>` : ""}
+        <span class="toggle-detail" data-delpart="${p.id}" style="color:var(--bad);">quitar</span>
+      </td>`;
+    pb.appendChild(tr);
+  }
+  pb.querySelectorAll("[data-reopen]").forEach(el => el.addEventListener("click", async () => {
+    const pid = el.dataset.reopen;
+    if (!confirm("¿Reabrir? Su intento actual queda descartado y empezará un examen nuevo (con otras preguntas).")) return;
+    const ss = await getDocs(query(collection(db, "sessions"), where("participantId", "==", pid), where("status", "==", "in_progress")));
+    for (const d of ss.docs) await updateDoc(doc(db, "sessions", d.id), { status: "abandoned" });
+    await updateDoc(doc(db, "participants", pid), { status: "registered" });
+    await loadGroups();
+  }));
+  pb.querySelectorAll("[data-delpart]").forEach(el => el.addEventListener("click", async () => {
+    if (!confirm("¿Quitar este participante? Podrá registrarse de nuevo.")) return;
+    await deleteDoc(doc(db, "participants", el.dataset.delpart));
+    await loadGroups();
+  }));
 }
+
+const esc = (t) => String(t ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+const grpInst = document.getElementById("grpInstitution");
+for (const slug of Object.keys(INSTITUTIONS)) { const o = document.createElement("option"); o.value = slug; o.textContent = INSTITUTIONS[slug].name; grpInst.appendChild(o); }
+grpInst.value = "eam";
+
+document.getElementById("createGroupBtn").addEventListener("click", async () => {
+  const msg = document.getElementById("grpMsg");
+  msg.textContent = "";
+  const name = document.getElementById("grpName").value.trim();
+  const password = document.getElementById("grpPassword").value.trim();
+  if (!name || password.length < 4) { msg.textContent = "Escribe un nombre y una contraseña de al menos 4 caracteres."; return; }
+  const id = await groupIdFromPassword(password);
+  const exists = await getDoc(doc(db, "exam_groups", id));
+  if (exists.exists()) { msg.textContent = "Ya existe una sesión con esa contraseña (en mayúsculas o minúsculas). Usa otra."; return; }
+  await setDoc(doc(db, "exam_groups", id), { name, institution: grpInst.value, password, status: "closed", createdAt: serverTimestamp() });
+  document.getElementById("grpName").value = ""; document.getElementById("grpPassword").value = "";
+  await loadGroups();
+});
 
 function renderSummary() {
   const n = allSessions.length;
@@ -424,7 +457,8 @@ function startLiveListener() {
         tr.innerHTML = `
           <td>${s.name || "—"}</td>
           <td class="mono">${s.username || "—"}</td>
-          <td>${s.status === "completed" ? "✅ Completado" : "🟡 En curso"}</td>
+          <td>${esc(s.groupName || "—")}</td>
+          <td>${s.status === "completed" ? "✅ Completado" : s.status === "abandoned" ? "⚫ Descartado" : "🟡 En curso"}</td>
           <td><div class="progress-mini"><div style="width:${pctDone}%;"></div></div>${answered}/${total}</td>
           <td class="mono">${elapsedMin} min</td>
           <td>${eventBadges(s.suspiciousEvents)}</td>
@@ -744,52 +778,6 @@ document.getElementById("exportCsvBtn").addEventListener("click", () => {
   const a = document.createElement("a");
   a.href = url;
   a.download = `piloto_respuestas_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-});
-
-// ---------------- GESTIONAR ACCESOS ----------------
-let lastGenerated = [];
-const batchSel = document.getElementById("batchInstitution");
-for (const slug of Object.keys(INSTITUTIONS)) { const o = document.createElement("option"); o.value = slug; o.textContent = INSTITUTIONS[slug].name; batchSel.appendChild(o); }
-batchSel.value = "eam";
-
-document.getElementById("generateBtn").addEventListener("click", async () => {
-  const raw = document.getElementById("accessInput").value.trim();
-  if (!raw) return;
-  const btn = document.getElementById("generateBtn");
-  const lines = raw.split("\n").map(l => l.trim()).filter(Boolean);
-  lastGenerated = [];
-  btn.disabled = true;
-  let n = 0;
-  for (const line of lines) {
-    const [name, username, email, inst] = line.split(",").map(s => s.trim());
-    if (!name || !username) continue;
-    const institution = (inst && INSTITUTIONS[inst.toLowerCase()]) ? inst.toLowerCase() : batchSel.value;
-    const password = generateRandomPassword(8);
-    await setDoc(doc(db, "access_codes", username), { name, pwHash: await hashPassword(username, password), email: email || "", institution, status: "not_started" });
-    await setDoc(doc(db, "access_secrets", username), { password });
-    lastGenerated.push({ name, username, email: email || "", institution, password });
-    btn.textContent = `Generando… ${++n}/${lines.length}`;
-  }
-  btn.disabled = false; btn.textContent = "Generar accesos";
-  const tbody = document.getElementById("accessResultBody");
-  tbody.innerHTML = "";
-  for (const r of lastGenerated) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${r.name}</td><td class="mono">${r.username}</td><td class="mono">${r.email}</td><td>${r.institution}</td><td class="mono">${r.password}</td>`;
-    tbody.appendChild(tr);
-  }
-  document.getElementById("accessResultWrap").style.display = "block";
-  await loadAllAccessCodes();
-});
-
-document.getElementById("downloadAccessCsvBtn").addEventListener("click", () => {
-  const lines = ["nombre,usuario,correo,institucion,contraseña", ...lastGenerated.map(r => `${r.name},${r.username},${r.email},${r.institution},${r.password}`)];
-  const blob = new Blob([lines.join("\n")], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "accesos_examen.csv";
   a.click();
 });
 

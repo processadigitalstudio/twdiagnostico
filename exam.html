@@ -76,17 +76,24 @@ import { loadAllBanks, buildExamPlan, createSession, recordAnswers, finishSessio
 import { assetUrl, SECTION_DURATIONS_MIN, MAX_AUDIO_PLAYS, WEIGHTS, LEVEL_CUTS, REQUIRE_FULLSCREEN, ENABLE_WATERMARK, UOL_TOTAL_POINTS, READING_POINTS_PER_TEXT, LISTENING_POINTS_PER_AUDIO } from "./js/exam-config.js";
 import { resolveInstitution, renderBrand } from "./js/institutions.js";
 
-const username = sessionStorage.getItem("username");
-const participantName = sessionStorage.getItem("participantName") || "";
-const participantEmail = sessionStorage.getItem("participantEmail") || "";
-const institutionSlug = sessionStorage.getItem("institution") || "tweetalig";
-if (!username) window.location.href = "index.html";
+const ctx = {
+  participantId: sessionStorage.getItem("participantId") || "",
+  cedula: sessionStorage.getItem("cedula") || "",
+  name: sessionStorage.getItem("participantName") || "",
+  groupId: sessionStorage.getItem("groupId") || "",
+  groupName: sessionStorage.getItem("groupName") || "",
+  institution: sessionStorage.getItem("institution") || "tweetalig"
+};
+const username = ctx.cedula;
+const participantName = ctx.name;
+const institutionSlug = ctx.institution;
+if (!ctx.participantId) window.location.href = "index.html";
 
 const inst = resolveInstitution(institutionSlug);
 renderBrand(document.getElementById("brandBar"), inst);
 
 // El estado del examen vive en localStorage: sobrevive si se cierra la pestaña o se recarga.
-const STORAGE_KEY = `examState_${username}`;
+const STORAGE_KEY = `examState_${ctx.participantId}`;
 let state = null;
 try { const saved = localStorage.getItem(STORAGE_KEY); if (saved) state = JSON.parse(saved); } catch (e) {}
 function persist() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
@@ -350,7 +357,7 @@ function renderOverview() {
 // ============================================================
 async function init() {
   if (!state) {
-    const sessionId = await createSession(username, participantName, participantEmail, pendingPlan, institutionSlug);
+    const sessionId = await createSession(ctx, pendingPlan);
     state = {
       sessionId,
       plan: pendingPlan,
@@ -802,7 +809,7 @@ async function submitExam() {
   document.getElementById("nextBtn").textContent = "Submitting...";
   examRunning = false;
   if (sectionTimerInterval) clearInterval(sectionTimerInterval);
-  try { await finishSession(state.sessionId, username); }
+  try { await finishSession(state.sessionId, ctx.participantId); }
   catch (e) { console.error(e); examRunning = true; document.getElementById("nextBtn").disabled = false; document.getElementById("nextBtn").textContent = "Retry submit"; return; }
   try { localStorage.setItem("lastSessionId", state.sessionId); localStorage.removeItem(STORAGE_KEY); } catch (e) {}
   try { if (document.exitFullscreen && inFs()) await document.exitFullscreen(); } catch (e) {}
