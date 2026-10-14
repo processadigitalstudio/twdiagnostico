@@ -71,5 +71,5 @@ export const MAX_EVENTS_PER_SESSION = 150;  // tope de eventos sospechosos guard
 // En Firebase Hosting gratis (twtest.web.app) el tráfico diario es limitado, así que allí los audios e
 // imágenes (los archivos pesados) se sirven desde GitHub Pages. En cualquier otro dominio salen del mismo sitio.
 const ON_FIREBASE_HOSTING = /\.(web\.app|firebaseapp\.com)$/.test(location.hostname);
-export const ASSET_BASE = ON_FIREBASE_HOSTING ? "https://processadigitalstudio.github.io/twdiagnostico/" : "";
+export const ASSET_BASE = ON_FIREBASE_HOSTING ? "https://processadigitalstudio.github.io/twtest/" : "";
 export const assetUrl = (path) => ASSET_BASE + path;
