@@ -126,11 +126,7 @@ function render(r) {
   }).join("");
 
   const cta = inst.enrollUrl
-    ? `<div class="cta-box">
-         <h3>¿Ya elegiste tu ruta?</h3>
-         <p style="margin:0; opacity:.9;">Cuando hayas decidido, haz tu inscripción en Tweetalig.</p>
-         <a class="cta-btn" href="${esc(inst.enrollUrl)}" target="_blank" rel="noopener">${esc(inst.enrollLabel || "Inscribirme")} →</a>
-       </div>`
+    ? `<div class="cta-box cta-only"><a class="cta-btn" href="${esc(inst.enrollUrl)}" target="_blank" rel="noopener">Inscríbete ya →</a></div>`
     : (inst.contact ? `<div class="cta-box"><h3>¿Quieres inscribirte?</h3><p>Escríbenos a ${esc(inst.contact)}</p></div>` : "");
 
   view.innerHTML = `
