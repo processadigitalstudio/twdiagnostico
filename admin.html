@@ -135,6 +135,9 @@
       <select id="boardGroup" style="padding:9px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--bg);"></select>
       <span class="mono muted" id="boardCounters"></span>
       <button class="btn-secondary" id="boardAddBtn" style="padding:8px 16px;">＋ Agregar estudiante a esta sesión</button>
+      <button class="btn-primary" id="mailGroupBtn" style="padding:8px 16px; width:auto; margin:0;">✉ Enviar resultados de esta sesión</button>
+      <button class="btn-secondary" id="mailCfgBtn" style="padding:8px 12px;" title="Configurar el envío de correos">⚙ Correo</button>
+      <span class="muted" id="mailCounter" style="font-size:.85rem;"></span>
     </div>
     <div class="board">
       <div class="board-col col-wait"><h3>⚪ Sin iniciar <span id="cntNot" class="count">0</span></h3><div id="colNot"></div></div>
@@ -227,6 +230,7 @@ import { BANK_VERSION, SECTION_DURATIONS_MIN, SKILL_LABELS } from "./js/exam-con
 import { generateRandomPassword, buildExamPlan, allItemIdsFromPlan, groupIdFromPassword, participantIdOf, normalizeCedula, tsMs, loadAllBanks, flattenBanks, loadAnswerKey, uploadAnswerKey, computeSessionResults, setResultDelivery, publishResult } from "./js/exam-engine.js";
 import { buildBookmarkOrder, saveBookmarkOrder, loadAllJudgments, loadAllJudgeCodes } from "./js/bookmark-engine.js";
 import { INSTITUTIONS } from "./js/institutions.js";
+import { getMailer, setMailer, clearMailer, sendResultEmails, EMAIL_RE as MAIL_OK_RE } from "./js/mailer.js";
 import {
   collection, getDocs, getDoc, query, where, onSnapshot, setDoc, updateDoc, doc, deleteDoc, serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
@@ -728,6 +732,83 @@ document.getElementById("boardAddBtn").addEventListener("click", () => {
   setTimeout(() => { const t = document.getElementById("dAddOneTitle"); if (t) { t.scrollIntoView({ behavior: "smooth", block: "start" }); document.getElementById("aCed").focus(); } }, 150);
 });
 
+// ---------------- ENVÍO DE RESULTADOS POR CORREO ----------------
+const RESULTS_BASE = "https://tweetaligtest.web.app/";
+const emailOf = (s, p) => ((s?.profile?.email || p?.email || "").trim());
+function mailMessage(s, p, force = false) {
+  const r = computeSessionResults(s, answerKey);
+  return { id: s.id, to: emailOf(s, p), name: s.name || p?.name || "", level: r.level, score: r.finalScore,
+    pct: { UoL: r.pct.UoL, Reading: r.pct.Reading, Listening: r.pct.Listening },
+    link: `${RESULTS_BASE}results.html?s=${encodeURIComponent(s.id)}`, institution: s.institution || "", force };
+}
+// Listos para enviar: terminaron, resultado publicado, correo válido y aún no enviado.
+function eligibleMails(parts, byPart) {
+  if (!answerKey) return [];
+  return parts.map(p => ({ p, s: byPart[p.id] })).filter(({ p, s }) => p.status === "completed" && s && s.status === "completed"
+    && s.resultDelivery?.status === "published" && s.emailDelivery?.status !== "sent" && MAIL_OK_RE.test(emailOf(s, p)));
+}
+function mailLine(s, p) {
+  if (!s || s.resultDelivery?.status !== "published") return "";
+  const sent = s.emailDelivery?.status === "sent";
+  const em = emailOf(s, p);
+  if (!MAIL_OK_RE.test(em)) return `<div class="sub" style="color:var(--bad);">✉ sin correo válido</div>`;
+  return `<div class="sub" style="margin-top:4px;">${sent ? "✉ enviado ✓ " : ""}<span class="toggle-detail" onclick="mailOne('${s.id}', ${sent})">${sent ? "↻ reenviar" : "✉ enviar resultado"}</span></div>`;
+}
+async function doSendMails(items, force) {
+  if (!getMailer()) { configureMailer(); if (!getMailer()) return; }
+  const btn = document.getElementById("mailGroupBtn"); btn.disabled = true;
+  let ok = 0; const fails = [];
+  try {
+    for (let i = 0; i < items.length; i += 20) {
+      const chunk = items.slice(i, i + 20);
+      btn.textContent = `Enviando… ${Math.min(i + 20, items.length)}/${items.length}`;
+      let results;
+      try { results = await sendResultEmails(chunk.map(({ s, p }) => mailMessage(s, p, force))); }
+      catch (e) { chunk.forEach(({ s }) => fails.push(`${s.name}: ${e.message}`)); break; }
+      for (const { s, p } of chunk) {
+        const r = results.find(x => x.id === s.id);
+        if (r && r.ok) { ok++; try { await updateDoc(doc(db, "sessions", s.id), { emailDelivery: { status: "sent", to: emailOf(s, p), atMs: Date.now(), sentAt: serverTimestamp() } }); } catch (e) { console.warn(e); } }
+        else fails.push(`${s.name}: ${r?.error || "sin respuesta"}`);
+      }
+    }
+  } finally { btn.disabled = false; btn.textContent = "✉ Enviar resultados de esta sesión"; }
+  alert(`Correos enviados: ${ok}` + (fails.length ? `\n\nNo se pudieron enviar (${fails.length}):\n` + fails.join("\n") : ""));
+}
+function configureMailer() {
+  const cur = getMailer();
+  const url = prompt("Pega la URL de la aplicación web del Apps Script (termina en /exec).\nDeja vacío para borrar la configuración.", cur?.url || "");
+  if (url === null) return;
+  if (!url.trim()) { clearMailer(); alert("Configuración de correo borrada."); return; }
+  if (!/^https:\/\/script\.google\.com\//.test(url.trim())) { alert("Esa URL no parece de Apps Script (debe empezar por https://script.google.com/)."); return; }
+  const token = prompt("Escribe la clave (MAIL_TOKEN) del Apps Script:", cur?.token || "");
+  if (!token || !token.trim()) return;
+  setMailer(url, token); alert("Guardado en este navegador.");
+}
+window.mailOne = async (sessionId, force) => {
+  const s = latestSessions.find(x => x.id === sessionId); if (!s) return;
+  const p = partsCache.find(x => x.id === s.participantId);
+  if (!answerKey) { alert("Carga la clave de respuestas primero."); return; }
+  if (!confirm(`${force ? "Reenviar" : "Enviar"} el resultado a ${s.name} (${emailOf(s, p)}) desde el correo de Exámenes?`)) return;
+  await doSendMails([{ s, p }], !!force);
+};
+document.getElementById("mailCfgBtn").addEventListener("click", configureMailer);
+document.getElementById("mailGroupBtn").addEventListener("click", async () => {
+  if (!answerKey) { alert("Carga la clave de respuestas primero."); return; }
+  const gid = document.getElementById("boardGroup").value;
+  const parts = partsCache.filter(p => !gid || p.groupId === gid);
+  const byPart = {};
+  for (const s of latestSessions) {
+    if (!s.participantId || s.status === "abandoned") continue;
+    const prev = byPart[s.participantId];
+    if (!prev || (s.startedAt?.seconds || 0) >= (prev.startedAt?.seconds || 0)) byPart[s.participantId] = s;
+  }
+  const items = eligibleMails(parts, byPart);
+  if (!items.length) { alert("No hay resultados pendientes de enviar en esta sesión (deben estar terminados, publicados y con correo válido)."); return; }
+  const g = document.getElementById("boardGroup").selectedOptions[0]?.textContent || "esta sesión";
+  if (!confirm(`Se enviarán ${items.length} correos con el resultado, desde el correo de Exámenes.\n\nSesión: ${g}\n\nTodos los estudiantes que ya terminaron y aún no lo han recibido. ¿Continuar?`)) return;
+  await doSendMails(items, false);
+});
+
 const tierOf = (events) => eventTierCounts(events);
 function renderBoard() {
   const gid = document.getElementById("boardGroup").value;
@@ -767,12 +848,14 @@ function renderBoard() {
     const cov = skillCoverage(s);
     let pcts = "";
     if (s && answerKey) { try { const r = computeSessionResults(s, answerKey); pcts = `<div class="sub" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">${["UoL", "Reading", "Listening"].map(k => { const v = Math.round(r.pct[k]); const c = cov && cov.find(x => x.name === k); const zero = v === 0 || (c && c.answered === 0); return `<span style="padding:1px 7px; border-radius:8px; border:1.5px solid ${zero ? "var(--bad)" : "var(--line)"}; ${zero ? "color:var(--bad); font-weight:800;" : ""}">${{ UoL: "LU", Reading: "Reading", Listening: "Listening" }[k]} ${v}%</span>`; }).join("")}</div>`; } catch (e) {} }
-    return `<div class="board-card"><b>${esc(p.name)}</b>${sev(s?.suspiciousEvents)}<div class="sub mono">${esc(p.cedula)}${res}${pub}</div>${pcts}<div style="margin-top:6px;">${sectButtons(p.id, cov)}</div></div>`;
+    return `<div class="board-card"><b>${esc(p.name)}</b>${sev(s?.suspiciousEvents)}<div class="sub mono">${esc(p.cedula)}${res}${pub}</div>${pcts}<div style="margin-top:6px;">${sectButtons(p.id, cov)}</div>${mailLine(s, p)}</div>`;
   }).join("") || `<div class="muted">—</div>`;
   document.getElementById("cntNot").textContent = cols.not_started.length;
   document.getElementById("cntProg").textContent = cols.in_progress.length;
   document.getElementById("cntDone").textContent = cols.completed.length;
   document.getElementById("boardCounters").textContent = `${parts.length} estudiantes`;
+  { const el = eligibleMails(parts, byPart); const sent = parts.filter(p => byPart[p.id]?.emailDelivery?.status === "sent").length;
+    document.getElementById("mailCounter").textContent = `${el.length} por enviar · ${sent} enviados`; }
 }
 
 function fmtMinSec(seconds) {
