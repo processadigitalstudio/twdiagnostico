@@ -5,6 +5,10 @@
     "ignore": [
       "firebase.json",
       "**/.*",
+      ".git/**",
+      "**/.git/**",
+      ".firebase/**",
+      "apps-script/**",
       "**/node_modules/**",
       "answer_key_PRIVADO_NO_SUBIR.json",
       "serviceAccountKey.json",
