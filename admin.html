@@ -1148,26 +1148,53 @@ document.getElementById("exportStudentsBtn").addEventListener("click", () => {
   const header = ["cedula", "nombres", "apellidos", "correo", "nivel_requerido_grado", "sesion", "estado", "nivel_obtenido", "cumple_nivel_requerido", "nota_final",
     "language_use_pct", "reading_comprehension_pct", "listening_comprehension_pct", "eventos_sospechosos", "reaperturas"];
   const order = { A1: 1, A2: 2, B1: 3, B2: 4 };
+  // Se arma desde los INTENTOS (sessions) + los participantes que aún no han iniciado. Así el archivo nunca sale vacío
+  // aunque la lista de participantes no esté cargada o la sesión de examen ya se haya borrado.
+  const sessById = new Map();
+  for (const s of [...allSessions, ...latestSessions]) sessById.set(s.id, s);
+  const bestByPid = new Map();
+  for (const s of sessById.values()) {
+    if (s.status === "abandoned" || !s.participantId) continue;
+    const cur = bestByPid.get(s.participantId);
+    if (!cur || (s.startedAt?.seconds || 0) > (cur.startedAt?.seconds || 0)) bestByPid.set(s.participantId, s);
+  }
+  const rows = [];
+  const seen = new Set();
+  for (const p of partsCache) { seen.add(p.id); rows.push({ p, sess: bestByPid.get(p.id) }); }
+  for (const [pid, sess] of bestByPid) if (!seen.has(pid)) {
+    const prof = sess.profile || {};
+    rows.push({ p: { id: pid, cedula: prof.cedula || (sess.username || "").split("_").pop(), nombres: prof.nombres || sess.name, apellidos: prof.apellidos, name: sess.name,
+      email: prof.email, nivel: prof.nivel, groupName: sess.groupName, status: sess.status }, sess });
+  }
+  rows.sort((x, y) => (x.p.groupName || "").localeCompare(y.p.groupName || "") || (x.p.name || x.p.nombres || "").localeCompare(y.p.name || y.p.nombres || ""));
   const lines = [header.join(",")];
-  for (const p of partsCache.slice().sort((a, b) => (a.groupName || "").localeCompare(b.groupName || "") || (a.name || "").localeCompare(b.name || ""))) {
-    const sess = latestSessions.filter(x => x.participantId === p.id && x.status !== "abandoned").sort((a, b) => (b.startedAt?.seconds || 0) - (a.startedAt?.seconds || 0))[0];
+  for (const { p, sess } of rows) {
     const prof = sess?.profile || {};
-    let r = null; if (sess && p.status === "completed" && sess.status === "completed" && answerKey) { try { r = computeSessionResults(sess, answerKey); } catch (e) {} }
+    let r = null;
+    if (sess && sess.status === "completed" && answerKey && sess.bankVersion === BANK_VERSION) { r = computedById[sess.id] || null; if (!r) { try { r = computeSessionResults(sess, answerKey); } catch (e) {} } }
     const req = prof.nivel || p.nivel || "";
     const meets = r && req ? (order[r.level] >= order[req] ? "SI" : "NO") : "";
-    const status = { not_started: "sin iniciar", in_progress: "en proceso", closed: "cerrado por interrupcion", completed: "finalizado" }[p.status] || p.status;
-    lines.push([p.cedula, prof.nombres || p.nombres, prof.apellidos || p.apellidos, prof.email || p.email, req, p.groupName, status, r?.level, meets, r?.finalScore,
+    const st = sess ? (sess.status === "completed" ? "completed" : p.status === "closed" || sess.status === "closed" ? "closed" : sess.status) : p.status;
+    const status = { not_started: "sin iniciar", in_progress: "en proceso", closed: "cerrado por interrupcion", completed: "finalizado" }[st] || st;
+    lines.push([p.cedula, prof.nombres || p.nombres, prof.apellidos || p.apellidos, prof.email || p.email, req, p.groupName || sess?.groupName, status, r?.level, meets, r?.finalScore,
       r?.pct?.UoL, r?.pct?.Reading, r?.pct?.Listening, (sess?.suspiciousEvents || []).length, sess?.reopenCount || 0].map(q).join(","));
   }
+  if (lines.length === 1) { alert("No hay estudiantes ni intentos para exportar todavía. Espera unos segundos a que cargue el panel y vuelve a intentar."); return; }
   const blob = new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
   a.download = `resultados_por_estudiante_${new Date().toISOString().slice(0, 10)}.csv`; a.click();
 });
 
 document.getElementById("exportCsvBtn").addEventListener("click", () => {
-  const lines = ["session_id,username,name,item_id,skill,level,category,selected,correct,time_ms,final_score,level_assigned,suspicious_events_count,time_uol_sec,time_reading_sec,time_listening_sec,uol_timed_out,reading_timed_out,listening_timed_out,pattern_alerts_count,uol_A1,uol_A2,uol_B1,uol_B2,reading_A1,reading_A2,reading_B1,reading_B2,listening_A1,listening_A2,listening_B1,listening_B2"];
-  for (const s of allSessions) {
-    const r = computedById[s.id];
+  const lines = ["session_id,username,name,item_id,skill,level,category,selected,correct,time_ms,final_score,level_assigned,suspicious_events_count,time_uol_sec,time_reading_sec,time_listening_sec,uol_timed_out,reading_timed_out,listening_timed_out,pattern_alerts_count,uol_A1,uol_A2,uol_B1,uol_B2,reading_A1,reading_A2,reading_B1,reading_B2,listening_A1,listening_A2,listening_B1,listening_B2,sesion,nivel_requerido,inicio,correct_option,is_test_account"];
+  const L = (i) => (Number.isInteger(i) && i >= 0 && i < 26) ? String.fromCharCode(65 + i) : "";
+  const qq = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  // Sesiones terminadas: las cargadas al abrir el panel + las que llegaron en vivo después (antes quedaban fuera del CSV)
+  const liveDone = new Map();
+  for (const s of [...allSessions, ...latestSessions]) if (s.status === "completed" && s.bankVersion === BANK_VERSION) liveDone.set(s.id, s);
+  for (const s of liveDone.values()) {
+    let r = computedById[s.id];
+    if (!r && answerKey) { try { r = computeSessionResults(s, answerKey); } catch (e) {} }
     if (!r) continue;
     const eventCount = (s.suspiciousEvents || []).length;
     const st = s.sectionTimings || {};
@@ -1179,11 +1206,15 @@ document.getElementById("exportCsvBtn").addEventListener("click", () => {
     const breakdownCols = ["UoL", "Reading", "Listening"].flatMap(skill =>
       ["A1", "A2", "B1", "B2"].map(l => lb[skill][l] ?? "")
     );
+    const startedIso = s.startedAt?.seconds ? new Date(s.startedAt.seconds * 1000).toISOString() : "";
+    const isTest = /prueba|\btest\b|demo/i.test(`${s.username || ""} ${s.name || ""}`) ? 1 : 0;
     for (const [itemId, info] of Object.entries(r.perItem)) {
+      const resp = (s.responses || {})[itemId];
       lines.push([
-        s.id, s.username, (s.name || "").replace(/,/g, " "), itemId, info.skill, info.level, info.category,
-        "", info.correct ? 1 : 0, info.timeMs ?? "", r.finalScore, r.level, eventCount, ...timingCols,
-        r.patternAlerts.length, ...breakdownCols
+        qq(s.id), qq(s.username), qq(s.name), itemId, info.skill, info.level, info.category,
+        L(resp?.selected), info.correct ? 1 : 0, info.timeMs ?? "", r.finalScore, r.level, eventCount, ...timingCols,
+        r.patternAlerts.length, ...breakdownCols,
+        qq(s.groupName), qq(s.profile?.nivel), startedIso, L(answerKey?.[itemId]?.correct), isTest
       ].join(","));
     }
   }
