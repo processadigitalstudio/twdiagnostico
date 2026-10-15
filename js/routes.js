@@ -24,19 +24,18 @@ export const ROUTE_BY_LEVEL = {
   },
   A2: {
     headline: "Te recomendamos fortalecer tu inglés primero",
-    text: "Lo recomendado es el curso intensivo, empezando en el curso B1.1 (resaltado abajo). Después podrás prepararte y certificarte.",
+    text: "Lo recomendado es el curso intensivo, empezando en el curso A2 (resaltado abajo). Después podrás prepararte y certificarte.",
     recommended: ["formacion"], others: ["preparacion", "certificacion"], entry: "formacion"
   },
   A1: {
     headline: "Te recomendamos fortalecer tu inglés primero",
-    text: "Lo recomendado es el curso intensivo, empezando en el curso A2 (resaltado abajo). Después podrás prepararte y certificarte.",
+    text: "Lo recomendado es el curso intensivo, empezando en el curso A1 (resaltado abajo). Después podrás prepararte y certificarte.",
     recommended: ["formacion"], others: ["preparacion", "certificacion"], entry: "formacion"
   }
 };
 
-// Curso intensivo que le corresponde según el nivel que SACÓ: el que sigue al suyo (no repite el que ya demostró).
-// B2 ya no necesita curso intensivo: va a certificarse.
-export const NEXT_COURSE = { A1: "A2", A2: "B1.1", B1: "B2", B2: null };
+// Curso intensivo donde EMPIEZA según el nivel en que lo ubica el examen (punto de partida: aún le falta lograr ese nivel).
+export const START_COURSE = { A1: "A1", A2: "A2", B1: "B1.1", B2: "B2" };
 
 // Fechas del examen de certificación: la facturación EAM 2026-2 tiene fechas propias; el resto usa las generales.
 const CERT_DATES = {
@@ -88,8 +87,8 @@ export function routeCards(level, institutionSlug) {
       facts: ["12 semanas por nivel", "80 horas de trabajo autónomo", "32 horas de clases sincrónicas", "8 horas de actividades grupales"],
       priceTitle: "Valores con 20% de descuento para estudiantes",
       price: INTENSIVE_PRICES,
-      highlightPrice: NEXT_COURSE[level] || null,   // se resalta el curso que le corresponde (el siguiente a su nivel)
-      startNote: NEXT_COURSE[level] ? `Te corresponde empezar en el curso ${NEXT_COURSE[level]}` : "",
+      highlightPrice: START_COURSE[level] || null,   // se resalta el curso donde empieza
+      startNote: START_COURSE[level] ? `Te corresponde empezar en el curso ${START_COURSE[level]}` : "",
       dateGroups: [
         { title: "Ciclo 3 (el que empieza ahora)", rows: [
           ["Inscripciones y pagos", "14 de septiembre al 31 de octubre"],

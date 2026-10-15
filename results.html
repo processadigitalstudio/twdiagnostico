@@ -142,9 +142,9 @@ function render(r) {
 
     <div class="cando-box lvl-${esc(r.level)}">
       <div class="eyebrow">Nivel ${esc(r.level)} · ${esc(c.range)}</div>
-      <h3>Tu resultado indica un nivel ${esc(r.level)} según el Marco Común Europeo de Referencia (MCER)</h3>
-      <p class="muted" style="margin:0;">En este nivel, puedes:</p>
-      <ul>${c.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
+      <h3>Tu resultado te ubica en el nivel ${esc(r.level)} según el Marco Común Europeo de Referencia (MCER)</h3>
+      <p class="muted" style="margin:0;">Es tu punto de partida en el nivel ${esc(r.level)}. Esto es lo que te falta lograr:</p>
+      <ul>${c.items.map(i => `<li>${esc("Llegar a " + i.charAt(0).toLowerCase() + i.slice(1))}</li>`).join("")}</ul>
     </div>
 
     ${routeSection(r.level, inst.slug || (r.institution || "").toLowerCase())}
