@@ -19,11 +19,12 @@ var REPLY_TO = 'info.eam@tweetalig.edu.co';
 var ALLOWED_LINK_PREFIX = 'https://tweetaligtest.web.app/';
 var MAX_PER_CALL = 40;
 
+// Placement: el nivel es el PUNTO DE PARTIDA (lo que aún le falta lograr), no lo que ya domina.
 var LEVEL_TEXT = {
-  A1: 'Nivel inicial: ya puedes comprender y usar expresiones cotidianas muy básicas.',
-  A2: 'Nivel elemental: te comunicas en situaciones sencillas y cotidianas.',
-  B1: 'Nivel intermedio: te desenvuelves en la mayoría de situaciones y puedes expresar tus ideas con claridad.',
-  B2: 'Nivel intermedio alto: te comunicas con fluidez y espontaneidad en temas variados.'
+  A1: 'Es tu punto de partida. Te falta lograr comprender y usar expresiones cotidianas muy básicas y presentarte con frases sencillas.',
+  A2: 'Es tu punto de partida. Te falta lograr comunicarte en tareas sencillas y cotidianas y describir en términos simples tu pasado y tu entorno.',
+  B1: 'Es tu punto de partida. Te falta lograr desenvolverte en la mayoría de situaciones y expresar tus ideas, experiencias y planes con claridad.',
+  B2: 'Es tu punto de partida. Te falta lograr comunicarte con fluidez y espontaneidad y explicar tu punto de vista sobre temas variados.'
 };
 var LEVEL_COLOR = { A1: '#7FB241', A2: '#E6A93A', B1: '#3E8FB0', B2: '#2C3D4D' };
 
@@ -88,7 +89,7 @@ function sendOne_(m) {
     '<p style="font-size:16px;margin:0 0 14px;">Hola, <b>' + esc_(first) + '</b>:</p>' +
     '<p style="font-size:15px;line-height:1.5;margin:0 0 18px;">Ya está listo el resultado de tu examen de ubicación (diagnóstico) de inglés.</p>' +
     '<div style="background:#F7F4EC;border-left:6px solid ' + c + ';border-radius:8px;padding:16px 18px;margin:0 0 18px;">' +
-    '<div style="font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#52616F;">Tu nivel</div>' +
+    '<div style="font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#52616F;">Tu resultado te ubica en el nivel</div>' +
     '<div style="font-size:40px;font-weight:bold;color:' + c + ';line-height:1.1;">' + esc_(m.level) + '</div>' +
     '<div style="font-size:14px;line-height:1.45;margin-top:6px;">' + LEVEL_TEXT[m.level] + '</div>' +
     '<div style="font-size:13px;color:#52616F;margin-top:8px;">Puntaje final: <b>' + esc_(Math.round(Number(m.score) || 0)) + ' / 100</b></div></div>' +
@@ -97,7 +98,7 @@ function sendOne_(m) {
     '<p style="margin:0 0 20px;"><a href="' + esc_(m.link) + '" style="background:#2C3D4D;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:bold;display:inline-block;">Ver mi resultado y mi ruta</a></p>' +
     '<p style="font-size:12.5px;color:#52616F;line-height:1.5;margin:0;">Resultado válido para el periodo académico 2026-2. ¿Dudas? Escríbenos a ' + REPLY_TO + '.</p>' +
     '</div></div>';
-  var text = 'Hola, ' + first + ':\n\nTu nivel de inglés es ' + m.level + ' (puntaje final ' + Math.round(Number(m.score) || 0) + '/100).\n' +
+  var text = 'Hola, ' + first + ':\n\nTu resultado te ubica en el nivel ' + m.level + ' de inglés' + ' (puntaje final ' + Math.round(Number(m.score) || 0) + '/100).\n' +
     'Mira tu resultado completo y tu ruta recomendada aquí: ' + m.link + '\n\nResultado válido para el periodo académico 2026-2.\nCentro de Idiomas Tweetalig — ' + REPLY_TO;
   MailApp.sendEmail({
     to: m.to,

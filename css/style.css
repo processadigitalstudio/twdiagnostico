@@ -621,7 +621,7 @@ body.exam-locked .exam-shell, body.exam-locked .watermark { filter: blur(26px); 
   --shadow: 0 2px 4px rgba(44,61,77,.06), 0 10px 28px rgba(44,61,77,.08);
 }
 
-html { font-size: 17px; -webkit-text-size-adjust: 100%; }
+html { font-size: 15px; -webkit-text-size-adjust: 100%; }
 html, body {
   font-family: "Nunito Sans", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
   line-height: 1.55;
@@ -753,7 +753,7 @@ table.admin-table th { font-family: "Nunito", sans-serif; font-size: .75rem; }
 .board-card .sub { color: var(--ink-soft); font-size: .85rem; }
 
 @media (max-width: 640px) {
-  html { font-size: 16px; }
+  html { font-size: 14.5px; }
   h1 { font-size: 1.7rem; }
   .topbar { padding: 10px 14px; }
   .skill-row { grid-template-columns: 1fr; gap: 4px; }
