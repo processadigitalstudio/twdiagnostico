@@ -102,7 +102,7 @@ function sendOne_(m) {
     'Mira tu resultado completo y tu ruta recomendada aquí: ' + m.link + '\n\nResultado válido para el periodo académico 2026-2.\nCentro de Idiomas Tweetalig — ' + REPLY_TO;
   MailApp.sendEmail({
     to: m.to,
-    subject: 'Tu resultado del examen de ubicación de inglés — Tweetalig',
+    subject: 'Tu resultado del examen de ubicación de inglés — Centro de Idiomas Tweetalig',
     body: text, htmlBody: html, name: FROM_NAME, replyTo: REPLY_TO
   });
 }
