@@ -750,26 +750,30 @@ function eligibleMails(parts, byPart) {
 function mailLine(s, p) {
   if (!s || s.resultDelivery?.status !== "published") return "";
   const sent = s.emailDelivery?.status === "sent";
-  const em = emailOf(s, p);
-  const fix = `<span class="toggle-detail" onclick="fixEmail('${s.id}')">✏ corregir correo</span>`;
-  if (!MAIL_OK_RE.test(em)) return `<div class="sub" style="color:var(--bad);">✉ sin correo válido · ${fix}</div>`;
-  return `<div class="sub" style="margin-top:4px;">${sent ? "✉ enviado ✓ " : ""}<span class="toggle-detail" onclick="mailOne('${s.id}', ${sent})">${sent ? "↻ reenviar" : "✉ enviar resultado"}</span> · ${fix}<div class="mono" style="font-size:11px;">${esc(em)}</div></div>`;
+  if (!MAIL_OK_RE.test(emailOf(s, p))) return `<div class="sub" style="color:var(--bad);">✉ sin correo válido</div>`;
+  return `<div class="sub" style="margin-top:4px;">${sent ? "✉ enviado ✓ " : ""}<span class="toggle-detail" onclick="mailOne('${s.id}', ${sent})">${sent ? "↻ reenviar" : "✉ enviar resultado"}</span></div>`;
 }
-// Corrige el correo de un estudiante (se guarda en su intento y en su ficha de participante).
-window.fixEmail = async (sessionId) => {
-  const s = latestSessions.find(x => x.id === sessionId); if (!s) return;
-  const p = partsCache.find(x => x.id === s.participantId);
+// Corrige el correo de un estudiante (en cualquier estado: sin iniciar, en proceso o finalizado).
+// Se guarda en su ficha de participante y, si ya tiene intento, también en el intento.
+const latestSessOf = (pid) => latestSessions.filter(x => x.participantId === pid && x.status !== "abandoned").sort((a, b) => (b.startedAt?.seconds || 0) - (a.startedAt?.seconds || 0))[0];
+window.fixEmail = async (pid) => {
+  const p = partsCache.find(x => x.id === pid); if (!p) { alert("No encontré al estudiante. Recarga el panel."); return; }
+  const s = latestSessOf(pid);
   const cur = emailOf(s, p);
-  const nv = (prompt(`Correo de ${s.name || p?.name || ""}:\n\nActual: ${cur || "(vacío)"}\nEscribe el correo correcto:`, cur) || "").trim().toLowerCase();
+  const nv = (prompt(`Correo de ${p.name || ""}:\n\nActual: ${cur || "(vacío)"}\nEscribe el correo correcto:`, cur) || "").trim().toLowerCase();
   if (!nv || nv === cur) return;
   if (!MAIL_OK_RE.test(nv)) { alert("Ese correo no parece válido. Revisa que tenga @ y dominio."); return; }
   try {
-    await updateDoc(doc(db, "sessions", s.id), { "profile.email": nv });
-    if (p) await updateDoc(doc(db, "participants", p.id), { email: nv });
+    await updateDoc(doc(db, "participants", p.id), { email: nv });
+    if (s) await updateDoc(doc(db, "sessions", s.id), { "profile.email": nv });
   } catch (e) { console.error(e); alert("No se pudo guardar el correo: " + (e.message || e)); return; }
-  if (s.emailDelivery?.status === "sent" && answerKey && confirm(`Correo corregido a ${nv}.\n\nEl resultado ya se había enviado antes (a ${s.emailDelivery.to || cur}). ¿Enviarlo ahora al correo corregido?`)) {
-    await doSendMails([{ s: { ...s, profile: { ...(s.profile || {}), email: nv } }, p: p ? { ...p, email: nv } : p }], true);
+  if (s && s.emailDelivery?.status === "sent" && answerKey && confirm(`Correo corregido a ${nv}.\n\nEl resultado ya se había enviado antes (a ${s.emailDelivery.to || cur}). ¿Enviarlo ahora al correo corregido?`)) {
+    await doSendMails([{ s: { ...s, profile: { ...(s.profile || {}), email: nv } }, p: { ...p, email: nv } }], true);
   } else alert("Correo corregido: " + nv);
+};
+const emailFixLine = (p, s) => {
+  const em = emailOf(s, p);
+  return `<div class="sub" style="margin-top:4px;"><span class="mono" style="font-size:11px;${MAIL_OK_RE.test(em) ? "" : "color:var(--bad);"}">${em ? esc(em) : "sin correo"}</span> · <span class="toggle-detail" onclick="fixEmail('${p.id}')">✏ corregir correo</span></div>`;
 };
 async function doSendMails(items, force) {
   if (!getMailer()) { configureMailer(); if (!getMailer()) return; }
@@ -841,7 +845,7 @@ function renderBoard() {
 
   const sev = (events) => { const c = tierOf(events); return (c.high ? ` <span class="sev-badge" style="background:var(--sev-high);">🔴 ${c.high}</span>` : "") + (c.med ? ` <span class="sev-badge" style="background:var(--sev-med);">🟠 ${c.med}</span>` : ""); };
   const lvl = (p) => p.nivel ? ` · req. ${esc(p.nivel)}` : "";
-  document.getElementById("colNot").innerHTML = cols.not_started.map(p => `<div class="board-card"><b>${esc(p.name)}</b><div class="sub mono">${esc(p.cedula)}${lvl(p)}</div></div>`).join("") || `<div class="muted">—</div>`;
+  document.getElementById("colNot").innerHTML = cols.not_started.map(p => `<div class="board-card"><b>${esc(p.name)}</b><div class="sub mono">${esc(p.cedula)}${lvl(p)}</div>${emailFixLine(p, null)}</div>`).join("") || `<div class="muted">—</div>`;
   document.getElementById("colProg").innerHTML = cols.in_progress.map(p => {
     const s = byPart[p.id];
     const total = (s?.itemIds || []).length || 68, answered = Object.keys(s?.responses || {}).length;
@@ -854,6 +858,7 @@ function renderBoard() {
       : (idle !== null && idle >= 6 ? `<div class="sub" style="color:var(--sev-med); font-weight:800;">⚠ sin guardar hace ${idle} min</div>` : "");
     return `<div class="board-card" style="${closed ? "border-color:var(--bad);" : ""}"><b>${esc(p.name)}</b>${sev(s?.suspiciousEvents)}<div class="sub mono">${esc(p.cedula)}${lvl(p)}${mins !== null ? " · " + mins + " min" : ""}</div>${warn}
       <div class="progress-mini" style="width:100%; margin-top:6px;"><div style="width:${Math.round(answered / total * 100)}%;"></div></div><div class="sub">${answered}/${total} respuestas guardadas</div>${covChips(skillCoverage(s))}
+      ${emailFixLine(p, s)}
       <div style="margin-top:6px;">${sectButtons(p.id, skillCoverage(s))}</div>
       <div style="margin-top:4px;"><span class="toggle-detail" onclick="resumeParticipant('${p.id}')">▶ continuar</span> &nbsp; <span class="toggle-detail" onclick="restartParticipant('${p.id}')" style="color:var(--ink-soft);">↺ examen nuevo</span></div></div>`;
   }).join("") || `<div class="muted">—</div>`;
@@ -865,7 +870,7 @@ function renderBoard() {
     const cov = skillCoverage(s);
     let pcts = "";
     if (s && answerKey) { try { const r = computeSessionResults(s, answerKey); pcts = `<div class="sub" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">${["UoL", "Reading", "Listening"].map(k => { const v = Math.round(r.pct[k]); const c = cov && cov.find(x => x.name === k); const zero = v === 0 || (c && c.answered === 0); return `<span style="padding:1px 7px; border-radius:8px; border:1.5px solid ${zero ? "var(--bad)" : "var(--line)"}; ${zero ? "color:var(--bad); font-weight:800;" : ""}">${{ UoL: "LU", Reading: "Reading", Listening: "Listening" }[k]} ${v}%</span>`; }).join("")}</div>`; } catch (e) {} }
-    return `<div class="board-card"><b>${esc(p.name)}</b>${sev(s?.suspiciousEvents)}<div class="sub mono">${esc(p.cedula)}${res}${pub}</div>${pcts}<div style="margin-top:6px;">${sectButtons(p.id, cov)}</div>${mailLine(s, p)}</div>`;
+    return `<div class="board-card"><b>${esc(p.name)}</b>${sev(s?.suspiciousEvents)}<div class="sub mono">${esc(p.cedula)}${res}${pub}</div>${pcts}<div style="margin-top:6px;">${sectButtons(p.id, cov)}</div>${mailLine(s, p)}${emailFixLine(p, s)}</div>`;
   }).join("") || `<div class="muted">—</div>`;
   document.getElementById("cntNot").textContent = cols.not_started.length;
   document.getElementById("cntProg").textContent = cols.in_progress.length;
