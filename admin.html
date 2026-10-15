@@ -751,9 +751,26 @@ function mailLine(s, p) {
   if (!s || s.resultDelivery?.status !== "published") return "";
   const sent = s.emailDelivery?.status === "sent";
   const em = emailOf(s, p);
-  if (!MAIL_OK_RE.test(em)) return `<div class="sub" style="color:var(--bad);">✉ sin correo válido</div>`;
-  return `<div class="sub" style="margin-top:4px;">${sent ? "✉ enviado ✓ " : ""}<span class="toggle-detail" onclick="mailOne('${s.id}', ${sent})">${sent ? "↻ reenviar" : "✉ enviar resultado"}</span></div>`;
+  const fix = `<span class="toggle-detail" onclick="fixEmail('${s.id}')">✏ corregir correo</span>`;
+  if (!MAIL_OK_RE.test(em)) return `<div class="sub" style="color:var(--bad);">✉ sin correo válido · ${fix}</div>`;
+  return `<div class="sub" style="margin-top:4px;">${sent ? "✉ enviado ✓ " : ""}<span class="toggle-detail" onclick="mailOne('${s.id}', ${sent})">${sent ? "↻ reenviar" : "✉ enviar resultado"}</span> · ${fix}<div class="mono" style="font-size:11px;">${esc(em)}</div></div>`;
 }
+// Corrige el correo de un estudiante (se guarda en su intento y en su ficha de participante).
+window.fixEmail = async (sessionId) => {
+  const s = latestSessions.find(x => x.id === sessionId); if (!s) return;
+  const p = partsCache.find(x => x.id === s.participantId);
+  const cur = emailOf(s, p);
+  const nv = (prompt(`Correo de ${s.name || p?.name || ""}:\n\nActual: ${cur || "(vacío)"}\nEscribe el correo correcto:`, cur) || "").trim().toLowerCase();
+  if (!nv || nv === cur) return;
+  if (!MAIL_OK_RE.test(nv)) { alert("Ese correo no parece válido. Revisa que tenga @ y dominio."); return; }
+  try {
+    await updateDoc(doc(db, "sessions", s.id), { "profile.email": nv });
+    if (p) await updateDoc(doc(db, "participants", p.id), { email: nv });
+  } catch (e) { console.error(e); alert("No se pudo guardar el correo: " + (e.message || e)); return; }
+  if (s.emailDelivery?.status === "sent" && answerKey && confirm(`Correo corregido a ${nv}.\n\nEl resultado ya se había enviado antes (a ${s.emailDelivery.to || cur}). ¿Enviarlo ahora al correo corregido?`)) {
+    await doSendMails([{ s: { ...s, profile: { ...(s.profile || {}), email: nv } }, p: p ? { ...p, email: nv } : p }], true);
+  } else alert("Correo corregido: " + nv);
+};
 async function doSendMails(items, force) {
   if (!getMailer()) { configureMailer(); if (!getMailer()) return; }
   const btn = document.getElementById("mailGroupBtn"); btn.disabled = true;
